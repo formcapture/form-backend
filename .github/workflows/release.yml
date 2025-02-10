@@ -21,9 +21,6 @@ jobs:
       - name: Install dependencies ⏬
         run: npm ci
 
-      - name: Build artifacts 🏗️
-        run: npm run build
-
       - name: Release 🚀
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}

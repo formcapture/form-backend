@@ -1,0 +1,59 @@
+{
+  "name": "form-frontend",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "dev": "vite",
+    "dev:build": "tsc -b && vite build --config vite.config.dev.ts",
+    "lint": "eslint -c .eslintrc.cjs --ext .tsx,.ts src/",
+    "lint:fix": "npm run lint -- --fix",
+    "preview": "vite preview",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --config vite.config.dev.ts"
+  },
+  "dependencies": {
+    "@ag-grid-community/client-side-row-model": "^32.2.0",
+    "@ag-grid-community/core": "^32.2.0",
+    "@ag-grid-community/locale": "^32.2.0",
+    "@ag-grid-community/react": "^32.2.0",
+    "@ag-grid-community/styles": "^32.2.0",
+    "@json-editor/json-editor": "^2.15.1",
+    "@types/geojson": "^7946.0.14",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "dotenv": "^16.4.5",
+    "keycloak-js": "^25.0.2",
+    "mime": "^4.0.4",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.4",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.2",
+    "@terrestris/eslint-config-typescript": "^5.0.0",
+    "@testing-library/react": "^16.0.0",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^20.14.12",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "@vitest/coverage-v8": "^2.0.4",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "jsdom": "^24.1.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.4",
+    "vitest": "^2.0.4",
+    "vitest-sonar-reporter": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20",
+    "npm": ">=10"
+  }
+}

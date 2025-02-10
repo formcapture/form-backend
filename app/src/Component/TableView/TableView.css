@@ -1,0 +1,23 @@
+.content-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .create-button {
+    margin: 10px;
+    align-self: flex-end;
+  }
+
+  .actions {
+    text-decoration:none;
+    font-size: small;
+  }
+}
+
+.content-box .ag-paging-row-summary-panel {
+  display: none;
+}
+
+.formbackend-row-number-cell {
+  text-align: end;
+}

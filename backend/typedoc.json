@@ -1,0 +1,43 @@
+{
+  "out": "./public/docs",
+  "cleanOutputDir": false,
+  "entryPoints": [
+    "./src/types/formConfig.ts"
+  ],
+  "plugin": [
+    "typedoc-plugin-missing-exports"
+  ],
+  "readme": "./docs/index.md",
+  "projectDocuments": [
+    "./docs/api.md",
+    "../CHANGELOG.md"
+  ],
+  "hideGenerator": true,
+  "disableSources": true,
+  "kindSortOrder": [
+    "TypeAlias",
+    "Reference",
+    "Project",
+    "Module",
+    "Namespace",
+    "Enum",
+    "EnumMember",
+    "Class",
+    "Interface",
+    "Constructor",
+    "Property",
+    "Variable",
+    "Function",
+    "Accessor",
+    "Method",
+    "Parameter",
+    "TypeParameter",
+    "TypeLiteral",
+    "CallSignature",
+    "ConstructorSignature",
+    "IndexSignature",
+    "GetSignature",
+    "SetSignature"
+  ],
+  "customFooterHtml": "Created by terrestris GmbH & Co. KG"
+}

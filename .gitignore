@@ -1,0 +1,10 @@
+node_modules
+backend/public/app/*
+!backend/public/app/.gitkeep
+backend/public/docs/*
+!backend/public/docs/.gitkeep
+backend/dist
+.vite
+app/coverage
+backend/coverage
+backend/.env

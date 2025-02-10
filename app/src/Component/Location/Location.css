@@ -1,0 +1,9 @@
+.fb-geom-indicator {
+  padding: 8px;
+  border-radius: 100%;
+}
+
+.fb-geom-indicator-valid {
+  color: var(--bs-white);
+  background-color: var(--bs-success);
+}

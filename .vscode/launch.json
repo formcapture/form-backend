@@ -1,0 +1,54 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend Run Dev Server",
+      "request": "launch",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/backend",
+      "type": "node"
+    },
+    {
+      "name": "Backend Run Tests Debug",
+      "request": "launch",
+      "runtimeArgs": [
+        "run",
+        "test:watch"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/backend",
+      "type": "node",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Backend Run Tests Current File",
+      "request": "launch",
+      "runtimeArgs": [
+        "run",
+        "test",
+        "--",
+        "../${relativeFile}"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/backend",
+      "type": "node",
+      "console": "integratedTerminal"
+    }
+  ]
+}

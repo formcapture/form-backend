@@ -1,0 +1,43 @@
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.formbackend-editor .card {
+  background-color: white !important;
+}
+
+.formbackend-editor .btn-group, .btn-group-vertical  {
+  flex-wrap: wrap;
+}
+
+.formbackend-editor .btn-group>.btn {
+  margin-right: 8px;
+  margin-top: 8px;
+  border-radius: var(--bs-border-radius) !important;
+}
+
+.formbackend-editor .btn-group>.btn:last-of-type {
+  margin-right: 0;
+}
+
+.formbackend-editor .formbackend-file-name {
+  font-size: 1rem;
+  color: var(--bs-body-color);
+  background-color: var(--bs-body-bg);
+  padding: 6px;
+  height: 38px;
+  border: var(--bs-border-width) solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  min-width: 150px;
+}
+
+.formbackend-editor .formbackend-file-name-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

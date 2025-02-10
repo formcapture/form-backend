@@ -1,0 +1,14 @@
+FROM mcr.microsoft.com/playwright:v1.46.1-focal@sha256:2286c685f2be91dd3ee482f1a3d382af08c9a1049406c9f7b499aec6ad691a2c
+
+WORKDIR /form-backend
+COPY app/package.json app/package-lock.json ./
+
+RUN npm install -D @playwright/test
+
+RUN npm install dotenv@v16.3.1
+RUN npm ci
+RUN npx playwright install --with-deps
+
+COPY ./app/playwright.config.ts ./
+COPY ./app/global-setup.js ./
+COPY ./app/e2e-tests ./e2e-tests

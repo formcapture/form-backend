@@ -20,7 +20,7 @@
 ## Run Application
 
 1. Run `docker compose up --build` from `./demo`
-1. The application will be running on http://<YOUR_IP>/form-backend/app/?formId=fountains_minimal&view=table
+1. The application will be running on `http://<YOUR_IP>/form-backend/app/?formId=fountains_minimal&view=table`
 
 Following applications are included:
 - `/form-backend/app/?formId=fountains_minimal&view=table` - minimal configuration

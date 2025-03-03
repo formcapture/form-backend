@@ -8,3 +8,8 @@ backend/dist
 app/coverage
 backend/coverage
 backend/.env
+
+demo/form-backend/uploads/*
+!demo/form-backend/uploads/.gitkeep
+demo/postgres/data
+demo/postgres-keycloak/data

@@ -743,7 +743,7 @@ class DataProcessor {
         if (!refCol) {
           throw new Error(`Cannot reconstruct data. Missing includedProperties in lookupTable ${c}.`);
         }
-        itemClone[c] = itemClone[c][refCol];
+        itemClone[c] = itemClone[c]?.[refCol];
       });
       return itemClone;
     });

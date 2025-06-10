@@ -1,10 +1,7 @@
-name: Release
+name: Release form-backend
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - test
 
 jobs:
   release:

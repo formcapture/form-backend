@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.46.1-focal@sha256:2286c685f2be91dd3ee482f1a3d382af08c9a1049406c9f7b499aec6ad691a2c
+FROM mcr.microsoft.com/playwright:v1.48.2-focal@sha256:c37bcb50b237e975f3fe80013ab1b3958946db1b24aba39b52be8b3123b8a3df
 
 WORKDIR /form-backend
 COPY app/package.json app/package-lock.json ./

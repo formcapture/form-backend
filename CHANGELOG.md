@@ -1,3 +1,10 @@
+# [1.0.0-test.2](https://github.com/formcapture/form-backend/compare/v1.0.0-test.1...v1.0.0-test.2) (2025-06-10)
+
+
+### Bug Fixes
+
+* trigger docker publish ([6dc0108](https://github.com/formcapture/form-backend/commit/6dc01085dcf4ef6fa9713f590e874a5e9c6a8414))
+
 # 1.0.0-test.1 (2025-06-10)
 
 

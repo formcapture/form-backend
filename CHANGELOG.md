@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/formcapture/form-backend/compare/v1.0.0...v1.0.1) (2025-06-10)
+
+
+### Bug Fixes
+
+* checkout sources again to include actual changelog ([e2cce29](https://github.com/formcapture/form-backend/commit/e2cce2914a688343e7a5277354accfaf9244b9d3))
+
 # 1.0.0 (2025-06-10)
 
 

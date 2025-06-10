@@ -5,7 +5,7 @@
   "license": "BSD-2-Clause",
   "repository": {
     "type": "git",
-    "url": "git@github.com:formcapture/form-backend.git"
+    "url": "git+https://github.com/formcapture/form-backend.git"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.4.0",

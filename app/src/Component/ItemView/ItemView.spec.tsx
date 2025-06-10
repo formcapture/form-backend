@@ -48,7 +48,7 @@ describe('<ItemView />', () => {
   const previousView = '/previous';
 
   vi.mock('@json-editor/json-editor', () => ({
-    JSONEditor: vi.fn().mockImplementation((_element) => ({
+    JSONEditor: vi.fn().mockImplementation(() => ({
       on: vi.fn(),
       setValue: vi.fn(),
       getValue: () => ({ name: 'Test-Object 1', value: 1 }),

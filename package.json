@@ -4,6 +4,7 @@
   "description": "Form Backend",
   "license": "BSD-2-Clause",
   "devDependencies": {
+    "@codedependant/semantic-release-docker": "^5.1.1",
     "@commitlint/cli": "^19.4.0",
     "@commitlint/config-conventional": "^19.2.2",
     "@semantic-release/changelog": "^6.0.3",

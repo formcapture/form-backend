@@ -1,3 +1,10 @@
+# [1.0.0-test.3](https://github.com/formcapture/form-backend/compare/v1.0.0-test.2...v1.0.0-test.3) (2025-06-10)
+
+
+### Bug Fixes
+
+* trigger docker build only when a new release was published ([2d39357](https://github.com/formcapture/form-backend/commit/2d39357fd9f6d561176bf870c2377f86d1acc3b5))
+
 # [1.0.0-test.2](https://github.com/formcapture/form-backend/compare/v1.0.0-test.1...v1.0.0-test.2) (2025-06-10)
 
 

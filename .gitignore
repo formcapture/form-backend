@@ -13,3 +13,7 @@ demo/form-backend/uploads/*
 !demo/form-backend/uploads/.gitkeep
 demo/postgres/data
 demo/postgres-keycloak/data
+
+# IntelliJ IDEA
+.idea
+*.iml

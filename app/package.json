@@ -50,7 +50,7 @@
     "typescript": "^5.2.2",
     "vite": "^5.3.4",
     "vitest": "^2.0.4",
-    "vitest-sonar-reporter": "^2.0.0"
+    "vitest-sonar-reporter": "^2.0.1"
   },
   "engines": {
     "node": ">=20",

@@ -20,6 +20,7 @@
     "@ag-grid-community/react": "^32.2.0",
     "@ag-grid-community/styles": "^32.2.0",
     "@json-editor/json-editor": "^2.15.2",
+    "@terrestris/base-util": "^3.0.0",
     "@types/geojson": "^7946.0.14",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",

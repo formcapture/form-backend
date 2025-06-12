@@ -2,19 +2,20 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import {
+  CellClickedEvent,
+  CellMouseOverEvent,
   ColDef,
+  FilterChangedEvent,
   GridReadyEvent,
+  ICellRendererParams,
+  ISimpleFilterModel,
   ModuleRegistry,
   PaginationChangedEvent,
-  SortChangedEvent,
-  FilterChangedEvent,
-  CellClickedEvent,
-  ICellRendererParams,
-  CellMouseOverEvent,
-  ISimpleFilterModel
+  SortChangedEvent
 } from '@ag-grid-community/core';
 import { AG_GRID_LOCALE_DE } from '@ag-grid-community/locale';
 import { AgGridReact, CustomCellEditorProps } from '@ag-grid-community/react';
+import { Logger } from '@terrestris/base-util';
 import Keycloak from 'keycloak-js';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
@@ -27,11 +28,11 @@ import { isGeometryType } from '../../util/jsonEditor';
 import { receiveMessage, sendMessage } from '../../util/postMessage';
 import { getFeaturesFromTableData, getGeometryColumns, isFilterableProp, isSortableProp } from '../../util/table';
 import { createItemViewUrl, createTableViewUrl, ItemViewQueryParams, TableViewQueryParams } from '../../util/url';
+
 import ConfirmDelete from '../ConfirmDelete/ConfirmDelete';
-
 import '@ag-grid-community/styles/ag-grid.css';
-import '@ag-grid-community/styles/ag-theme-quartz.css';
 
+import '@ag-grid-community/styles/ag-theme-quartz.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './TableView.css';
@@ -107,7 +108,7 @@ const TableView: React.FC<TableViewProps> = ({
       const nextUrl = createTableViewUrl(window.location.href, queryParams);
       window.location.assign(nextUrl);
     } catch (e) {
-      console.debug(e);
+      Logger.error('Failed to delete item', e);
     }
   };
 
@@ -379,11 +380,11 @@ const TableView: React.FC<TableViewProps> = ({
     setIdToDelete(undefined);
   };
 
-  const onDelete = () => {
+  const onDelete = async () => {
     if (!idToDelete) {
       return;
     }
-    deleteItem(formId, idToDelete);
+    await deleteItem(formId, idToDelete);
   };
 
   const onSortChanged = (event: SortChangedEvent) => {
@@ -427,8 +428,7 @@ const TableView: React.FC<TableViewProps> = ({
   const paddData = () => {
     const leftPaddedData = Array(page * data.config.views.pageSize).fill(undefined);
     const rightPaddedData = Array(data.data.count - leftPaddedData.length - data.data.data.length).fill(undefined);
-    const paddedData = [...leftPaddedData, ...data.data.data, ...rightPaddedData];
-    return paddedData;
+    return [...leftPaddedData, ...data.data.data, ...rightPaddedData];
   };
 
   const onGridReady = (event: GridReadyEvent) => {

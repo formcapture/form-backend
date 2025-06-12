@@ -23,6 +23,10 @@ module.exports = {
         ]
       }
     ],
+    'no-debugger': 'error',
+    'no-unused-vars': ['error', {
+      ignoreRestSiblings: true
+    }],
     'import/no-unresolved': 'off',
     'import/named': 'off',
     'import/order': ['warn', {

@@ -1,4 +1,5 @@
 import { Base64Editor } from '@json-editor/json-editor/src/editors/base64';
+import { Logger } from '@terrestris/base-util';
 import mimeTypes from 'mime';
 
 import { getKeycloakInst } from '../../singletons/keycloak';
@@ -206,7 +207,7 @@ export class FileEditor extends Base64Editor {
       const blob = await response.blob();
       img.src = URL.createObjectURL(blob);
     } catch (err) {
-      console.error(err);
+      Logger.error('Error in creation of image preview', err);
     }
     return img;
   }

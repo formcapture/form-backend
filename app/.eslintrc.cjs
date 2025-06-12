@@ -13,7 +13,7 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
-    'no-console': 'warn',
+    'no-console': 'error',
     'no-debugger': 'error',
     'no-unused-vars': ['error', {
       ignoreRestSiblings: true

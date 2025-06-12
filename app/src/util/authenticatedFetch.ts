@@ -1,3 +1,4 @@
+import { Logger } from '@terrestris/base-util';
 import Keycloak from 'keycloak-js';
 
 export const authenticatedFetch = async (url: string, opts: {[key: string]: any}, keycloak?: Keycloak) => {
@@ -5,7 +6,7 @@ export const authenticatedFetch = async (url: string, opts: {[key: string]: any}
     try {
       await keycloak.updateToken();
     } catch (err) {
-      console.log('Failed to update token');
+      Logger.error('Failed to update token');
     }
   }
   let headers = opts.headers || {};

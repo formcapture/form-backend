@@ -1,3 +1,4 @@
+import { Logger } from '@terrestris/base-util';
 import Keycloak from 'keycloak-js';
 import { describe, it, expect, vi, beforeEach, Mocked } from 'vitest';
 
@@ -34,7 +35,7 @@ describe('authenticatedFetch', () => {
 
     await authenticatedFetch('https://example.com', {}, mockKeycloak);
 
-    expect(console.log).toHaveBeenCalledWith('Failed to update token');
+    expect(Logger.error).toHaveBeenCalledWith('Failed to update token');
     expect(fetch).toHaveBeenCalledWith('https://example.com', {
       headers: {
         Authorization: 'Bearer mocked-token',

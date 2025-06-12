@@ -18,7 +18,7 @@
   "dependencies": {
     "@supabase/postgrest-js": "^1.15.8",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "express": "^4.21.2",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "lodash.merge": "^4.6.2",

@@ -8,7 +8,7 @@ export default defineConfig({
   base: './',
   build: {
     outDir: '../backend/public/app',
-    sourcemap: true,
+    sourcemap: 'inline',
     watch: {}
   },
   plugins: [react()],

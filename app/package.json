@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "dev": "vite",
-    "dev:build": "tsc -b && vite build --config vite.config.dev.ts",
+    "dev:build": "tsc -b && vite build --config vite.config.dev.ts --emptyOutDir",
     "lint": "eslint -c .eslintrc.cjs --ext .tsx,.ts src/",
     "lint:fix": "npm run lint -- --fix",
     "preview": "vite preview",

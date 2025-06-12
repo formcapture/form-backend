@@ -1,4 +1,4 @@
-import { Logger } from '@terrestris/base-util';
+import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak from 'keycloak-js';
 
 export const authenticatedFetch = async (url: string, opts: {[key: string]: any}, keycloak?: Keycloak) => {

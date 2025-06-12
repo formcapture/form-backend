@@ -3,7 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { ISimpleFilterModel } from '@ag-grid-community/core';
 import { JSONEditor } from '@json-editor/json-editor';
-import { Logger } from '@terrestris/base-util';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak from 'keycloak-js';
 
 import { FormConfiguration, ItemId } from '../../App';

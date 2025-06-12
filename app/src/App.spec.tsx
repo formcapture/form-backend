@@ -1,19 +1,7 @@
-import {
-  cleanup,
-  render,
-  screen,
-  waitFor
-} from '@testing-library/react';
+import Logger from '@terrestris/base-util/dist/Logger';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  Mock
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 import App, { FormConfiguration } from './App';
 import { setKeycloakInst } from './singletons/keycloak';
@@ -35,7 +23,7 @@ describe('App', () => {
       status,
       headers: { 'Content-Type': 'application/json' },
     });
-  };
+  }
 
   const mockData: FormConfiguration = {
     config: {
@@ -151,7 +139,7 @@ describe('App', () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
 
-    const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => { });
+    const loggerMock = vi.spyOn(Logger, 'error').mockImplementation(() => { });
     (mockKeycloak.init as Mock).mockRejectedValueOnce(new Error('Initialization failed'));
 
     const localMockFetch = vi.fn(
@@ -166,9 +154,9 @@ describe('App', () => {
     await waitFor(() => {
       expect(localMockFetch).toHaveBeenCalled();
       expect(Keycloak).toHaveBeenCalled();
-      expect(consoleLog).toHaveBeenCalledWith('Failed to initialize keycloak', new Error('Initialization failed'));
+      expect(loggerMock).toHaveBeenCalledWith('Failed to initialize keycloak', new Error('Initialization failed'));
     });
-    consoleLog.mockRestore();
+    loggerMock.mockRestore();
   });
 
   it('should return immediately if keycloak is already set', async () => {
@@ -189,7 +177,7 @@ describe('App', () => {
   it('throws error when data can not be fetched', async () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
-    const consoleLogMock = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const loggerMock = vi.spyOn(Logger, 'error').mockImplementation(() => {});
 
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 500));
 
@@ -199,23 +187,22 @@ describe('App', () => {
       expect(screen.queryByText('Seite wird geladen…')).not.toBeNull();
     }, { timeout: 400 });
 
-    expect(consoleLogMock).toHaveBeenCalled();
-    expect(consoleLogMock).toHaveBeenCalledWith(
-      expect.any(Error)
+    expect(loggerMock).toHaveBeenCalled();
+    expect(loggerMock).toHaveBeenCalledWith(
+      expect.any(String), expect.any(Error)
     );
 
-    consoleLogMock.mockRestore();
+    loggerMock.mockRestore();
   });
 
   it('throws error when keycloak config can not be fetched', async () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
-    const consoleDebugMock = vi.spyOn(console, 'debug').mockImplementation(() => { });
+    const loggerError = vi.spyOn(Logger, 'error').mockImplementation(() => { });
 
-    const localMockFetch = vi.fn(
-      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 500 }))
+    global.fetch = vi.fn(
+      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 500}))
     );
-    global.fetch = localMockFetch;
 
     render(<App />);
 
@@ -223,22 +210,21 @@ describe('App', () => {
       expect(screen.queryByText('Seite wird geladen…')).not.toBeNull();
     }, { timeout: 400 });
 
-    expect(consoleDebugMock).toHaveBeenCalled();
-    expect(consoleDebugMock).toHaveBeenCalledWith(
-      expect.any(Error)
+    expect(loggerError).toHaveBeenCalled();
+    expect(loggerError).toHaveBeenCalledWith(
+      expect.any(String), expect.any(Error)
     );
 
-    consoleDebugMock.mockRestore();
+    loggerError.mockRestore();
   });
 
   it('redirects to login page without token', async () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?view=item&formId=abc&itemId=123');
     mockKeycloak.token = null;
-    const localMockFetch = vi.fn(
-      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 200 }))
+    global.fetch = vi.fn(
+      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
-    global.fetch = localMockFetch;
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 401));
 
     render(<App />);
@@ -252,10 +238,9 @@ describe('App', () => {
   it('shows error if unauthorized with token', async () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
-    const localMockFetch = vi.fn(
-      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 200 }))
+    global.fetch = vi.fn(
+      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
-    global.fetch = localMockFetch;
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 401));
 
     render(<App />);

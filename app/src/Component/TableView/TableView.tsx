@@ -15,7 +15,8 @@ import {
 } from '@ag-grid-community/core';
 import { AG_GRID_LOCALE_DE } from '@ag-grid-community/locale';
 import { AgGridReact, CustomCellEditorProps } from '@ag-grid-community/react';
-import { Logger } from '@terrestris/base-util';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak from 'keycloak-js';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 

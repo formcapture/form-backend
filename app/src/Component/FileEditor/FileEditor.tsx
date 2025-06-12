@@ -1,5 +1,5 @@
 import { Base64Editor } from '@json-editor/json-editor/src/editors/base64';
-import { Logger } from '@terrestris/base-util';
+import Logger from '@terrestris/base-util/dist/Logger';
 import mimeTypes from 'mime';
 
 import { getKeycloakInst } from '../../singletons/keycloak';

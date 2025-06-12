@@ -55,24 +55,29 @@ describe('<ItemView />', () => {
     })),
   }));
 
-
   beforeAll(() => {
-    global.window.location = {
-      href: '',
-      origin: '',
-      assign: vi.fn(),
-      replace: vi.fn(),
-      reload: vi.fn(),
-      toString: vi.fn().mockReturnValue(''),
-    } as unknown as Location;
+    Object.defineProperty(global.window, 'location', {
+      value: {
+        href: '',
+        origin: '',
+        assign: vi.fn(),
+        replace: vi.fn(),
+        reload: vi.fn(),
+        toString: vi.fn().mockReturnValue(''),
+      },
+      writable: true
+    });
 
-    global.window.history = {
-      pushState: vi.fn(),
-      replaceState: vi.fn(),
-      go: vi.fn(),
-      back: vi.fn(),
-      forward: vi.fn(),
-    } as unknown as History;
+    Object.defineProperty(global.window, 'history', {
+      value: {
+        pushState: vi.fn(),
+        replaceState: vi.fn(),
+        go: vi.fn(),
+        back: vi.fn(),
+        forward: vi.fn(),
+      },
+      writable: true
+    });
   });
 
   afterEach(() => {

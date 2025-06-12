@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
-import { Logger } from '@terrestris/base-util';
+import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
 
 import ErrorPage from './Component/ErrorPage/ErrorPage';

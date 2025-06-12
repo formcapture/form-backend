@@ -1,4 +1,4 @@
-import { Logger } from '@terrestris/base-util';
+import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak from 'keycloak-js';
 import { describe, it, expect, vi, beforeEach, Mocked } from 'vitest';
 
@@ -30,7 +30,7 @@ describe('authenticatedFetch', () => {
   });
 
   it('logs an error if token update fails', async () => {
-    vi.spyOn(console, 'log');
+    vi.spyOn(Logger, 'error');
     mockKeycloak.updateToken.mockRejectedValue(new Error('Token update failed'));
 
     await authenticatedFetch('https://example.com', {}, mockKeycloak);

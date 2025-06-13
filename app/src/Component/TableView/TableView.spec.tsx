@@ -53,12 +53,13 @@ describe('<TableView />', () => {
   });
 
   it('renders the table with correct headers and data', () => {
-    render(<TableView
-      data={mockData}
-      formId={mockFormId}
-      page={0}
-    />);
-
+    render(
+      <TableView
+        data={mockData}
+        formId={mockFormId}
+        page={0}
+      />
+    );
 
     Object.keys(mockData.config.properties).forEach(col => {
       expect(screen.getByText(col)).toBeDefined();
@@ -78,19 +79,23 @@ describe('<TableView />', () => {
   });
 
   it('creates correct edit URL', () => {
-    render(<TableView
-      data={mockData}
-      formId={mockFormId}
-      page={0}
-    />);
+    render(
+      <TableView
+        data={mockData}
+        formId={mockFormId}
+        page={0}
+      />
+    );
   });
 
   it('renders the zoomToFeatures button correctly', () => {
-    render(<TableView
-      data={mockData}
-      formId={mockFormId}
-      page={0}
-    />);
+    render(
+      <TableView
+        data={mockData}
+        formId={mockFormId}
+        page={0}
+      />
+    );
 
     expect(screen.getAllByLabelText('Auf Geometrie zoomen')).toBeDefined();
   });

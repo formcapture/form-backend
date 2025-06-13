@@ -17,7 +17,7 @@ const getForm = async (
 ) => {
   let url = `../form/${formId}`;
 
-  let params = new URLSearchParams({
+  const params = new URLSearchParams({
     page: page.toString()
   });
   if (order) {
@@ -72,7 +72,7 @@ const deleteItem = async (formId: string, itemId: ItemId, kc?: Keycloak) => {
   return authenticatedFetch(url, { method: 'DELETE' }, kc);
 };
 
-const updateItem = async (formId: string, itemId: ItemId, body: Object, kc?: Keycloak) => {
+const updateItem = async (formId: string, itemId: ItemId, body: object, kc?: Keycloak) => {
   const url = `../form/${formId}/item/${itemId}`;
 
   return authenticatedFetch(url, {
@@ -84,7 +84,7 @@ const updateItem = async (formId: string, itemId: ItemId, body: Object, kc?: Key
   }, kc);
 };
 
-const createItem = async (formId: string, body: Object, kc?: Keycloak) => {
+const createItem = async (formId: string, body: object, kc?: Keycloak) => {
   const url = `../form/${formId}/item`;
   return authenticatedFetch(url, {
     method: 'POST',

@@ -30,11 +30,13 @@ describe('<ConfirmDelete />', () => {
   });
 
   it('renders the modal buttons', async () => {
-    render(<ConfirmDelete
-      show={show}
-      onCancel={() => {}}
-      onDelete={() => {}}
-    />);
+    render(
+      <ConfirmDelete
+        show={show}
+        onCancel={() => undefined}
+        onDelete={() => undefined}
+      />
+    );
 
     const cancelButton = screen.getByText('Abbrechen');
     const deleteButton = screen.getByText('Löschen');
@@ -44,11 +46,13 @@ describe('<ConfirmDelete />', () => {
   });
 
   it('handles the cancel button', async () => {
-    render(<ConfirmDelete
-      show={show}
-      onCancel={onCancel}
-      onDelete={() => {}}
-    />);
+    render(
+      <ConfirmDelete
+        show={show}
+        onCancel={onCancel}
+        onDelete={() => undefined}
+      />
+    );
 
     const cancelButton = screen.getByText('Abbrechen');
 
@@ -57,11 +61,13 @@ describe('<ConfirmDelete />', () => {
   });
 
   it('handles the delete button', async () => {
-    render(<ConfirmDelete
-      show={show}
-      onCancel={() => {}}
-      onDelete={onDelete}
-    />);
+    render(
+      <ConfirmDelete
+        show={show}
+        onCancel={() => undefined}
+        onDelete={onDelete}
+      />
+    );
 
     const deleteButton = screen.getByText('Löschen');
 
@@ -70,11 +76,13 @@ describe('<ConfirmDelete />', () => {
   });
 
   it('handles the visibilty of the modal', async () => {
-    render(<ConfirmDelete
-      show={show}
-      onCancel={() => {}}
-      onDelete={() => {}}
-    />);
+    render(
+      <ConfirmDelete
+        show={show}
+        onCancel={() => undefined}
+        onDelete={() => undefined}
+      />
+    );
 
     await waitFor(() => {
       expect(screen.getByText('Eintrag löschen')).toBeDefined();

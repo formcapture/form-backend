@@ -29,7 +29,7 @@ jobs:
 
       - name: Run typecheck, lint and tests 🧪
         working-directory: ./app
-        run: npm run lint && npm run test
+        run: npm run check && npm run test
 
       - name: Build artifacts 🏗️
         working-directory: ./app

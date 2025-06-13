@@ -44,12 +44,12 @@ export const getPageFromUrl = (url: string) => {
   }
 };
 
-export type ItemViewQueryParams = {
+export interface ItemViewQueryParams {
   formId: string;
   itemId?: ItemId;
   message?: string;
   prev?: string;
-};
+}
 
 export const createItemViewUrl = (
   baseUrl: string,
@@ -71,7 +71,7 @@ export const createItemViewUrl = (
   return url.toString();
 };
 
-export type TableViewQueryParams = {
+export interface TableViewQueryParams {
   formId: string;
   message?: string;
   page?: number;
@@ -80,7 +80,7 @@ export type TableViewQueryParams = {
   filterKey?: string;
   filterOp?: ISimpleFilterModel['type'];
   filterValue?: string;
-};
+}
 
 export const createTableViewUrl = (
   baseUrl: string,

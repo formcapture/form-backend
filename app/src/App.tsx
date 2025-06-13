@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
-import Logger from '@terrestris/base-util/dist/Logger';
+
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 
 import ErrorPage from './Component/ErrorPage/ErrorPage';
 import FileEditor from './Component/FileEditor/FileEditor';
@@ -21,32 +23,32 @@ import { getFilterFromUrl, getOrderFromUrl, getPageFromUrl } from './util/url';
 
 import './App.css';
 
-export type EnumValue = {
+export interface EnumValue {
   title?: string;
   value?: string | number;
-};
+}
 
-export type EnumSource = {
+export interface EnumSource {
   source?: EnumValue[];
   title?: string;
   value?: string;
-};
+}
 
-export type FormItemProperty = {
+export interface FormItemProperty {
   type?: 'string';
   readonly?: boolean;
-};
+}
 
-export type FormItem = {
+export interface FormItem {
   properties?: Record<string, FormItemProperty>;
   readOnly?: boolean;
   type?: 'object';
-};
+}
 
 export type FormPropertyFormat = 'integer' | 'character varying' | 'table' | 'location' | 'double precision' |
   'geometry' | 'geometrySelection' | `geometry.(${string})` | `${string}.geometry` | `${string}.geometry(${string})`;
 
-export type FormProperty = {
+export interface FormProperty {
   format?: FormPropertyFormat;
   type?: 'integer' | 'string' | 'boolean' | 'array' | 'object' | 'number';
   description?: string;
@@ -56,9 +58,9 @@ export type FormProperty = {
   properties?: FormItem['properties'];
   title?: string;
   media?: any;
-};
+}
 
-export type FormConfiguration = {
+export interface FormConfiguration {
   config: {
     title?: string;
     description?: string;
@@ -77,7 +79,7 @@ export type FormConfiguration = {
     count: number;
     data: Record<string, string | number | object>[];
   };
-};
+}
 
 export type ItemId = number | string;
 
@@ -125,16 +127,16 @@ const App: React.FC = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [unauthorizedWithToken, setUnauthorizedWithToken] = useState(false);
-  const [toastVisible, setToastVisible] = useState(message ? true : false);
+  const [toastVisible, setToastVisible] = useState(!!message);
   const [toastMessageType, setToastMessageType] = useState<TOAST_MESSAGE>(message as TOAST_MESSAGE);
 
-  const handleUnauthorized = (keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
+  const handleUnauthorized = useCallback((keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
     if (kc?.token) {
       setUnauthorizedWithToken(true);
       return;
     }
     redirectToLogin(keycloakConfig);
-  };
+  }, []);
 
   const redirectToLogin = async (keycloakConfig: KeycloakConfig) => {
     const newKc = new Keycloak(keycloakConfig);
@@ -244,7 +246,7 @@ const App: React.FC = () => {
     };
 
     initialize();
-  }, []);
+  }, [fetchData, formId, handleUnauthorized]);
 
   const isValidUrl = (view === 'table' && formId && !itemId) || (view === 'item' && formId);
 
@@ -252,12 +254,9 @@ const App: React.FC = () => {
     if (!isLoading && !isValidUrl) {
       return true;
     }
-    if (unauthorizedWithToken) {
-      return true;
-    }
-
-    return false;
+    return unauthorizedWithToken;
   };
+
   const showTableView = data && formId && view === 'table';
   const showItemView = view === 'item' && data && formId;
 

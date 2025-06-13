@@ -1,15 +1,16 @@
-import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak from 'keycloak-js';
 
-export const authenticatedFetch = async (url: string, opts: {[key: string]: any}, keycloak?: Keycloak) => {
+import Logger from '@terrestris/base-util/dist/Logger';
+
+export const authenticatedFetch = async (url: string, opts: Record<string, any>, keycloak?: Keycloak) => {
   if (keycloak) {
     try {
       await keycloak.updateToken();
-    } catch (err) {
-      Logger.error('Failed to update token');
+    } catch (e) {
+      Logger.error(`Failed to update token: ${e}`);
     }
   }
-  let headers = opts.headers || {};
+  const headers = opts.headers || {};
   if (keycloak?.token) {
     headers.Authorization = `Bearer ${keycloak.token}`;
   }

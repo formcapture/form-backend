@@ -1,6 +1,7 @@
-import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak from 'keycloak-js';
 import { describe, it, expect, vi, beforeEach, Mocked } from 'vitest';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 
 import { authenticatedFetch } from './authenticatedFetch';
 

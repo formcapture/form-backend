@@ -104,6 +104,7 @@ class DataProcessor {
 
     const selectStatement = this.#createItemSelectStatement(formConfig);
 
+    // @ts-ignore
     const data: PostgrestResponse<DataItem> = await this.#pgClient
       .schema(formConfig.dataSource.schema || this.#pgClient.schemaName!)
       .from(tableName)
@@ -686,21 +687,22 @@ class DataProcessor {
   }
 
   #addFilterQuery(query: PostgrestFilterBuilder<any, any, any>, filter: FilterType) {
+    const filterValue = filter?.filterValue?.trim();
     switch (filter?.filterOp) {
     case 'equals':
-      query.eq(filter.filterKey, filter.filterValue);
+      query.eq(filter.filterKey, filterValue);
       break;
     case 'notEqual':
-      query.neq(filter.filterKey, filter.filterValue);
+      query.neq(filter.filterKey, filterValue);
       break;
     case 'like':
-      query.like(filter.filterKey, filter.filterValue);
+      query.like(filter.filterKey, filterValue);
       break;
     case 'greaterThan':
-      query.gt(filter.filterKey, filter.filterValue);
+      query.gt(filter.filterKey, filterValue);
       break;
     case 'lessThan':
-      query.lt(filter.filterKey, filter.filterValue);
+      query.lt(filter.filterKey, filterValue);
       break;
     default:
       break;

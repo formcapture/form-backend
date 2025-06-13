@@ -704,6 +704,9 @@ class DataProcessor {
       case 'lessThan':
         query.lt(filter.filterKey, filterValue);
         break;
+      case 'contains':
+        query.textSearch(filter.filterKey, filterValue);
+        break;
       default:
         break;
     }

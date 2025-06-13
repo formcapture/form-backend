@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { ISimpleFilterModel } from '@ag-grid-community/core';
 import { JSONEditor } from '@json-editor/json-editor';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak from 'keycloak-js';
 
 import { FormConfiguration, ItemId } from '../../App';
@@ -83,10 +85,10 @@ const ItemView: React.FC<ItemViewProps> = ({
         };
         const nextUrl = createTableViewUrl(previousView, queryParams);
         window.location.assign(nextUrl);
-      };
+      }
       // TODO handle if no previousView is provided (maybe remove button from itemView?)
     } catch (e) {
-      console.error(e);
+      Logger.error('Failed to delete item', e);
     }
   };
 
@@ -145,8 +147,8 @@ const ItemView: React.FC<ItemViewProps> = ({
       };
       const nextUrl = createItemViewUrl(window.location.href, queryParams);
       window.location.assign(nextUrl);
-    } catch {
-      console.log('failed to update item');
+    } catch (err) {
+      Logger.error('failed to update item', err);
     }
   };
 
@@ -170,8 +172,8 @@ const ItemView: React.FC<ItemViewProps> = ({
       };
       const itemViewUrl = createItemViewUrl(window.location.href, queryParams);
       window.location.assign(itemViewUrl);
-    } catch {
-      console.log('failed to update item');
+    } catch (err) {
+      Logger.error('failed to update item', err);
     }
   };
 
@@ -192,11 +194,11 @@ const ItemView: React.FC<ItemViewProps> = ({
     setShowDeleteDialog(false);
   };
 
-  const onDelete = () => {
+  const onDelete = async () => {
     if (!itemId) {
       return;
     }
-    deleteItem(formId, itemId);
+    await deleteItem(formId, itemId);
   };
 
   useEffect(() => {

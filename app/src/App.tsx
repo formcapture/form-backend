@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
+import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
 
 import ErrorPage from './Component/ErrorPage/ErrorPage';
@@ -146,13 +147,13 @@ const App: React.FC = () => {
         onLoad: 'login-required'
       });
     } catch (err) {
-      console.log('Failed to initialize keycloak', err);
+      Logger.error('Failed to initialize keycloak', err);
     }
   };
 
   const fetchData = async (kc?: Keycloak) => {
     if (formId === null) {
-      console.log('Cannot fetch data. No formId provided');
+      Logger.error('Cannot fetch data. No formId provided');
       return;
     }
 
@@ -180,7 +181,7 @@ const App: React.FC = () => {
       }
       return json;
     } catch (e) {
-      console.log(e);
+      Logger.error('Error while fetching data', e);
     }
   };
 
@@ -190,10 +191,9 @@ const App: React.FC = () => {
       if (response.status !== 200) {
         throw new Error('Failed to fetch keycloak config');
       }
-      const config = await response.json();
-      return config;
+      return await response.json();
     } catch (e) {
-      console.debug(e);
+      Logger.error('Error while fetching keycloak config', e);
     }
   };
 
@@ -210,7 +210,7 @@ const App: React.FC = () => {
         onLoad: 'check-sso'
       });
     } catch (err) {
-      console.log('Failed to initialize keycloak', err);
+      Logger.error('Failed to initialize keycloak', err);
     }
     return kc;
   };

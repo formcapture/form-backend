@@ -10,6 +10,7 @@ const readdirMock = jest.fn();
 const readFileMock = jest.fn();
 jest.mock('node:fs/promises', () => ({
   readdir: () => readdirMock(),
+  // eslint-disable-next-line prefer-spread
   readFile: (...args: any[]) => readFileMock.apply(null, args)
 }));
 
@@ -22,7 +23,7 @@ describe('formConfigLoader', () => {
 
     readdirMock.mockResolvedValue(['formId.json']);
 
-    await configLoader(req, {} as any, () => {});
+    await configLoader(req, {} as any, () => undefined);
 
     const expectedPath = path.join(process.cwd(), 'formConfigs/formId.json');
     expect(readFileMock).toHaveBeenCalledWith(expectedPath, { encoding: 'utf-8' });
@@ -35,7 +36,7 @@ describe('formConfigLoader', () => {
     readdirMock.mockResolvedValue(['formId.json']);
     readFileMock.mockResolvedValue('{"formId": "formId"}');
 
-    await configLoader(req, {} as any, () => {});
+    await configLoader(req, {} as any, () => undefined);
 
     const modifiedRequest = req as FormConfigRequest;
     expect(modifiedRequest.formConfig).toEqual({ formId: 'formId' });

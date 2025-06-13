@@ -1,7 +1,7 @@
 /**
  * Access control for forms.
  */
-export type Access = {
+export interface Access {
   /**
    * List of roles that can read the form.
    * An empty list signifies that no role can read the form.
@@ -15,4 +15,4 @@ export type Access = {
    * If set to true, writing is also permitted for non-logged in users.
    */
   write: true | string[];
-};
+}

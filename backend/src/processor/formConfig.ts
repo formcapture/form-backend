@@ -365,18 +365,18 @@ class FormConfigProcessor {
           const filteredJoinTableProperties = this.#filterByIncludedProperties(joinTable, joinTableIncludedProperties);
 
           switch (joinTable.relationship) {
-          case Relationship.MANY_TO_MANY:
-          case Relationship.ONE_TO_MANY:
-            filteredProperty[key].items = {
-              properties: filteredJoinTableProperties
-            };
-            break;
-          case Relationship.MANY_TO_ONE:
-          case Relationship.ONE_TO_ONE:
-            filteredProperty[key].properties = filteredJoinTableProperties;
-            break;
-          default:
-            break;
+            case Relationship.MANY_TO_MANY:
+            case Relationship.ONE_TO_MANY:
+              filteredProperty[key].items = {
+                properties: filteredJoinTableProperties
+              };
+              break;
+            case Relationship.MANY_TO_ONE:
+            case Relationship.ONE_TO_ONE:
+              filteredProperty[key].properties = filteredJoinTableProperties;
+              break;
+            default:
+              break;
           }
         }
         return filteredProperty;
@@ -518,7 +518,7 @@ class FormConfigProcessor {
 
   #mergeDefinitionAndProps(
     // TODO add proper type as soon as we have postgrest model definitions
-    tableDefinition: { [key: string]: any },
+    tableDefinition: Record<string, any>,
     properties: FormConfigInternal['properties']
   ) {
     const mergedProperties = merge(tableDefinition.properties, properties);
@@ -549,25 +549,25 @@ class FormConfigProcessor {
         throw new Error(`Join table ${prop} not found in joinTables`);
       }
       switch (joinTable.relationship) {
-      case Relationship.MANY_TO_MANY:
-      case Relationship.ONE_TO_MANY:
-        config.properties[prop].type = 'array';
-        config.properties[prop].items = {
-          ...formConfig.properties[prop].items,
-          type: 'object',
-          properties: joinTable.properties
-        };
-        break;
-      case Relationship.MANY_TO_ONE:
-      case Relationship.ONE_TO_ONE:
-        config.properties[prop].type = 'object';
-        config.properties[prop].properties = {
-          ...formConfig.properties[prop].properties,
-          ...joinTable.properties
-        };
-        break;
-      default:
-        throw new GenericRequestError('Relationship not supported');
+        case Relationship.MANY_TO_MANY:
+        case Relationship.ONE_TO_MANY:
+          config.properties[prop].type = 'array';
+          config.properties[prop].items = {
+            ...formConfig.properties[prop].items,
+            type: 'object',
+            properties: joinTable.properties
+          };
+          break;
+        case Relationship.MANY_TO_ONE:
+        case Relationship.ONE_TO_ONE:
+          config.properties[prop].type = 'object';
+          config.properties[prop].properties = {
+            ...formConfig.properties[prop].properties,
+            ...joinTable.properties
+          };
+          break;
+        default:
+          throw new GenericRequestError('Relationship not supported');
       }
     }
 

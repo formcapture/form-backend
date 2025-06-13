@@ -1,4 +1,4 @@
-export type BaseProperty = {
+export interface BaseProperty {
   /** The datatype of the property. */
   type: 'string' | 'number' | 'boolean' | 'array' | 'object';
   /** The format of the property. */
@@ -32,7 +32,7 @@ export type BaseProperty = {
    * Required if `resolveAsEnum` is set to true.
    */
   resolveToColumn?: boolean;
-};
+}
 
 /**
  * The configuration for file inputs.
@@ -62,12 +62,4 @@ export type FileProperty = BaseProperty & {
   };
 };
 
-export type FormConfigProperties = {
-  // TODO add proper typing
-  /**
-   * The configuration of the properties/columns.
-   * Here, the format for an input field and other
-   * properties for an included column can be configured.
-   */
-  [key: string]: any | BaseProperty | FileProperty;
-};
+export type FormConfigProperties = Record<string, any | BaseProperty | FileProperty>;

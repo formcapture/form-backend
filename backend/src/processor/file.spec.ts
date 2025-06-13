@@ -10,6 +10,7 @@ const writeFileMock = jest.fn();
 jest.mock('fs/promises', () => {
   return {
     mkdir: () => mkdirMock(),
+    // eslint-disable-next-line prefer-spread
     readdir: (...args: any[]) => readdirMock.apply(null, args),
     stat: () => statMock(),
     unlink: () => unlinkMock(),

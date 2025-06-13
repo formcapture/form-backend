@@ -1,5 +1,5 @@
 /** Type for the form-backend environment variables. */
-export type Opts = {
+export interface Opts {
   /** Directory for the form configurations */
   FORM_CONFIGS_DIR: string;
   /** Directory for the file uploads */
@@ -42,4 +42,4 @@ export type Opts = {
    * The log level for the logger.
    */
   LOG_LEVEL?: 'debug' | 'verbose' | 'info' | 'warn' | 'error';
-};
+}

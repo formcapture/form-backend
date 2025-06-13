@@ -36,6 +36,7 @@ export default tsEslint.config({
     '@typescript-eslint/no-unused-vars': 'warn',
     '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/ban-ts-comment': 'warn',
+    'prefer-spread': 'warn',
     'import/no-unresolved': 'off',
     'import/named': 'off',
     'import/no-named-as-default': 'off',

@@ -2,17 +2,12 @@ import path from 'path';
 
 import { Request } from 'express';
 
+import { readdir, readFile } from '../../__mocks__/node:fs/promises';
 import { FormConfigRequest } from '../types/formConfigRequest';
 
 import { formConfigLoader } from './formConfigLoader';
 
-const readdirMock = jest.fn();
-const readFileMock = jest.fn();
-jest.mock('node:fs/promises', () => ({
-  readdir: () => readdirMock(),
-  // eslint-disable-next-line prefer-spread
-  readFile: (...args: any[]) => readFileMock.apply(null, args)
-}));
+jest.mock('node:fs/promises');
 
 describe('formConfigLoader', () => {
   const configLoader = formConfigLoader({ formConfigsDir: 'formConfigs' });
@@ -21,20 +16,20 @@ describe('formConfigLoader', () => {
       params: { formId: 'formId' }
     } as unknown as Request;
 
-    readdirMock.mockResolvedValue(['formId.json']);
+    readdir.mockResolvedValue(['formId.json']);
 
     await configLoader(req, {} as any, () => undefined);
 
     const expectedPath = path.join(process.cwd(), 'formConfigs/formId.json');
-    expect(readFileMock).toHaveBeenCalledWith(expectedPath, { encoding: 'utf-8' });
+    expect(readFile).toHaveBeenCalledWith(expectedPath, { encoding: 'utf-8' });
   });
   it('adds the form config to the request object', async () => {
     const req: Request = {
       params: { formId: 'formId' }
     } as unknown as Request;
 
-    readdirMock.mockResolvedValue(['formId.json']);
-    readFileMock.mockResolvedValue('{"formId": "formId"}');
+    readdir.mockResolvedValue(['formId.json']);
+    readFile.mockResolvedValue('{"formId": "formId"}');
 
     await configLoader(req, {} as any, () => undefined);
 
@@ -57,7 +52,7 @@ describe('formConfigLoader', () => {
       params: { formId: 'formId' }
     } as unknown as Request;
 
-    readdirMock.mockResolvedValue(['foo.json']);
+    readdir.mockResolvedValue(['foo.json']);
     const next = jest.fn();
 
     await configLoader(req, {} as any, next);

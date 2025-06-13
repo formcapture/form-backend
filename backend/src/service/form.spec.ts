@@ -34,7 +34,6 @@ const createFormProcessorMock = jest.fn(() => {
 jest.mock('../processor/form', () => {
   return {
     FormProcessor: {
-      // eslint-disable-next-line prefer-spread
       createFormProcessor: (...args: any[]) => createFormProcessorMock.apply(null, args)
     }
   };
@@ -47,8 +46,7 @@ jest.mock('../processor/file', () => {
   return {
     FileProcessor: jest.fn(() => ({
       fileExists: () => fileExistsMock(),
-      // eslint-disable-next-line prefer-spread
-      getFilePath: (...args: any[]) => getFilePathMock.apply(null, args)
+      getFilePath: (...args: any[]) => getFilePathMock.apply(args)
     }))
   };
 });

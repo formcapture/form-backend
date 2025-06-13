@@ -1,4 +1,4 @@
-import { mkdir, readdir, stat, unlink, writeFile } from 'fs/promises';
+import { mkdir, readdir, stat, unlink, writeFile } from 'node:fs/promises';
 
 import mime from 'mime-types';
 import { Logger } from 'winston';

@@ -36,7 +36,7 @@ describe('authenticatedFetch', () => {
 
     await authenticatedFetch('https://example.com', {}, mockKeycloak);
 
-    expect(Logger.error).toHaveBeenCalledWith('Failed to update token');
+    expect(Logger.error).toHaveBeenCalledWith('Failed to update token: Error: Token update failed');
     expect(fetch).toHaveBeenCalledWith('https://example.com', {
       headers: {
         Authorization: 'Bearer mocked-token',

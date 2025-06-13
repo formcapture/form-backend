@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
 
@@ -46,7 +46,7 @@ export interface FormItem {
 }
 
 export type FormPropertyFormat = 'integer' | 'character varying' | 'table' | 'location' | 'double precision' |
-  'geometry' | 'geometrySelection' | `geometry.(${string})` | `${string}.geometry` | `${string}.geometry(${string})`;
+    'geometry' | 'geometrySelection' | `geometry.(${string})` | `${string}.geometry` | `${string}.geometry(${string})`;
 
 export interface FormProperty {
   format?: FormPropertyFormat;
@@ -127,16 +127,16 @@ const App: React.FC = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [unauthorizedWithToken, setUnauthorizedWithToken] = useState(false);
-  const [toastVisible, setToastVisible] = useState(!!message);
+  const [toastVisible, setToastVisible] = useState(message ? true : false);
   const [toastMessageType, setToastMessageType] = useState<TOAST_MESSAGE>(message as TOAST_MESSAGE);
 
-  const handleUnauthorized = useCallback((keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
+  const handleUnauthorized = (keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
     if (kc?.token) {
       setUnauthorizedWithToken(true);
       return;
     }
     redirectToLogin(keycloakConfig);
-  }, []);
+  };
 
   const redirectToLogin = async (keycloakConfig: KeycloakConfig) => {
     const newKc = new Keycloak(keycloakConfig);
@@ -246,7 +246,7 @@ const App: React.FC = () => {
     };
 
     initialize();
-  }, [fetchData, formId, handleUnauthorized]);
+  }, []);
 
   const isValidUrl = (view === 'table' && formId && !itemId) || (view === 'item' && formId);
 
@@ -254,9 +254,12 @@ const App: React.FC = () => {
     if (!isLoading && !isValidUrl) {
       return true;
     }
-    return unauthorizedWithToken;
-  };
+    if (unauthorizedWithToken) {
+      return true;
+    }
 
+    return false;
+  };
   const showTableView = data && formId && view === 'table';
   const showItemView = view === 'item' && data && formId;
 

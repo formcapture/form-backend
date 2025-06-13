@@ -9,27 +9,26 @@ import { FormConfigRequest } from '../types/formConfigRequest';
 import { Opts } from '../types/opts';
 
 export type Permission = 'readForm' | 'writeForm' | 'tableView' | 'itemView';
-export type AuthorizationOpts = {
+export interface AuthorizationOpts {
   opts: Opts;
   requiredPermissions: Permission[];
-};
-export type UserRolesLoaderOpts = {
+}
+export interface UserRolesLoaderOpts {
   opts: Opts;
-};
-
+}
 
 const checkPermission = (formConfig: FormConfig, permission: Permission, userRoles: string[]) => {
   switch (permission) {
-  case 'readForm':
-    return FormConfigProcessor.allowsReadForm(formConfig, userRoles);
-  case 'writeForm':
-    return FormConfigProcessor.allowsWriteForm(formConfig, userRoles);
-  case 'tableView':
-    return FormConfigProcessor.allowsTableView(formConfig);
-  case 'itemView':
-    return FormConfigProcessor.allowsItemView(formConfig);
-  default:
-    return false;
+    case 'readForm':
+      return FormConfigProcessor.allowsReadForm(formConfig, userRoles);
+    case 'writeForm':
+      return FormConfigProcessor.allowsWriteForm(formConfig, userRoles);
+    case 'tableView':
+      return FormConfigProcessor.allowsTableView(formConfig);
+    case 'itemView':
+      return FormConfigProcessor.allowsItemView(formConfig);
+    default:
+      return false;
   }
 };
 

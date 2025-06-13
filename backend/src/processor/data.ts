@@ -14,11 +14,11 @@ import { Relationship } from '../types/relationship';
 import FileProcessor from './file';
 import FormConfigProcessor from './formConfig';
 
-export type DataProcessorOpts = {
+export interface DataProcessorOpts {
   pgClient: PostgrestClient<any, string, any>;
   formId: string;
   opts: Opts;
-};
+}
 
 class DataProcessor {
   #pgClient: PostgrestClient<any, string, any>;
@@ -212,6 +212,7 @@ class DataProcessor {
       this.#logger.error(`Could not delete files for item ${itemId} of table ${tableName}. ${err}`);
     }
 
+    // @ts-ignore
     const response = await this.#pgClient
       .schema(formConfig.dataSource.schema || this.#pgClient.schemaName!)
       .from(tableName)
@@ -243,33 +244,34 @@ class DataProcessor {
         continue;
       }
       const newConfigKeys = configKeys ? [...configKeys, prop] : [prop];
-      const handledId = await this.#handleToOneData(item[prop], formConfig, newConfigKeys);
-      item[prop] = handledId;
+      item[prop] = await this.#handleToOneData(item[prop], formConfig, newConfigKeys);
     }
 
     switch (action) {
-    case DbAction.CREATE:
-      const createdItem = await this.createItemData(item, formConfig, configKeys?.join('/'));
-      if (!createdItem.success) {
-        throw new Error(`Could not create item ${item[formConfig.dataSource.idColumn]}`);
+      case DbAction.CREATE: {
+        const createdItem = await this.createItemData(item, formConfig, configKeys?.join('/'));
+        if (!createdItem.success) {
+          throw new Error(`Could not create item ${item[formConfig.dataSource.idColumn]}`);
+        }
+        itemId = createdItem.id;
+        break;
       }
-      itemId = createdItem.id;
-      break;
-    case DbAction.UPDATE:
-      const updatedItem = await this.updateItemData(
-        item,
-        item[formConfig.dataSource.idColumn],
-        formConfig,
-        configKeys?.join('/')
-      );
-      itemId = updatedItem.id;
-      this.#logger.debug(`Updated item ${itemId} for configKeys ${configKeys}`);
-      break;
-    case DbAction.DELETE:
-      itemId = item[formConfig.dataSource.idColumn];
-      break;
-    default:
-      throw new Error(`Action ${action} not supported`);
+      case DbAction.UPDATE: {
+        const updatedItem = await this.updateItemData(
+          item,
+          item[formConfig.dataSource.idColumn],
+          formConfig,
+          configKeys?.join('/')
+        );
+        itemId = updatedItem.id;
+        this.#logger.debug(`Updated item ${itemId} for configKeys ${configKeys}`);
+        break;
+      }
+      case DbAction.DELETE:
+        itemId = item[formConfig.dataSource.idColumn];
+        break;
+      default:
+        throw new Error(`Action ${action} not supported`);
     }
 
     const propsWithManyToMany = FormConfigProcessor.getPropsWithJoinTables(formConfig, Relationship.MANY_TO_MANY);
@@ -454,8 +456,7 @@ class DataProcessor {
     this.#logger.debug(`Checking if item ${JSON.stringify(item)} was added`);
     const idColumn = formConfig.dataSource.idColumn;
     const wasAdded = !unchangedDbItems.some(unchangedDbItem => {
-      const sameId = unchangedDbItem[idColumn] === item[idColumn];
-      return sameId;
+      return unchangedDbItem[idColumn] === item[idColumn];
     });
     this.#logger.debug(`Item ${JSON.stringify(item)} was ${wasAdded ? '' : 'not '}added`);
     return wasAdded;
@@ -518,7 +519,7 @@ class DataProcessor {
 
   #filterIncludedProperties(item: DataItem, formConfig: FormConfigInternal | JoinTable) {
     const includedProperties = formConfig.includedProperties;
-    const filteredData = includedProperties.reduce((acc: { [key: string]: any }, prop: any) => {
+    const filteredData = includedProperties.reduce((acc: Record<string, any>, prop: any) => {
       if (!(prop in item)) {
         return { ...acc };
       }
@@ -542,10 +543,10 @@ class DataProcessor {
       ...FormConfigProcessor.getPropsWithJoinTables(formConfig, Relationship.ONE_TO_MANY)
     ];
     const dataClone = structuredClone(item);
-    const filteredData = joinTablesToExclude.reduce((acc, prop) => {
+    return joinTablesToExclude.reduce((acc, prop) => {
       if (prop in item) {
         const {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
+          // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/no-unused-vars
           [prop]: _,
           ...dataWithoutProp
         } = acc;
@@ -555,7 +556,6 @@ class DataProcessor {
         ...acc
       };
     }, dataClone);
-    return filteredData;
   }
 
   #removeId(item: DataItem, formConfig: FormConfigInternal | JoinTable) {
@@ -602,8 +602,7 @@ class DataProcessor {
       throw new Error('Invalid file(s).');
     }
     // TODO check if we always want to remove the id or only if it is set to readonly
-    const dataWithoutId = this.#removeId(dataWithEmptyGeometries, formConfig);
-    return dataWithoutId;
+    return this.#removeId(dataWithEmptyGeometries, formConfig);
   }
 
   async #updateData(item: DataItem, itemId: string, formConfig: FormConfigInternal | JoinTable) {
@@ -614,6 +613,7 @@ class DataProcessor {
       return isSuccess;
     }
 
+    // @ts-ignore
     const response = await this.#pgClient
       .schema(formConfig.dataSource.schema || this.#pgClient.schemaName!)
       .from(tableName)
@@ -689,23 +689,23 @@ class DataProcessor {
   #addFilterQuery(query: PostgrestFilterBuilder<any, any, any>, filter: FilterType) {
     const filterValue = filter?.filterValue?.trim();
     switch (filter?.filterOp) {
-    case 'equals':
-      query.eq(filter.filterKey, filterValue);
-      break;
-    case 'notEqual':
-      query.neq(filter.filterKey, filterValue);
-      break;
-    case 'like':
-      query.like(filter.filterKey, filterValue);
-      break;
-    case 'greaterThan':
-      query.gt(filter.filterKey, filterValue);
-      break;
-    case 'lessThan':
-      query.lt(filter.filterKey, filterValue);
-      break;
-    default:
-      break;
+      case 'equals':
+        query.eq(filter.filterKey, filterValue);
+        break;
+      case 'notEqual':
+        query.neq(filter.filterKey, filterValue);
+        break;
+      case 'like':
+        query.like(filter.filterKey, filterValue);
+        break;
+      case 'greaterThan':
+        query.gt(filter.filterKey, filterValue);
+        break;
+      case 'lessThan':
+        query.lt(filter.filterKey, filterValue);
+        break;
+      default:
+        break;
     }
   }
 
@@ -734,7 +734,7 @@ class DataProcessor {
     const colsToReconstruct = formConfig.includedPropertiesTable
       .filter((c: string) => formConfig.properties[c].resolveAsEnum && formConfig.properties[c].resolveLookup);
 
-    const reconstructedData = data.map(item => {
+    return data.map(item => {
       const itemClone = structuredClone(item);
       colsToReconstruct.forEach((c: string) => {
         const lookupTables = formConfig.dataSource.lookupTables;
@@ -749,8 +749,6 @@ class DataProcessor {
       });
       return itemClone;
     });
-
-    return reconstructedData;
   }
 }
 

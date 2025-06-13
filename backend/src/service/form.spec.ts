@@ -46,7 +46,7 @@ jest.mock('../processor/file', () => {
   return {
     FileProcessor: jest.fn(() => ({
       fileExists: () => fileExistsMock(),
-      getFilePath: (...args: any[]) => getFilePathMock.apply(null, args)
+      getFilePath: (...args: any[]) => getFilePathMock.apply(args)
     }))
   };
 });

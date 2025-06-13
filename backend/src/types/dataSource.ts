@@ -1,7 +1,7 @@
 import { FormConfig } from './formConfig';
 import { JoinTable } from './joinTable';
 
-export type DataSource = {
+export interface DataSource {
   // TODO complete typing
   [key: string]: any;
   /**
@@ -20,16 +20,12 @@ export type DataSource = {
    * Configuration of the join tables.
    * The key of a join table can be used as reference in the properties.
    */
-  joinTables?: {
-    [key: string]: JoinTable;
-  };
+  joinTables?: Record<string, JoinTable>;
   /**
    * Configuration of the lookup tables.
    * The key of a lookup table can be used as reference in the properties.
    */
-  lookupTables?: {
-    [key: string]: FormConfig;
-  };
+  lookupTables?: Record<string, FormConfig>;
   /**
    * The direction in which the data should be ordered.
    * Use `asc` for ordering ascending and `desc` for ordering descending.
@@ -41,4 +37,4 @@ export type DataSource = {
    * Defaults to the primary key column.
    */
   orderBy?: string;
-};
+}

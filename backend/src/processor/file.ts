@@ -1,4 +1,4 @@
-import { mkdir, readdir, stat, unlink, writeFile } from 'fs/promises';
+import { mkdir, readdir, stat, unlink, writeFile } from 'node:fs/promises';
 
 import mime from 'mime-types';
 import { Logger } from 'winston';
@@ -9,10 +9,10 @@ import { FormConfigInternal } from '../types/formConfigInternal';
 import { JoinTable } from '../types/joinTable';
 import { Opts } from '../types/opts';
 
-export type FileProcessorOpts = {
+export interface FileProcessorOpts {
   opts: Opts;
   formId: string;
-};
+}
 
 export class FileProcessor {
 
@@ -52,7 +52,7 @@ export class FileProcessor {
       configKey
     }: {
       item: DataItem;
-      keysAndFiles: { [key: string]: string };
+      keysAndFiles: Record<string, string>;
       formConfig: FormConfigInternal | JoinTable;
       itemId?: string;
       configKey?: string;
@@ -65,8 +65,7 @@ export class FileProcessor {
     for (const key in keysAndFiles) {
       if (key in keysAndFiles) {
         await this.#removeOldFiles(itemClone[formConfig.dataSource.idColumn], key, configKey);
-        const fileIdentifier = await this.#createFile(itemClone, key, keysAndFiles[key], formConfig, configKey);
-        itemClone[key] = fileIdentifier;
+        itemClone[key] = await this.#createFile(itemClone, key, keysAndFiles[key], formConfig, configKey);
       }
     }
     return Object.keys(item).reduce((acc, key) => ({ ...acc, [key]: itemClone[key] }), {});
@@ -91,36 +90,32 @@ export class FileProcessor {
     const fileKeysWithData = this.#getFileKeysFromItem(item, formConfig)
       .filter((key: any) => item[key] && this.#isBase64String(item[key]));
 
-    const keysAndFiles = fileKeysWithData.reduce((acc, key) => {
+    return fileKeysWithData.reduce((acc, key) => {
       return {
         ...acc,
         [key]: item[key]
       };
     }, {});
-
-    return keysAndFiles;
   }
 
   getEmptyFileFields(item: DataItem, formConfig: FormConfigInternal | JoinTable) {
     const fileKeys = this.#getFileKeysFromConfig(formConfig);
 
-    const emptyFileFields = fileKeys.filter(key => {
+    return fileKeys.filter(key => {
       return item[key] === null || item[key] === undefined || item[key] === '';
     });
-    return emptyFileFields;
   }
 
   getItemWithoutFiles(item: DataItem, keys: string[]) {
-    const itemWithoutFiles = Object.keys(item).reduce((acc, itemKey) => {
+    return Object.keys(item).reduce((acc, itemKey) => {
       if (keys.includes(itemKey)) {
-        return { ...acc };
+        return {...acc};
       }
       return {
         ...acc,
         [itemKey]: item[itemKey]
       };
     }, {});
-    return itemWithoutFiles;
   }
 
   async fileExists(fileIdentifier: string) {
@@ -192,7 +187,7 @@ export class FileProcessor {
   }
 
   #isFilePathString(str: string, formConfig: FormConfigInternal | JoinTable, key: string, item: DataItem) {
-    const regexp = new RegExp(`^${this.#formId}/(.+/)*${key}_${item[formConfig.dataSource.idColumn]}(\..*)?`);
+    const regexp = new RegExp(`^${this.#formId}/(.+/)*${key}_${item[formConfig.dataSource.idColumn]}(\\..*)?`);
     return regexp.test(str);
   }
 

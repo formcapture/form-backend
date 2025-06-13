@@ -1,21 +1,10 @@
+import { readdir, readFile, unlink, writeFile } from '../../__mocks__/node:fs/promises';
 import { FormConfigInternal } from '../types/formConfigInternal';
 
 import FileProcessor, { FileProcessorOpts } from './file';
 
-const mkdirMock = jest.fn();
-const readdirMock = jest.fn();
-const statMock = jest.fn();
-const unlinkMock = jest.fn();
-const writeFileMock = jest.fn();
-jest.mock('fs/promises', () => {
-  return {
-    mkdir: () => mkdirMock(),
-    readdir: (...args: any[]) => readdirMock.apply(null, args),
-    stat: () => statMock(),
-    unlink: () => unlinkMock(),
-    writeFile: () => writeFileMock()
-  };
-});
+
+jest.mock('node:fs/promises');
 
 describe('FileProcessor', () => {
 
@@ -222,11 +211,11 @@ describe('FileProcessor', () => {
       } as FormConfigInternal;
       const fileProcessor = new FileProcessor({opts: {}} as FileProcessorOpts);
 
-      readdirMock.mockResolvedValue(['file_1', 'file2_1']);
+      readdir.mockResolvedValue(['file_1', 'file2_1']);
 
       await fileProcessor.createFiles({item, keysAndFiles, formConfig});
 
-      expect(unlinkMock).toHaveBeenCalledTimes(2);
+      expect(unlink).toHaveBeenCalledTimes(2);
     });
     it('creates new files', async () => {
       const item = {
@@ -244,11 +233,11 @@ describe('FileProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const fileProcessor = new FileProcessor({opts: {FILE_UPLOAD_DIR: ''}, formId: 'foo'} as FileProcessorOpts);
-      readdirMock.mockResolvedValue([]);
+      readdir.mockResolvedValue([]);
 
       await fileProcessor.createFiles({item, keysAndFiles, formConfig});
 
-      expect(writeFileMock).toHaveBeenCalledTimes(2);
+      expect(writeFile).toHaveBeenCalledTimes(2);
     });
     it('returns the item with updated file identifiers', async () => {
       const item = {
@@ -266,7 +255,7 @@ describe('FileProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const fileProcessor = new FileProcessor({opts: {FILE_UPLOAD_DIR: ''}, formId: 'foo'} as FileProcessorOpts);
-      readdirMock.mockResolvedValue([]);
+      readdir.mockResolvedValue([]);
 
       const result = await fileProcessor.createFiles({item, keysAndFiles, formConfig});
 
@@ -276,8 +265,8 @@ describe('FileProcessor', () => {
 
   describe('deleteFiles', () => {
     it('deletes files', async () => {
-      readdirMock.mockResolvedValue(['file_1']);
-      unlinkMock.mockResolvedValue(undefined);
+      readdir.mockResolvedValue(['file_1']);
+      unlink.mockResolvedValue(undefined);
       const fileProcessor = new FileProcessor({opts: {}} as FileProcessorOpts);
       const itemId = '1';
       const formConfig: FormConfigInternal = {
@@ -291,7 +280,7 @@ describe('FileProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       await fileProcessor.deleteFiles(itemId, formConfig);
-      expect(unlinkMock).toHaveBeenCalled();
+      expect(unlink).toHaveBeenCalled();
     });
   });
 
@@ -355,21 +344,21 @@ describe('FileProcessor', () => {
   describe('fileExists', () => {
     it('returns true, if a file exists', async () => {
       const fileProcessor = new FileProcessor({opts: {FILE_UPLOAD_DIR: ''}, formId: 'foo'} as FileProcessorOpts);
-      readdirMock.mockReturnValue(['file_1.png']);
+      readdir.mockReturnValue(['file_1.png']);
       const result = await fileProcessor.fileExists('file_1.png');
       expect(result).toBe(true);
     });
     it('returns false, if a file does not exist', async () => {
       const fileProcessor = new FileProcessor({opts: {FILE_UPLOAD_DIR: ''}, formId: 'foo'} as FileProcessorOpts);
-      readdirMock.mockReturnValue(['foo_1.png']);
+      readdir.mockReturnValue(['foo_1.png']);
       const result = await fileProcessor.fileExists('file_1.png');
       expect(result).toBe(false);
     });
     it('only checks for files in the form directory', async () => {
       const fileProcessor = new FileProcessor({opts: {FILE_UPLOAD_DIR: ''}, formId: 'foo'} as FileProcessorOpts);
-      readdirMock.mockReturnValue(['file_1.png']);
+      readdir.mockReturnValue(['file_1.png']);
       await fileProcessor.fileExists('file_1.png');
-      expect(readdirMock).toHaveBeenCalledWith('/foo', { encoding: 'utf-8', recursive: true });
+      expect(readdir).toHaveBeenCalledWith('/foo', { encoding: 'utf-8', recursive: true });
     });
   });
 

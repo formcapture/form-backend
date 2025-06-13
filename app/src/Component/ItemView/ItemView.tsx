@@ -4,8 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ISimpleFilterModel } from '@ag-grid-community/core';
 import { JSONEditor } from '@json-editor/json-editor';
 
-import Logger from '@terrestris/base-util/dist/Logger';
 import Keycloak from 'keycloak-js';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 
 import { FormConfiguration, ItemId } from '../../App';
 import { RECEIVE_EVENTS, SEND_EVENTS } from '../../constants/events';
@@ -53,7 +54,7 @@ const ItemView: React.FC<ItemViewProps> = ({
   previousView,
   keycloak,
   internalMap,
-  showToast = () => {}
+  showToast = () => undefined
 }) => {
 
   const [editor, setEditor] = useState<any>(null);
@@ -121,7 +122,7 @@ const ItemView: React.FC<ItemViewProps> = ({
       }
     });
     setEditor(editorInst);
-  }, [editorRef, editorData, formId]);
+  }, [editorRef, editorData, internalMap, formId, data, editor, editable]);
 
   const onUpdateItem = async (e: any) => {
     e.preventDefault();

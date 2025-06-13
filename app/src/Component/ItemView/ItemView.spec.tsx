@@ -89,12 +89,14 @@ describe('<ItemView />', () => {
   });
 
   it('renders the editor and handles back button', async () => {
-    render(<ItemView
-      data={mockData}
-      formId={formId}
-      itemId={itemId}
-      previousView={previousView}
-    />);
+    render(
+      <ItemView
+        data={mockData}
+        formId={formId}
+        itemId={itemId}
+        previousView={previousView}
+      />
+    );
 
     const backButton = screen.getByText('< Zurück');
     expect(backButton).not.toBeNull();
@@ -106,12 +108,14 @@ describe('<ItemView />', () => {
   });
 
   it('handles the save action', async () => {
-    render(<ItemView
-      data={mockData}
-      formId={formId}
-      itemId={itemId}
-      previousView={previousView}
-    />);
+    render(
+      <ItemView
+        data={mockData}
+        formId={formId}
+        itemId={itemId}
+        previousView={previousView}
+      />
+    );
 
     function createFetchResponse(data: any) {
       return {
@@ -119,7 +123,7 @@ describe('<ItemView />', () => {
         status: 200,
         json: () => new Promise((resolve) => resolve(data)),
       };
-    };
+    }
 
     global.fetch = vi.fn().mockResolvedValue(createFetchResponse({ success: true }));
 

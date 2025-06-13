@@ -1,6 +1,8 @@
 import { Base64Editor } from '@json-editor/json-editor/src/editors/base64';
-import Logger from '@terrestris/base-util/dist/Logger';
+
 import mimeTypes from 'mime';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 
 import { getKeycloakInst } from '../../singletons/keycloak';
 import api from '../../util/api';
@@ -150,8 +152,7 @@ export class FileEditor extends Base64Editor {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     const units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const unit = units[i];
-    const formattedSize = `${parseFloat((bytes / (1024 ** i)).toFixed(1))} ${unit}`;
-    return formattedSize;
+    return `${parseFloat((bytes / (1024 ** i)).toFixed(1))} ${unit}`;
   }
 
   isValidMimeType(mimeType: string) {

@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-shadow
+
 export enum Relationship {
   MANY_TO_MANY = 'manyToMany',
   ONE_TO_MANY = 'oneToMany',

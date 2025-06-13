@@ -26,7 +26,7 @@ describe('Authorization Middleware', () => {
 
       getTokenFromHeaderMock.mockReturnValue('bar');
 
-      userRolesLoader(req, {} as any, () => { });
+      userRolesLoader(req, {} as any, () => undefined);
 
       expect(getTokenFromHeaderMock).toHaveBeenCalledWith('Bearer bar');
     });
@@ -42,7 +42,7 @@ describe('Authorization Middleware', () => {
       decodeTokenMock.mockReturnValue({ resource_access: { foo: { roles: ['baz'] } } });
       getRolesFromTokenMock.mockReturnValue(['baz']);
 
-      userRolesLoader(req, {} as any, () => { });
+      userRolesLoader(req, {} as any, () => undefined);
 
       expect(req.userRoles).toEqual(['baz']);
     });

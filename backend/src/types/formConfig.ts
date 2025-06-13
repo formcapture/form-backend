@@ -696,7 +696,7 @@ import { Views } from './views';
  * }
  * ```
  */
-export type FormConfig = {
+export interface FormConfig {
   // TODO add proper typing
 
   /** Placeholder for properties that were not typed, yet. */
@@ -739,4 +739,4 @@ export type FormConfig = {
    * properties for an included column can be configured.
    */
   properties?: FormConfigProperties;
-};
+}

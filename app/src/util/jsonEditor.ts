@@ -132,8 +132,7 @@ export const DE = {
   * When a required property is not defined
   * @variables This key takes one variable: The name of the missing property
   */
-  // eslint-disable-next-line @typescript-eslint/quotes
-  error_required: "Objekt fehlt verpflichtendes Attribut '{{0}}'",
+  error_required: 'Objekt fehlt verpflichtendes Attribut \'{{0}}\'',
   /**
   * When there is an additional property is set whereas there should be none
   * @variables This key takes one variable: The name of the additional property

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import {
@@ -16,9 +16,11 @@ import {
 import { AG_GRID_LOCALE_DE } from '@ag-grid-community/locale';
 import { AgGridReact, CustomCellEditorProps } from '@ag-grid-community/react';
 
-import Logger from '@terrestris/base-util/dist/Logger';
+
 import Keycloak from 'keycloak-js';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 
 import { FormConfiguration, ItemId } from '../../App';
 import { RECEIVE_EVENTS, SEND_EVENTS } from '../../constants/events';
@@ -40,11 +42,11 @@ import './TableView.css';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
-export type FilterType = {
+export interface FilterType {
   filterOp: 'equals' | 'notEqual' | 'like' | 'greaterThan' | 'lessThan';
   filterKey: string;
   filterValue: string;
-};
+}
 
 interface TableViewProps {
   data: FormConfiguration;
@@ -65,7 +67,7 @@ const TableView: React.FC<TableViewProps> = ({
   order,
   orderBy,
   page,
-  showToast = () => { }
+  showToast = () => undefined
 }) => {
   /**
    *
@@ -83,10 +85,34 @@ const TableView: React.FC<TableViewProps> = ({
   const allowItemView = data.config.views?.item;
   const editable = data.config.editable;
 
-  const containsGeometryColumns = () => !!getGeometryColumns(data.config)?.length;
+  const containsGeometryColumns = useMemo(() => !!getGeometryColumns(data.config)?.length, [data]);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [idToDelete, setIdToDelete] = useState<ItemId>();
+
+  const viewTooltip = useMemo(() => (
+    <Tooltip id="tooltip">
+        Anzeigen
+    </Tooltip>
+  ), []);
+
+  const zoomToTooltip = useMemo(() => (
+    <Tooltip id="zoom-to-tooltip">
+        Auf Geometrie zoomen
+    </Tooltip>
+  ), []);
+
+  const editTooltip = useMemo(() => (
+    <Tooltip id="tooltip">
+        Bearbeiten
+    </Tooltip>
+  ), []);
+
+  const deleteTooltip = useMemo(() => (
+    <Tooltip id="tooltip">
+        Eintrag löschen
+    </Tooltip>
+  ), []);
 
   const deleteItem = async (fId: string, itemId: ItemId) => {
     try {
@@ -113,7 +139,7 @@ const TableView: React.FC<TableViewProps> = ({
     }
   };
 
-  const renderCell = (colName: string, value: unknown | unknown[]) => {
+  const renderCell = useCallback((colName: string, value: unknown | unknown[]) => {
     if (colsWithSubitems.includes(colName)) {
       return 'Siehe Detailansicht';
     }
@@ -135,7 +161,7 @@ const TableView: React.FC<TableViewProps> = ({
     }
 
     return value;
-  };
+  }, [data, colsWithSubitems]);
 
   const renderGeometryCell = (value: unknown) => {
     if (!value) {
@@ -153,7 +179,18 @@ const TableView: React.FC<TableViewProps> = ({
     return 'Geometrie';
   };
 
-  const renderRowNumberCell = (rowProps: CustomCellEditorProps) => {
+
+  const zoomToFeature = useCallback((rowProps: any) => {
+    const geometryColumns = getGeometryColumns(data.config);
+    if (!geometryColumns || !geometryColumns.length) {
+      return;
+    }
+    const features = getFeaturesFromTableData([rowProps.data], data.config, geometryColumns);
+
+    sendMessage(window.parent, SEND_EVENTS.zoomToFeature, features);
+  }, [data]);
+
+  const renderRowNumberCell = useCallback((rowProps: CustomCellEditorProps) => {
     if (!rowProps.data) {
       return;
     }
@@ -205,7 +242,7 @@ const TableView: React.FC<TableViewProps> = ({
           )
         }
         {
-          containsGeometryColumns() && (
+          containsGeometryColumns && (
             <OverlayTrigger placement="top" overlay={zoomToTooltip}>
               <button
                 className="btn btn-link actions"
@@ -253,11 +290,14 @@ const TableView: React.FC<TableViewProps> = ({
         }
       </div>
     );
-  };
+  }, [
+    allowItemView, containsGeometryColumns, data, deleteTooltip, editTooltip, editable,
+    filter, formId, order, page, viewTooltip, zoomToFeature, zoomToTooltip
+  ]);
 
-  const renderColumnTitle = (colName: any) => {
+  const renderColumnTitle = useCallback((colName: any) => {
     return data.config.properties[colName].title ?? colName;
-  };
+  }, [data]);
 
   const applyFilter = (setFilterModel: any, filterToApply: any) => {
     const filterModel = {
@@ -342,37 +382,15 @@ const TableView: React.FC<TableViewProps> = ({
           }
         ]
       );
-  }, [columnNames, data]);
+  }, [columnNames, data.config.order, data.config.orderBy, data.config.properties,
+    filterParams.numberFilterParams, filterParams.textFilterParams, order, orderBy,
+    renderCell, renderColumnTitle, renderRowNumberCell]);
 
   const defaultColumnDefs = useMemo(() => {
     return {
       comparator: () => 0
     };
   }, []);
-
-  const viewTooltip = (
-    <Tooltip id="tooltip">
-      Anzeigen
-    </Tooltip>
-  );
-
-  const zoomToTooltip = (
-    <Tooltip id="zoom-to-tooltip">
-      Auf Geometrie zoomen
-    </Tooltip>
-  );
-
-  const editTooltip = (
-    <Tooltip id="tooltip">
-      Bearbeiten
-    </Tooltip>
-  );
-
-  const deleteTooltip = (
-    <Tooltip id="tooltip">
-      Eintrag löschen
-    </Tooltip>
-  );
 
   const onCancelDelete = () => {
     setShowDeleteDialog(false);
@@ -465,23 +483,47 @@ const TableView: React.FC<TableViewProps> = ({
     window.location.assign(newUrl);
   };
 
-  const enableItemSelection = () => {
+  const enableItemSelection = useCallback(() => {
     if (!data.config.views.item) {
       return;
     }
     sendMessage(window.parent, SEND_EVENTS.enableItemSelection);
-  };
+  }, [data]);
 
   const disableItemSelection = () => {
     sendMessage(window.parent, SEND_EVENTS.disableItemSelection);
   };
 
+  const onEditRecord = useCallback((itemId: ItemId) => {
+    if (!data.config.views.item) {
+      return;
+    }
+    const tableViewQueryParams: TableViewQueryParams = {
+      formId: formId,
+      page: page + 1,
+      order: order ?? undefined,
+      orderBy: order ?? undefined,
+      filterValue: filter?.filterValue,
+      filterOp: filter?.filterOp as ISimpleFilterModel['type'],
+      filterKey: filter?.filterKey
+    };
+    const prevUrl = createTableViewUrl(window.location.href, tableViewQueryParams);
+    const itemViewQueryParams: ItemViewQueryParams = {
+      formId: formId,
+      itemId,
+      prev: prevUrl
+    };
+    const itemViewUrl = createItemViewUrl(window.location.href, itemViewQueryParams);
+
+    window.location.assign(itemViewUrl);
+  }, [data, filter, formId, order, page]);
+
   useEffect(() => {
-    if (!containsGeometryColumns()) {
+    if (!containsGeometryColumns) {
       return;
     }
     const showFeaturesInMap = () => {
-      // Find columns of geometry type
+      // Find columns of type geometry
       const geometryColumns = getGeometryColumns(data.config);
 
       if (!geometryColumns || !geometryColumns.length) {
@@ -524,31 +566,7 @@ const TableView: React.FC<TableViewProps> = ({
       window.removeEventListener('message', postMessageListener);
     };
 
-  }, [data]);
-
-  const onEditRecord = (itemId: ItemId) => {
-    if (!data.config.views.item) {
-      return;
-    }
-    const tableViewQueryParams: TableViewQueryParams = {
-      formId: formId,
-      page: page + 1,
-      order: order ?? undefined,
-      orderBy: order ?? undefined,
-      filterValue: filter?.filterValue,
-      filterOp: filter?.filterOp as ISimpleFilterModel['type'],
-      filterKey: filter?.filterKey
-    };
-    const prevUrl = createTableViewUrl(window.location.href, tableViewQueryParams);
-    const itemViewQueryParams: ItemViewQueryParams = {
-      formId: formId,
-      itemId,
-      prev: prevUrl
-    };
-    const itemViewUrl = createItemViewUrl(window.location.href, itemViewQueryParams);
-
-    window.location.assign(itemViewUrl);
-  };
+  }, [containsGeometryColumns, data, enableItemSelection, onEditRecord]);
 
   const onCellClicked = (event: CellClickedEvent) => {
     if (!event.colDef.field) {
@@ -562,16 +580,6 @@ const TableView: React.FC<TableViewProps> = ({
     const features = getFeaturesFromTableData([event.data], data.config, geometryColumns);
 
     sendMessage(window.parent, SEND_EVENTS.startHighlighting, features);
-  };
-
-  const zoomToFeature = (rowProps: any) => {
-    const geometryColumns = getGeometryColumns(data.config);
-    if (!geometryColumns || !geometryColumns.length) {
-      return;
-    }
-    const features = getFeaturesFromTableData([rowProps.data], data.config, geometryColumns);
-
-    sendMessage(window.parent, SEND_EVENTS.zoomToFeature, features);
   };
 
   const onCellMouseOver = (event: CellMouseOverEvent) => {

@@ -1,5 +1,5 @@
 /** View control for forms. */
-export type Views = {
+export interface Views {
   /**
    * En-/disable the table view. True, if the table view
    * should not be accessible for this form. False, otherwise.
@@ -15,4 +15,4 @@ export type Views = {
    * Defaults to 10.
    */
   pageSize?: number;
-};
+}

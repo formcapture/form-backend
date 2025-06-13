@@ -1,7 +1,8 @@
-import Logger from '@terrestris/base-util/dist/Logger';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+
+import Logger from '@terrestris/base-util/dist/Logger';
 
 import App, { FormConfiguration } from './App';
 import { setKeycloakInst } from './singletons/keycloak';
@@ -139,7 +140,7 @@ describe('App', () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
 
-    const loggerMock = vi.spyOn(Logger, 'error').mockImplementation(() => { });
+    const loggerMock = vi.spyOn(Logger, 'error').mockImplementation(() => undefined);
     (mockKeycloak.init as Mock).mockRejectedValueOnce(new Error('Initialization failed'));
 
     const localMockFetch = vi.fn(
@@ -177,7 +178,7 @@ describe('App', () => {
   it('throws error when data can not be fetched', async () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
-    const loggerMock = vi.spyOn(Logger, 'error').mockImplementation(() => {});
+    const loggerMock = vi.spyOn(Logger, 'error').mockImplementation(() => undefined);
 
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 500));
 
@@ -198,7 +199,7 @@ describe('App', () => {
   it('throws error when keycloak config can not be fetched', async () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
-    const loggerError = vi.spyOn(Logger, 'error').mockImplementation(() => { });
+    const loggerError = vi.spyOn(Logger, 'error').mockImplementation(() => undefined);
 
     global.fetch = vi.fn(
       () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 500}))

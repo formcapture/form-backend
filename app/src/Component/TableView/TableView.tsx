@@ -59,6 +59,20 @@ interface TableViewProps {
   showToast?: (message: TOAST_MESSAGE) => void;
 }
 
+const filterParams: any = {
+  textFilterParams: {
+    filterOptions: ['contains', 'equals', 'notEqual'],
+    buttons: ['reset', 'apply'],
+    maxNumConditions: 1
+  },
+  numberFilterParams: {
+    filterOptions: ['equals', 'notEqual', 'greaterThan', 'lessThan'],
+    trimInput: true,
+    buttons: ['reset', 'apply'],
+    maxNumConditions: 1
+  }
+};
+
 const TableView: React.FC<TableViewProps> = ({
   data,
   filter,
@@ -175,10 +189,7 @@ const TableView: React.FC<TableViewProps> = ({
     );
   };
 
-  const renderGeometryTooltip = () => {
-    return 'Geometrie';
-  };
-
+  const renderGeometryTooltip = useCallback(() => 'Geometrie', []);
 
   const zoomToFeature = useCallback((rowProps: any) => {
     const geometryColumns = getGeometryColumns(data.config);
@@ -310,20 +321,6 @@ const TableView: React.FC<TableViewProps> = ({
     setFilterModel(filterModel);
   };
 
-  const filterParams: any = {
-    textFilterParams: {
-      filterOptions: ['contains', 'equals', 'notEqual'],
-      buttons: ['reset', 'apply'],
-      maxNumConditions: 1
-    },
-    numberFilterParams: {
-      filterOptions: ['equals', 'notEqual', 'greaterThan', 'lessThan'],
-      trimInput: true,
-      buttons: ['reset', 'apply'],
-      maxNumConditions: 1
-    }
-  };
-
   const isGeometryColumn = (format?: string) => {
     return (format && isGeometryType(format)) || format === 'geometrySelection' || format === 'location';
   };
@@ -382,9 +379,10 @@ const TableView: React.FC<TableViewProps> = ({
           }
         ]
       );
-  }, [columnNames, data.config.order, data.config.orderBy, data.config.properties,
-    filterParams.numberFilterParams, filterParams.textFilterParams, order, orderBy,
-    renderCell, renderColumnTitle, renderRowNumberCell]);
+  }, [
+    columnNames, data, renderGeometryTooltip, order, orderBy,
+    renderCell, renderColumnTitle, renderRowNumberCell
+  ]);
 
   const defaultColumnDefs = useMemo(() => {
     return {

@@ -273,7 +273,6 @@ const TableView: React.FC<TableViewProps> = ({
   const filterParams: any = {
     textFilterParams: {
       filterOptions: ['contains', 'equals', 'notEqual'],
-      trimInput: true,
       buttons: ['reset', 'apply'],
       maxNumConditions: 1
     },
@@ -304,7 +303,6 @@ const TableView: React.FC<TableViewProps> = ({
           colDef.valueFormatter = params => renderCell(colName, params.value);
           colDef.tooltipValueGetter = params => renderCell(colName, params.value);
         }
-
 
         if (data.config.orderBy === colName) {
           colDef.sort = data.config.order;
@@ -639,22 +637,22 @@ const TableView: React.FC<TableViewProps> = ({
         </Button>
         <div className="ag-theme-quartz" style={{ height: '100%', width: '100%' }}>
           <AgGridReact
-            rowData={paddData()}
             columnDefs={columnDefs}
-            defaultColDef={defaultColumnDefs}
-            onSortChanged={onSortChanged}
-            suppressMultiSort
-            pagination
-            paginationPageSize={data.config.views.pageSize}
-            paginationPageSizeSelector={false}
-            onGridReady={onGridReady}
-            onCellClicked={onCellClicked}
-            onCellMouseOver={onCellMouseOver}
-            onCellMouseOut={onCellMouseOut}
-            localeText={AG_GRID_LOCALE_DE}
             // Automatically set the height of the table depending on the data.
             // Might become slow with a lot of data (1000+ rows).
             domLayout='autoHeight'
+            defaultColDef={defaultColumnDefs}
+            localeText={AG_GRID_LOCALE_DE}
+            onCellClicked={onCellClicked}
+            onCellMouseOut={onCellMouseOut}
+            onCellMouseOver={onCellMouseOver}
+            onGridReady={onGridReady}
+            onSortChanged={onSortChanged}
+            pagination
+            paginationPageSize={data.config.views.pageSize}
+            paginationPageSizeSelector={false}
+            rowData={paddData()}
+            suppressMultiSort
           />
         </div>
       </div>

@@ -1,5 +1,5 @@
 export interface FilterType {
-  filterOp: 'equals' | 'notEqual' | 'like' | 'greaterThan' | 'lessThan';
   filterKey: string;
+  filterOp: 'contains' | 'equals' | 'greaterThan' | 'lessThan' | 'like' | 'notEqual';
   filterValue: string;
 }

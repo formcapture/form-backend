@@ -689,12 +689,11 @@ class DataProcessor {
   #addFilterQuery(query: PostgrestFilterBuilder<any, any, any>, filter: FilterType) {
     const filterValue = filter?.filterValue?.trim();
     switch (filter?.filterOp) {
-      case 'contains':
-      case 'like':
-        query.ilike(filter.filterKey, `%${filterValue}%`);
-        break;
       case 'equals':
         query.eq(filter.filterKey, filterValue);
+        break;
+      case 'notEqual':
+        query.neq(filter.filterKey, filterValue);
         break;
       case 'greaterThan':
         query.gt(filter.filterKey, filterValue);
@@ -702,8 +701,9 @@ class DataProcessor {
       case 'lessThan':
         query.lt(filter.filterKey, filterValue);
         break;
-      case 'notEqual':
-        query.neq(filter.filterKey, filterValue);
+      case 'like':
+      case 'contains':
+        query.ilike(filter.filterKey, `%${filterValue}%`);
         break;
       default:
         break;

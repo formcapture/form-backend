@@ -16,8 +16,10 @@ import {
 import { AG_GRID_LOCALE_DE } from '@ag-grid-community/locale';
 import { AgGridReact, CustomCellEditorProps } from '@ag-grid-community/react';
 
-
 import Keycloak from 'keycloak-js';
+import _cloneDeep from 'lodash/cloneDeep';
+import _isNil from 'lodash/isNil';
+
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import Logger from '@terrestris/base-util/dist/Logger';
@@ -58,6 +60,20 @@ interface TableViewProps {
   orderBy?: string | null;
   showToast?: (message: TOAST_MESSAGE) => void;
 }
+
+const filterParams: any = {
+  textFilterParams: {
+    filterOptions: ['contains', 'equals', 'notEqual'],
+    buttons: ['reset', 'apply'],
+    maxNumConditions: 1
+  },
+  numberFilterParams: {
+    filterOptions: ['equals', 'notEqual', 'greaterThan', 'lessThan'],
+    trimInput: true,
+    buttons: ['reset', 'apply'],
+    maxNumConditions: 1
+  }
+};
 
 const TableView: React.FC<TableViewProps> = ({
   data,
@@ -175,10 +191,7 @@ const TableView: React.FC<TableViewProps> = ({
     );
   };
 
-  const renderGeometryTooltip = () => {
-    return 'Geometrie';
-  };
-
+  const renderGeometryTooltip = useCallback(() => 'Geometrie', []);
 
   const zoomToFeature = useCallback((rowProps: any) => {
     const geometryColumns = getGeometryColumns(data.config);
@@ -299,7 +312,7 @@ const TableView: React.FC<TableViewProps> = ({
     return data.config.properties[colName].title ?? colName;
   }, [data]);
 
-  const applyFilter = (setFilterModel: any, filterToApply: any) => {
+  const applyFilter = (setFilterModel: any, filterToApply: FilterType) => {
     const filterModel = {
       [filterToApply.filterKey]: {
         type: filterToApply.filterOp,
@@ -308,20 +321,6 @@ const TableView: React.FC<TableViewProps> = ({
       }
     };
     setFilterModel(filterModel);
-  };
-
-  const filterParams: any = {
-    textFilterParams: {
-      filterOptions: ['contains', 'equals', 'notEqual'],
-      buttons: ['reset', 'apply'],
-      maxNumConditions: 1
-    },
-    numberFilterParams: {
-      filterOptions: ['equals', 'notEqual', 'greaterThan', 'lessThan'],
-      trimInput: true,
-      buttons: ['reset', 'apply'],
-      maxNumConditions: 1
-    }
   };
 
   const isGeometryColumn = (format?: string) => {
@@ -382,9 +381,10 @@ const TableView: React.FC<TableViewProps> = ({
           }
         ]
       );
-  }, [columnNames, data.config.order, data.config.orderBy, data.config.properties,
-    filterParams.numberFilterParams, filterParams.textFilterParams, order, orderBy,
-    renderCell, renderColumnTitle, renderRowNumberCell]);
+  }, [
+    columnNames, data, renderGeometryTooltip, order, orderBy,
+    renderCell, renderColumnTitle, renderRowNumberCell
+  ]);
 
   const defaultColumnDefs = useMemo(() => {
     return {
@@ -438,14 +438,6 @@ const TableView: React.FC<TableViewProps> = ({
     };
     const newUrl = createTableViewUrl(window.location.href, queryParams);
     window.location.assign(newUrl);
-  };
-
-  // We have to fill the data with empty objects to
-  // make the table display the right pagination.
-  const paddData = () => {
-    const leftPaddedData = Array(page * data.config.views.pageSize).fill(undefined);
-    const rightPaddedData = Array(data.data.count - leftPaddedData.length - data.data.data.length).fill(undefined);
-    return [...leftPaddedData, ...data.data.data, ...rightPaddedData];
   };
 
   const onGridReady = (event: GridReadyEvent) => {
@@ -617,6 +609,23 @@ const TableView: React.FC<TableViewProps> = ({
     window.location.assign(itemViewUrl);
   };
 
+  const rowData = useMemo(() => {
+    if (!data.data || !data.data.data || !data.config.views.pageSize) {
+      return [];
+    }
+    if (data.data.data.length === 0) {
+      return [];
+    }
+
+    // If filter is set, we need to pad the data with objects matching the filter
+    // => re-use the first object in the data array
+    const fillContent = _isNil(filter) ? undefined : _cloneDeep(data.data.data[0]);
+
+    const leftPaddedData = Array(page * data.config.views.pageSize).fill(fillContent);
+    const rightPaddedData = Array(data.data.count - leftPaddedData.length - data.data.data.length).fill(fillContent);
+    return [...leftPaddedData, ...data.data.data, ...rightPaddedData];
+  }, [data, filter, page]);
+
   return (
     <div>
       <h3>{data.config.title ?? formId}</h3>
@@ -659,7 +668,7 @@ const TableView: React.FC<TableViewProps> = ({
             pagination
             paginationPageSize={data.config.views.pageSize}
             paginationPageSizeSelector={false}
-            rowData={paddData()}
+            rowData={rowData}
             suppressMultiSort
           />
         </div>

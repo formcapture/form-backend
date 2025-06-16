@@ -127,15 +127,15 @@ const App: React.FC = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [unauthorizedWithToken, setUnauthorizedWithToken] = useState(false);
-  const [toastVisible, setToastVisible] = useState(message ? true : false);
+  const [toastVisible, setToastVisible] = useState(!!message);
   const [toastMessageType, setToastMessageType] = useState<TOAST_MESSAGE>(message as TOAST_MESSAGE);
 
-  const handleUnauthorized = (keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
+  const handleUnauthorized = async (keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
     if (kc?.token) {
       setUnauthorizedWithToken(true);
       return;
     }
-    redirectToLogin(keycloakConfig);
+    await redirectToLogin(keycloakConfig);
   };
 
   const redirectToLogin = async (keycloakConfig: KeycloakConfig) => {
@@ -228,7 +228,7 @@ const App: React.FC = () => {
       const kc = await initializeKeycloak(keycloakConfig);
       const fetchedData = await fetchData(kc);
       if (fetchedData && fetchedData.error === 401) {
-        handleUnauthorized(keycloakConfig, kc);
+        await handleUnauthorized(keycloakConfig, kc);
       }
       if (kc) {
         setKeycloakInst(kc);
@@ -254,12 +254,9 @@ const App: React.FC = () => {
     if (!isLoading && !isValidUrl) {
       return true;
     }
-    if (unauthorizedWithToken) {
-      return true;
-    }
-
-    return false;
+    return unauthorizedWithToken;
   };
+
   const showTableView = data && formId && view === 'table';
   const showItemView = view === 'item' && data && formId;
 
@@ -312,10 +309,10 @@ const App: React.FC = () => {
           <ItemView
             data={data}
             formId={formId}
-            itemId={itemId}
-            previousView={previousView}
-            keycloak={getKeycloakInst()}
             internalMap={true}
+            itemId={itemId}
+            keycloak={getKeycloakInst()}
+            previousView={previousView}
             showToast={onShowToast}
           />
         )

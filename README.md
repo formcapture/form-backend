@@ -1,5 +1,9 @@
 # Form-Backend
 
+[![GitHub license](https://img.shields.io/github/license/formcapture/form-backend?style=flat-square)](https://github.com/formcapture/form-backend/blob/main/LICENSE)
+[![Coverage Status](https://img.shields.io/coverallsCoverage/github/formcapture/form-backend?style=flat-square)](https://coveralls.io/github/formcapture/form-backend?branch=main)
+![GitHub action build](https://img.shields.io/github/actions/workflow/status/formcapture/form-backend/on-push-main.yml?branch=main&style=flat-square)
+
 Backend providing form configuration and data input.
 
 ## Demo Application

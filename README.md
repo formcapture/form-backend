@@ -7,7 +7,7 @@
 An Express backend for serving dynamic forms based on custom configurations via a webapp, integrating with PostgREST for data access.
 
 ## Demo Application
-
+<!-- Todo: separate demo repository -->
 A simple demo application with some sample forms can be found in `./demo`.
 Take a look at `./demo/README.md` for details on how to get the demo
 up and running.

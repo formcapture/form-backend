@@ -20,10 +20,7 @@ Application will be accessible on `localhost:3000`.
 
 See `localhost:3000/docs` for the documentation.
 
-## Docker based Dev-Setup
-TODO docker dev setup in /demo folder.
-The `Dockerfile.dev` can also be used for the development setup.
-cf. https://github.com/opengisch/QFieldCloud/tree/master?tab=readme-ov-file#add-root-certificate
+<!-- Todo: docker based dev setup -->
 
 ## Configuration
 

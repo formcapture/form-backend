@@ -1,4 +1,6 @@
 import { NextFunction, Response } from 'express';
+import _isNil from 'lodash/isNil';
+import _isFinite from 'lodash/isFinite';
 import { Logger } from 'winston';
 
 import { GenericRequestError } from '../errors/GenericRequestError';
@@ -33,9 +35,9 @@ class FormService {
         filterValue,
         order,
         orderBy,
-        page
+        startRow,
+        endRow
       } = req.query;
-      let parsedPage;
       if (order !== null && order !== undefined && order !== 'asc' && order !== 'desc') {
         throw new GenericRequestError('Invalid value for argument "order"');
       }
@@ -44,8 +46,11 @@ class FormService {
         throw new GenericRequestError('Invalid value for argument "orderBy"');
       }
       // Query params are strings or arrays. We only support strings.
-      if (page !== null && page !== undefined && typeof page !== 'string') {
-        throw new GenericRequestError('Invalid value for argument "page"');
+      if (_isNil(startRow) || typeof startRow !== 'string') {
+        throw new GenericRequestError('Invalid value for argument "startRow"');
+      }
+      if (_isNil(endRow) || typeof endRow !== 'string') {
+        throw new GenericRequestError('Invalid value for argument "endRow"');
       }
       let filter;
       if (!checkFilterParams(filterKey as string, filterOp as string, filterValue as string)) {
@@ -62,15 +67,16 @@ class FormService {
           filterValue
         };
       }
-      if (page) {
-        try {
-          parsedPage = parseInt(page, 10);
-          if (isNaN(parsedPage)) {
-            throw new Error();
-          }
-        } catch {
-          throw new GenericRequestError('Invalid value for argument "page"');
+
+      let parsedStartRow, parsedEndRow;
+      try {
+        parsedStartRow = parseInt(startRow, 10);
+        parsedEndRow = parseInt(endRow, 10);
+        if (!_isFinite(parsedStartRow) || !_isFinite(parsedEndRow)) {
+          throw new Error();
         }
+      } catch {
+        throw new GenericRequestError('Invalid value for argument "startRow" / "endRow". Must be a number.');
       }
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
@@ -87,7 +93,7 @@ class FormService {
         orderBy
       );
 
-      const processedForm = await formProcessor.getTableForm(parsedPage, filter);
+      const processedForm = await formProcessor.getTableForm(parsedStartRow, parsedEndRow, filter);
       return res.json(processedForm);
     } catch (err) {
       if (err instanceof GenericRequestError) {

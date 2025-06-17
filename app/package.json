@@ -38,6 +38,7 @@
   "dependencies": {
     "@ag-grid-community/client-side-row-model": "^32.3.9",
     "@ag-grid-community/core": "^32.3.9",
+    "@ag-grid-community/infinite-row-model": "^32.3.9",
     "@ag-grid-community/locale": "^36.1.0",
     "@ag-grid-community/react": "^32.3.9",
     "@ag-grid-community/styles": "^32.3.9",
@@ -75,7 +76,7 @@
     "@typescript-eslint/parser": "^8.46.2",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "eslint": "^10.9.1",
+    "eslint": "^9.34.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",

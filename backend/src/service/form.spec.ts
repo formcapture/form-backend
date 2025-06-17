@@ -195,7 +195,7 @@ describe('FormService', () => {
 
       await formService.getForm(req, res, next);
 
-      expect(getTableFormMock).toHaveBeenCalledWith(undefined, {
+      expect(getTableFormMock).toHaveBeenCalledWith(0, 10, {
         filterKey: 'my_col',
         filterOp: 'contains',
         filterValue: 'my_value'

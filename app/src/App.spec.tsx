@@ -110,7 +110,9 @@ describe('App', () => {
     };
 
     globalThis.fetch = mockFetch;
-    (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 200));
+    (authenticatedFetch as Mock).mockImplementation(() => Promise.resolve(
+      createFetchResponse(mockData, 200)
+    ));
 
     setKeycloakInst(undefined as unknown as Keycloak);
   });

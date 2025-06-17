@@ -5,8 +5,7 @@ import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 import {
   AuthenticationError,
   FormRequestError,
-  GenericRequestError,
-  InternalServerError
+  GenericRequestError
 } from '../errors/GenericRequestError';
 import { checkFilterParams } from '../filter/filter';
 import { getPostgrestJwt } from '../keycloak/keycloak';
@@ -48,9 +47,9 @@ class FormService {
         filterValue,
         order,
         orderBy,
-        page
+        startRow = '0',
+        endRow = '10'
       } = req.query;
-      let parsedPage;
       if (order !== null && order !== undefined && order !== 'asc' && order !== 'desc') {
         next(new FormRequestError(
           'Invalid value for argument "order". Must be "asc" or "desc"', 400, {
@@ -67,9 +66,16 @@ class FormService {
         return;
       }
       // Query params are strings or arrays. We only support strings.
-      if (page !== null && page !== undefined && typeof page !== 'string') {
+      if (typeof startRow !== 'string') {
         next(new FormRequestError(
-          'Invalid value for argument "page"', 400, {
+          'Invalid value for argument "startRow"', 400, {
+            errorCode: FormBackendErrorCode.INVALID_PAGE
+          }));
+        return;
+      }
+      if (typeof endRow !== 'string') {
+        next(new FormRequestError(
+          'Invalid value for argument "endRow"', 400, {
             errorCode: FormBackendErrorCode.INVALID_PAGE
           }));
         return;
@@ -93,20 +99,14 @@ class FormService {
           filterValue
         };
       }
-      if (page) {
-        try {
-          parsedPage = parseInt(page, 10);
-          if (isNaN(parsedPage)) {
-            next(new InternalServerError('Could not parse page number'));
-            return;
-          }
-        } catch {
-          next(new FormRequestError(
-            'Invalid value for argument "page"', 400, {
-              errorCode: FormBackendErrorCode.INVALID_PAGE
-            }));
-          return;
-        }
+      const parsedStartRow = Number(startRow);
+      const parsedEndRow = Number(endRow);
+      if (!Number.isFinite(parsedStartRow) || !Number.isFinite(parsedEndRow)) {
+        next(new FormRequestError(
+          'Invalid value for arguments "startRow" and "endRow". Must be numbers.', 400, {
+            errorCode: FormBackendErrorCode.INVALID_PAGE
+          }));
+        return;
       }
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
@@ -124,7 +124,7 @@ class FormService {
         orderBy
       );
 
-      const processedForm = await formProcessor.getTableForm(parsedPage, filter);
+      const processedForm = await formProcessor.getTableForm(parsedStartRow, parsedEndRow, filter);
       return res.json(processedForm);
     } catch (err) {
       if (err instanceof GenericRequestError) {

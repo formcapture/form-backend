@@ -71,11 +71,6 @@ export const SEND_EVENTS = {
    */
   stopSelecting: 'embedit/stopSelecting',
   /**
-   * Update the features in the highlight layer with the given data.
-   * Replaces existing feature with the same column name or adds new feature.
-   */
-  updateHighlightingWith: 'embedit/updateHighlightingWith',
-  /**
    * Add features to the displayFormData layer.
    * Expects a list of objects containing a geojson geometry
    * and the respective column name as payload.

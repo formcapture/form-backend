@@ -46,7 +46,7 @@ class DataProcessor {
     return itemClone;
   }
 
-  async getFormData(formConfig: FormConfigInternal, page: number = 0, filter: FilterType) {
+  async getFormData(formConfig: FormConfigInternal, startRow: number, endRow: number, filter: FilterType) {
     const tableName = formConfig.dataSource.tableName;
     if (!tableName) {
       return;
@@ -54,17 +54,17 @@ class DataProcessor {
 
     const selectStatement = this.#createFormSelectStatement(formConfig);
 
-    const rangeLower = page * formConfig.views.pageSize;
-    const rangeUpper = rangeLower + formConfig.views.pageSize - 1;
+    // const rangeLower = page * formConfig.views.pageSize;
+    // const rangeUpper = rangeLower + formConfig.views.pageSize - 1;
     // TODO think about how to work with ranges and join tables, many-to-many etc
 
     const query = this.#pgClient
       .schema(formConfig.dataSource.schema || this.#pgClient.schemaName!)
       .from(tableName)
-      .select(selectStatement, { count: 'exact' });
+      .select(selectStatement, {count: 'exact'});
 
     this.#addOrderQuery(query, formConfig);
-    query.range(rangeLower, rangeUpper);
+    query.range(startRow, endRow - 1);
     this.#addFilterQuery(query, filter);
 
     const data = await query;

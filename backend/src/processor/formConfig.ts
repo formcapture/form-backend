@@ -1,5 +1,5 @@
 import { PostgrestClient } from '@supabase/postgrest-js';
-import merge from 'lodash.merge';
+import _merge from 'lodash/merge';
 import { Logger } from 'winston';
 
 import { GenericRequestError } from '../errors/GenericRequestError';
@@ -521,8 +521,7 @@ class FormConfigProcessor {
     tableDefinition: Record<string, any>,
     properties: FormConfigInternal['properties']
   ) {
-    const mergedProperties = merge(tableDefinition.properties, properties);
-    return mergedProperties;
+    return _merge(tableDefinition.properties, properties);
   }
 
   async #processJoinTables(formConfig: FormConfig | JoinTable, conf: FormConfigInternal | JoinTable) {

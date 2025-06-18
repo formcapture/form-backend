@@ -52,12 +52,12 @@ export class FormProcessor {
     return new FormProcessor(configProcessor, dataProcessor, userRoles);
   }
 
-  async getTableForm(page?: number, filter?: any) {
+  async getTableForm(startRow: number, endRow: number, filter?: any) {
     const processedConfig = this.#configProcessor.getFormConfig();
     if (!processedConfig) {
       return;
     }
-    const processedData = await this.#dataProcessor.getFormData(processedConfig, page, filter);
+    const processedData = await this.#dataProcessor.getFormData(processedConfig, startRow, endRow, filter);
     const postProcessedConfig = this.#configProcessor.postProcessTableConfig(this.#userRoles);
     return {
       config: postProcessedConfig,

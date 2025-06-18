@@ -1,9 +1,81 @@
-import { ISimpleFilterModel } from '@ag-grid-community/core';
+import { IGetRowsParams, ISimpleFilterModel } from '@ag-grid-community/core';
 import Keycloak from 'keycloak-js';
 
 import { ItemId } from '../App';
 
 import { authenticatedFetch } from './authenticatedFetch';
+import Logger from '@terrestris/base-util/dist/Logger';
+import _isNil from 'lodash/isNil';
+
+const fetchTableData = async (formId: string, getRowsParams: Partial<IGetRowsParams>, keycloak?: Keycloak) => {
+  const defaultItems = {
+    data: {
+      results: [],
+      count: 0
+    }
+  };
+  if (formId === null) {
+    Logger.error('Cannot fetch data. No formId provided');
+    return defaultItems;
+  }
+
+
+
+  // const response = await getForm(formId, getRowsParams.startRow ?? 0, null, null, null, undefined, null, keycloak);
+  let url = `../form/${formId}`;
+
+  const params = new URLSearchParams({
+    startRow: `${getRowsParams.startRow}`,
+    endRow:`${getRowsParams.endRow}`,
+  });
+
+  if (!_isNil(getRowsParams.sortModel)) {
+    const sortModel = getRowsParams.sortModel[0];
+    console.log('sortModel', sortModel);
+    if (sortModel) {
+      params.append('order', sortModel.sort);
+      params.append('orderBy', sortModel.colId);
+    }
+  }
+
+  if (!_isNil(getRowsParams.filterModel)) {
+    const filterModel = getRowsParams.filterModel;
+    const filterKey = Object.keys(filterModel)[0];
+    console.log('filterModel', filterModel);
+    if (filterKey) {
+      const filterValue = filterModel[filterKey].filter;
+      const filterOp = filterModel[filterKey].type;
+      params.append('filterKey', filterKey);
+      params.append('filterValue', filterValue);
+      params.append('filterOp', filterOp);
+    }
+  }
+  if (params.toString()) {
+    url += `?${params.toString()}`;
+  }
+
+  const response = await authenticatedFetch(url, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  }, keycloak);
+
+  if (response.status === 401) {
+    return {
+      error: 401
+    };
+  }
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch data');
+  }
+  const json = await response.json();
+  if (json.data === undefined) {
+    throw new Error('Failed to fetch data');
+  }
+
+  return json;
+};
+
 
 const getForm = async (
   formId: string,
@@ -109,6 +181,7 @@ const fetchFile = async (fileIdentifier: string, kc?: Keycloak) => {
 };
 
 export default {
+  fetchTableData,
   createItem,
   deleteItem,
   getEmptyForm,

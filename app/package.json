@@ -37,7 +37,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.29.0",
-    "@playwright/test": "^1.53.0",
+    "@playwright/test": "^1.53.1",
     "@stylistic/eslint-plugin": "^4.4.1",
     "@terrestris/eslint-config-typescript": "^9.0.0",
     "@terrestris/eslint-config-typescript-react": "^5.0.1",

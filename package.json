@@ -1,12 +1,30 @@
 {
   "name": "form-backend",
   "version": "0.9.0",
-  "description": "Form Backend",
-  "license": "BSD-2-Clause",
+  "description": "An Express backend for serving dynamic forms based on custom configurations via a webapp, integrating with PostgREST for data access.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/formcapture/form-backend.git"
   },
+  "license": "BSD-2-Clause",
+  "author": "terrestris GmbH & Co. KG <info@terrestris.de>",
+  "contributors": [
+    {
+      "name": "Jan Suleiman",
+      "email": "suleiman@terrestris.de",
+      "url": "https://github.com/jansule"
+    },
+    {
+      "name": "Hannes Blitza",
+      "email": "blitza@terrestris.de",
+      "url": "https://github.com/hblitza"
+    },
+    {
+      "name": "André Henn",
+      "email": "henn@terrestris.de",
+      "url": "https://github.com/ahennr"
+    }
+  ],
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",

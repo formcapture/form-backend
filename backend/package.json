@@ -1,6 +1,26 @@
 {
   "name": "form-backend",
   "version": "1.0.0",
+  "description": "The Backend providing form configuration and data input.",
+  "license": "BSD-2-Clause",
+  "author": "terrestris GmbH & Co. KG <info@terrestris.de>",
+  "contributors": [
+    {
+      "name": "Jan Suleiman",
+      "email": "suleiman@terrestris.de",
+      "url": "https://github.com/jansule"
+    },
+    {
+      "name": "Hannes Blitza",
+      "email": "blitza@terrestris.de",
+      "url": "https://github.com/hblitza"
+    },
+    {
+      "name": "André Henn",
+      "email": "henn@terrestris.de",
+      "url": "https://github.com/ahennr"
+    }
+  ],
   "main": "index.js",
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.prod.json",
@@ -16,9 +36,6 @@
     "test:watch": "jest --watch --config=jest.config.watch.ts",
     "typecheck": "tsc"
   },
-  "author": "",
-  "license": "MIT",
-  "description": "",
   "dependencies": {
     "@supabase/postgrest-js": "^1.15.8",
     "dotenv": "^16.4.5",

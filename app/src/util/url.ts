@@ -1,8 +1,9 @@
 import { ISimpleFilterModel } from '@ag-grid-community/core';
 
+import Logger from '@terrestris/base-util/dist/Logger';
+
 import { ItemId } from '../App';
 import { isFilterType } from '../typeguards';
-import Logger from '@terrestris/base-util/dist/Logger';
 
 export const getOrderFromUrl = (url: string) => {
   const urlInst = new URL(url);

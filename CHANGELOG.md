@@ -1,3 +1,25 @@
+# [1.1.0](https://github.com/formcapture/form-backend/compare/v1.0.1...v1.1.0) (2025-06-24)
+
+
+### Bug Fixes
+
+* allow whitespaces in filter ([d698698](https://github.com/formcapture/form-backend/commit/d698698141fd74ce9fac81fac72b39429e1b89ef))
+* contains and like filter Op ([9f26cc1](https://github.com/formcapture/form-backend/commit/9f26cc1f29e09a8fc77e7d13c7e09bb4d09833e6))
+* if filter is set, we need to pad the data with objects matching the filter ([68fc81a](https://github.com/formcapture/form-backend/commit/68fc81af2f574bace8d85ef587a406620289ad60))
+* introduce jest mock for node:fs/promise ([919e844](https://github.com/formcapture/form-backend/commit/919e844f9fababc6d687d67df13ea95258304279))
+* readd sourcemap to tsconfig ([99e451c](https://github.com/formcapture/form-backend/commit/99e451c5f334fdd2687cb5c4a2bede20f0312014))
+* show pagination total count ([be5b226](https://github.com/formcapture/form-backend/commit/be5b22673ef13956c419690867fb64f1a962e2f9))
+* tests ([1dabbc9](https://github.com/formcapture/form-backend/commit/1dabbc9b0442c25134de09ae716642a6d97f6355))
+* use Logger of @terrestris/base-util instead of console.log ([252bb9e](https://github.com/formcapture/form-backend/commit/252bb9e6ba21170720359d8af841fba41d0979fd))
+
+
+### Features
+
+* adds contains filter operation ([0573184](https://github.com/formcapture/form-backend/commit/0573184d8b7aa1c84c847d0cdf79e8cc0bccebd5))
+* bump vite to v6 and vitest to v3 ([6e48646](https://github.com/formcapture/form-backend/commit/6e486466d160912676a630cba663b8a39248de16))
+* enhance contributing guidelines, add pr template ([076d197](https://github.com/formcapture/form-backend/commit/076d1979cababe6ee143103cda7c03098ecfa839))
+* return geojson including all properties ([744bce0](https://github.com/formcapture/form-backend/commit/744bce0a3c76c3b02d28389e99ca4e44e2369402))
+
 ## [1.0.1](https://github.com/formcapture/form-backend/compare/v1.0.0...v1.0.1) (2025-06-10)
 
 

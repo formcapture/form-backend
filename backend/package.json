@@ -1,6 +1,6 @@
 {
   "name": "form-backend",
-  "version": "1.0.0",
+  "version": "0.0.0-semantically-released",
   "description": "The Backend providing form configuration and data input.",
   "license": "BSD-2-Clause",
   "author": "terrestris GmbH & Co. KG <info@terrestris.de>",

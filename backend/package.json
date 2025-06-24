@@ -42,7 +42,7 @@
     "express": "^4.21.2",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
-    "lodash.merge": "^4.6.2",
+    "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
     "winston": "^3.14.2"
   },
@@ -52,7 +52,7 @@
     "@types/express": "^4.17.21",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/lodash.merge": "^4.6.9",
+    "@types/lodash": "^4.17.17",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^20.14.11",
     "@typescript-eslint/eslint-plugin": "^8.34.0",

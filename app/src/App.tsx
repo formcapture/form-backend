@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, FC, JSX } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
 
@@ -109,7 +109,7 @@ if (JSONEditor && JSONEditor.defaults && JSONEditor.defaults.editors && JSONEdit
   });
 }
 
-const App: React.FC = () => {
+const App: FC = (): JSX.Element => {
   const view = new URLSearchParams(window.location.search).get('view');
   const formId = new URLSearchParams(window.location.search).get('formId');
   const itemId: ItemId | undefined = new URLSearchParams(window.location.search).get('itemId') ?? undefined;
@@ -162,9 +162,10 @@ const App: React.FC = () => {
     try {
       let response;
 
-      if (view === 'table') {
-        response = await api.getForm(formId, page, filterKey, filterOp, filterValue, order, orderBy, kc);
-      } else if (view === 'item' && itemId !== undefined) {
+      // if (view === 'table') {
+      //   response = await api.getForm(formId, page, filterKey, filterOp, filterValue, order, orderBy, kc);
+      // } else
+      if (view === 'item' && itemId !== undefined) {
         response = await api.getFormItem(formId, itemId, kc);
       } else {
         response = await api.getEmptyForm(formId, kc);

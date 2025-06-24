@@ -1,6 +1,6 @@
 {
   "name": "form-backend",
-  "version": "0.9.0",
+  "version": "0.0.0-semantically-released",
   "description": "An Express backend for serving dynamic forms based on custom configurations via a webapp, integrating with PostgREST for data access.",
   "repository": {
     "type": "git",

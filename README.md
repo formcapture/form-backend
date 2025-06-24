@@ -7,10 +7,9 @@
 An Express backend for serving dynamic forms based on custom configurations via a webapp, integrating with PostgREST for data access.
 
 ## Demo Application
-<!-- Todo: separate demo repository -->
-A simple demo application with some sample forms can be found in `./demo`.
-Take a look at `./demo/README.md` for details on how to get the demo
-up and running.
+
+A simple demo application with some sample forms can be found in the [form-backend-demo repository](https://github.com/formcapture/form-backend-demo).
+Take a look at `README.md` for details on how to get the demo up and running.
 
 ## Docs
 
@@ -18,7 +17,7 @@ User docs are available on a running instance on `/docs`.
 
 ## App
 
-A React webapp to to render dataview tables and forms. While the table view shows all records in a filterable overview table, the detail view renders the actual form to edit a record. Several specific Postmessage API events supports the integration of the webapp in other clients (e.g. to visualize spatial data). See [app/README.md](respective README) for more information.
+A React webapp to render dataview tables and forms. While the table view shows all records in a filterable overview table, the detail view renders the actual form to edit a record. Several specific Postmessage API events supports the integration of the webapp in other clients (e.g. to visualize spatial data). See [app/README.md](respective README) for more information.
 
 ## Backend
 The backend that will serve the webapp as well as handle requests. [PostgREST](https://postgrest.org) is required to access data and [keycloak](https://keycloak.org) for authentification. Please check the `demo` folder to run a test setup.

@@ -31,7 +31,7 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/gitlab": "^13.2.6",
-    "semantic-release": "^24.2.5"
+    "semantic-release": "^24.2.7"
   },
   "engines": {
     "node": ">=20",

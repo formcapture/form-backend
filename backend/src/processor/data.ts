@@ -15,13 +15,13 @@ import FileProcessor from './file';
 import FormConfigProcessor from './formConfig';
 
 export interface DataProcessorOpts {
-  pgClient: PostgrestClient<any, string, any>;
+  pgClient: PostgrestClient<any, any, any>;
   formId: string;
   opts: Opts;
 }
 
 class DataProcessor {
-  #pgClient: PostgrestClient<any, string, any>;
+  #pgClient: PostgrestClient<any, any, any>;
   #fileProcessor: FileProcessor;
   #logger: Logger;
 
@@ -686,7 +686,7 @@ class DataProcessor {
     return columns.toString();
   }
 
-  #addFilterQuery(query: PostgrestFilterBuilder<any, any, any>, filter: FilterType) {
+  #addFilterQuery(query: PostgrestFilterBuilder<any, any, any, any>, filter: FilterType) {
     const filterValue = filter?.filterValue?.trim();
     switch (filter?.filterOp) {
       case 'equals':
@@ -710,7 +710,7 @@ class DataProcessor {
     }
   }
 
-  #addOrderQuery(query: PostgrestFilterBuilder<any, any, any>, formConfig: FormConfigInternal) {
+  #addOrderQuery(query: PostgrestFilterBuilder<any, any, any, any>, formConfig: FormConfigInternal) {
     const orderBy = formConfig.dataSource.orderBy;
     const ascending = formConfig.dataSource.order === 'asc';
     const resolveAsEnum = formConfig.properties[orderBy].resolveAsEnum;

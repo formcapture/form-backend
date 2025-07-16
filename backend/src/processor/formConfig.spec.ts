@@ -27,7 +27,7 @@ describe('FormConfigProcessor', () => {
 
   it('can be created', () => {
     const opts = {} as Opts;
-    const pgClient = {} as PostgrestClient<any, string, any>;
+    const pgClient = {} as PostgrestClient<any, any, any>;
     const formProcessor = new FormConfigProcessor(opts, pgClient, '');
     expect(formProcessor).toBeDefined();
   });
@@ -41,7 +41,7 @@ describe('FormConfigProcessor', () => {
         },
         views: {}
       } as unknown as FormConfig;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const postgrestToken = '';
       const mockedResponse = {
         definitions: {
@@ -90,7 +90,7 @@ describe('FormConfigProcessor', () => {
       };
       fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -116,7 +116,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const userDefinedOrder = 'asc';
         const processedConfig = await formProcessor.processConfig(formConfig, userDefinedOrder);
@@ -140,7 +140,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -162,7 +162,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -190,7 +190,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const userDefinedOrderBy = 'bar';
         const processedConfig = await formProcessor.processConfig(formConfig, undefined, userDefinedOrderBy);
@@ -218,7 +218,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -245,7 +245,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -266,7 +266,7 @@ describe('FormConfigProcessor', () => {
       };
       fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -287,7 +287,7 @@ describe('FormConfigProcessor', () => {
       };
       fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -312,7 +312,7 @@ describe('FormConfigProcessor', () => {
       };
       fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -337,7 +337,7 @@ describe('FormConfigProcessor', () => {
       };
       fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -358,7 +358,7 @@ describe('FormConfigProcessor', () => {
       };
       fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -397,7 +397,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -443,7 +443,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -481,7 +481,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -520,7 +520,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -559,7 +559,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -599,7 +599,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -633,7 +633,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -674,7 +674,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -764,7 +764,7 @@ describe('FormConfigProcessor', () => {
         };
         fetchMock.mockReturnValue(createFetchResponse(mockedResponse));
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         const processedConfig = await formProcessor.processConfig(formConfig);
 
@@ -867,7 +867,7 @@ describe('FormConfigProcessor', () => {
           }
         } as unknown as FormConfigInternal;
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         formProcessor.setFormConfig(formConfig);
         const processedConfig = formProcessor.postProcessItemConfig([]);
@@ -889,7 +889,7 @@ describe('FormConfigProcessor', () => {
           }
         } as unknown as FormConfigInternal;
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         formProcessor.setFormConfig(formConfig);
         const processedConfig = formProcessor.postProcessItemConfig([]);
@@ -911,7 +911,7 @@ describe('FormConfigProcessor', () => {
           }
         } as unknown as FormConfigInternal;
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         formProcessor.setFormConfig(formConfig);
         const processedConfig = formProcessor.postProcessItemConfig([]);
@@ -938,7 +938,7 @@ describe('FormConfigProcessor', () => {
           }
         } as unknown as FormConfigInternal;
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         formProcessor.setFormConfig(formConfig);
         const processedConfig = formProcessor.postProcessItemConfig([]);
@@ -960,7 +960,7 @@ describe('FormConfigProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessItemConfig(['foo']);
@@ -981,7 +981,7 @@ describe('FormConfigProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessItemConfig(['foo']);
@@ -1003,7 +1003,7 @@ describe('FormConfigProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessItemConfig(['foo']);
@@ -1025,7 +1025,7 @@ describe('FormConfigProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessItemConfig(['foo']);
@@ -1060,7 +1060,7 @@ describe('FormConfigProcessor', () => {
           }
         } as unknown as FormConfigInternal;
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         formProcessor.setFormConfig(formConfig);
         const processedConfig = formProcessor.postProcessTableConfig([]);
@@ -1082,7 +1082,7 @@ describe('FormConfigProcessor', () => {
           }
         } as unknown as FormConfigInternal;
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         formProcessor.setFormConfig(formConfig);
         const processedConfig = formProcessor.postProcessTableConfig([]);
@@ -1104,7 +1104,7 @@ describe('FormConfigProcessor', () => {
           }
         } as unknown as FormConfigInternal;
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         formProcessor.setFormConfig(formConfig);
         const processedConfig = formProcessor.postProcessTableConfig([]);
@@ -1131,7 +1131,7 @@ describe('FormConfigProcessor', () => {
           }
         } as unknown as FormConfigInternal;
         const opts = {} as Opts;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const formProcessor = new FormConfigProcessor(opts, pgClient, '');
         formProcessor.setFormConfig(formConfig);
         const processedConfig = formProcessor.postProcessTableConfig([]);
@@ -1153,7 +1153,7 @@ describe('FormConfigProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessTableConfig(['foo']);
@@ -1174,7 +1174,7 @@ describe('FormConfigProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessTableConfig(['foo']);
@@ -1196,7 +1196,7 @@ describe('FormConfigProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessTableConfig(['foo']);
@@ -1218,7 +1218,7 @@ describe('FormConfigProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       const opts = {} as Opts;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const formProcessor = new FormConfigProcessor(opts, pgClient, '');
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessTableConfig(['foo']);

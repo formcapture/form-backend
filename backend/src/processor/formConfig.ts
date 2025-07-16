@@ -16,14 +16,14 @@ class FormConfigProcessor {
 
   #formConfig?: FormConfigInternal;
 
-  #pgClient: PostgrestClient<any, string, any>;
+  #pgClient: PostgrestClient<any, any, any>;
   #pgUrl: string;
   #postgrestToken: string;
   #logger: Logger;
 
   constructor(
     opts: Opts,
-    pgClient: PostgrestClient<any, string, any>,
+    pgClient: PostgrestClient<any, any, any>,
     postgrestToken: string
   ) {
     this.#pgUrl = opts.POSTGREST_URL;
@@ -36,18 +36,20 @@ class FormConfigProcessor {
    * Create a new FormConfigProcessor instance with already
    * resolved formConfig.
    * In comparison to the direct instantiation of FormConfigProcessor,
-   * this methods resolves the formConfig and sets it on the processor.
+   * this method resolves the formConfig and sets it on the processor.
    *
    * @param opts The opts.
    * @param formConfig The form config.
    * @param pgClient The pgClient.
    * @param postgrestToken The postgrest token.
+   * @param order The order to use for the data source (optional).
+   * @param orderBy The orderBy to use for the data source (optional).
    * @returns FormConfigProcessor instance with resolved formConfig.
    */
   static async createFormConfigProcessor(
     opts: Opts,
     formConfig: FormConfig,
-    pgClient: PostgrestClient<any, string, any>,
+    pgClient: PostgrestClient<any, any, any>,
     postgrestToken: string,
     order?: FormConfig['dataSource']['order'],
     orderBy?: FormConfig['dataSource']['orderBy'],
@@ -65,6 +67,7 @@ class FormConfigProcessor {
    * - user has write permission on form
    * - form is set to be readable by all (aka read === true)
    * - user has role that is included in the access.read
+   * @param formConfig The form config to check access for.
    * @param userRoles List of roles that user has
    * @returns True, if user has permission to read form, false otherwise.
    */
@@ -92,6 +95,7 @@ class FormConfigProcessor {
    * Write form is allowed when one of following conditions hold true:
    * - form is set to be writable by all (aka write === true)
    * - user has role that is included in the access.write
+   * @param formConfig The form config to check access for.
    * @param userRoles List of roles that user has
    * @returns True, if user has permission to write form, false otherwise.
    */
@@ -138,9 +142,8 @@ class FormConfigProcessor {
       .filter((prop: string) => formConfig.properties[prop].resolveTable);
 
     if (relationship) {
-      const propsWithRelationship = propsWithJoinTables
+      return propsWithJoinTables
         .filter((prop: string) => formConfig.dataSource.joinTables?.[prop]?.relationship === relationship);
-      return propsWithRelationship;
     }
 
     return propsWithJoinTables;
@@ -157,6 +160,8 @@ class FormConfigProcessor {
   /**
    * Process the form config to a form config internal.
    * @param formConfig The form config to process.
+   * @param order
+   * @param orderBy
    * @returns The form config internal.
    */
   async processConfig(
@@ -193,17 +198,14 @@ class FormConfigProcessor {
     } as FormConfigInternal | JoinTable;
 
     if (isFormConfig(formConfig)) {
-      const views: FormConfigInternal['views'] = {
+      config.views = {
         item: formConfig.views.item ?? false,
         table: formConfig.views.table ?? false,
         pageSize: formConfig.views.pageSize ?? 10
       };
-      config.views = views;
     }
 
-    const resolvedProperties = await this.#resolveEnums(properties, config);
-
-    config.properties = resolvedProperties;
+    config.properties = await this.#resolveEnums(properties, config);
 
     config = await this.#processJoinTables(formConfig, config);
     config = await this.#processLookupTables(formConfig, config);
@@ -228,9 +230,7 @@ class FormConfigProcessor {
     }
 
     const filteredProperties = this.#filterByIncludedProperties(formConfig, formConfig.includedProperties);
-    const postProcessedProperties = this.#postProcessProperties(filteredProperties);
-
-    postProcessedConfig.properties = postProcessedProperties;
+    postProcessedConfig.properties = this.#postProcessProperties(filteredProperties);
     return postProcessedConfig;
   }
 
@@ -251,8 +251,7 @@ class FormConfigProcessor {
     }
 
     const filteredProperties = this.#filterByIncludedProperties(formConfig, formConfig.includedPropertiesTable);
-    const postProcessedProperties = this.#postProcessProperties(filteredProperties);
-    postProcessedConfig.properties = postProcessedProperties;
+    postProcessedConfig.properties = this.#postProcessProperties(filteredProperties);
 
     return postProcessedConfig;
   }
@@ -287,7 +286,7 @@ class FormConfigProcessor {
    */
   #postProcessProperties(properties: FormConfigInternal['properties']) {
     const propsToExclude = ['resolveTable', 'resolveAsEnum', 'resolveToColumn', 'resolveLookup'];
-    const postProcessedProperties = Object.keys(properties)
+    return Object.keys(properties)
       .reduce((acc, key) => {
         const property = properties[key];
         const processedProperty: FormConfigPublic['properties'] = Object.keys(property)
@@ -316,7 +315,6 @@ class FormConfigProcessor {
           [key]: processedProperty
         };
       }, {});
-    return postProcessedProperties;
   }
 
   #addRequiredFileProperties(properties: FormConfigInternal['properties']) {
@@ -348,7 +346,7 @@ class FormConfigProcessor {
     includedProperties: FormConfigInternal['includedProperties'] | FormConfigInternal['includedPropertiesTable'] = []
   ) {
     const properties = formConfig.properties;
-    const filteredProperties = Object.keys(properties)
+    return Object.keys(properties)
       .filter(key => includedProperties.includes(key))
       .reduce((obj, key) => {
         const filteredProperty: FormConfigInternal['properties'] = {
@@ -381,8 +379,6 @@ class FormConfigProcessor {
         }
         return filteredProperty;
       }, {});
-
-    return filteredProperties;
   }
 
   #sanitizeIncludedProperties(
@@ -521,8 +517,7 @@ class FormConfigProcessor {
     tableDefinition: Record<string, any>,
     properties: FormConfigInternal['properties']
   ) {
-    const mergedProperties = merge(tableDefinition.properties, properties);
-    return mergedProperties;
+    return merge(tableDefinition.properties, properties);
   }
 
   async #processJoinTables(formConfig: FormConfig | JoinTable, conf: FormConfigInternal | JoinTable) {

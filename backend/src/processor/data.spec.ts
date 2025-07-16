@@ -35,7 +35,7 @@ describe('DataProcessor', () => {
   });
 
   it('can be created', () => {
-    const pgClient = {} as PostgrestClient<any, string, any>;
+    const pgClient = {} as PostgrestClient<any, any, any>;
     const dataProcessor = new DataProcessor(
       { pgClient, formId: '', opts: {} as Opts },
       new FileProcessor({} as FileProcessorOpts)
@@ -294,7 +294,7 @@ describe('DataProcessor', () => {
           }
         }
       } as unknown as FormConfigInternal;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const fileProcessor = {} as FileProcessor;
       const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -320,7 +320,7 @@ describe('DataProcessor', () => {
           }
         }
       } as unknown as FormConfigInternal;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const fileProcessor = {} as FileProcessor;
       const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -346,7 +346,7 @@ describe('DataProcessor', () => {
           }
         }
       } as unknown as FormConfigInternal;
-      const pgClient = {} as PostgrestClient<any, string, any>;
+      const pgClient = {} as PostgrestClient<any, any, any>;
       const fileProcessor = {} as FileProcessor;
       const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -395,7 +395,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -448,7 +448,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -507,7 +507,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -564,7 +564,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -617,7 +617,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -676,7 +676,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -736,7 +736,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -791,7 +791,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -853,7 +853,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -917,7 +917,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 
@@ -976,7 +976,7 @@ describe('DataProcessor', () => {
             }
           }
         } as unknown as FormConfigInternal;
-        const pgClient = {} as PostgrestClient<any, string, any>;
+        const pgClient = {} as PostgrestClient<any, any, any>;
         const fileProcessor = {} as FileProcessor;
         const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, fileProcessor);
 

@@ -2,7 +2,11 @@
   "out": "./public/docs",
   "cleanOutputDir": false,
   "entryPoints": [
-    "./src/types/formConfig.ts"
+    "./src/types/formConfig.ts",
+    "./src/types/access.ts",
+    "./src/types/dataSource.ts",
+    "./src/types/formConfigProperties.ts",
+    "./src/types/views.ts"
   ],
   "plugin": [
     "typedoc-plugin-missing-exports"

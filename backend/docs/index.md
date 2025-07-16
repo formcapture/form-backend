@@ -2,7 +2,7 @@
 
 This is the documentation for the form-backend.
 
-- [Configuration Documentation (formConfig)](./types/formConfig.FormConfig.html)
+- [Configuration Documentation (formConfig)](./interfaces/formConfig.FormConfig.html)
 - [API Documentation](./api.md)
 - [Changelog](../../CHANGELOG.md)
 

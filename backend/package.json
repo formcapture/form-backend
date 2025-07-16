@@ -24,9 +24,10 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.prod.json",
-    "build-docs": "typedoc",
+    "build-docs": "npm run clean:docs && typedoc",
     "check": "npm run lint && npm run typecheck",
     "clean": "rimraf dist coverage",
+    "clean:docs": "rimraf backend/public/docs",
     "dev": "nodemon",
     "lint": "eslint -c eslint.config.mjs src/**",
     "lint:fix": "eslint -c eslint.config.mjs src/** --fix",

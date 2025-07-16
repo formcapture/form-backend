@@ -55,8 +55,7 @@ export const getTokenFromHeader = (authorization: string|undefined) => {
 };
 
 export const getRolesFromToken = (decodedToken: JwtPayload|undefined, opts: Opts) => {
-  const roles = decodedToken?.resource_access?.[opts.KC_CLIENT_APP_ID]?.roles ?? [];
-  return roles;
+  return decodedToken?.resource_access?.[opts.KC_CLIENT_APP_ID]?.roles ?? [];
 };
 
 /**
@@ -87,6 +86,5 @@ export const getPostgrestJwt = async (opts: Opts) => {
     return;
   }
   const data = await response.json();
-  const token = data.access_token;
-  return token;
+  return data.access_token;
 };

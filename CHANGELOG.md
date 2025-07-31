@@ -1,3 +1,22 @@
+# [2.0.0](https://github.com/formcapture/form-backend/compare/v1.1.0...v2.0.0) (2025-07-31)
+
+
+### Bug Fixes
+
+* improve doc generation ([407645c](https://github.com/formcapture/form-backend/commit/407645c21d6160b5e6fa5653b57b6f68ef294153))
+* itemView useEffect hook ([9cd602d](https://github.com/formcapture/form-backend/commit/9cd602daed3a0789c652992afdea42c37d0e7d85))
+* typing issues ([e1a16dc](https://github.com/formcapture/form-backend/commit/e1a16dc058c1067500e17a4eda6cbad103b3b4e8))
+
+
+### chore
+
+* update package lock ([4214e55](https://github.com/formcapture/form-backend/commit/4214e55001ac4b4bc9175e2ac5e2ccdb7e70331d))
+
+
+### BREAKING CHANGES
+
+* Update node to v24
+
 # [1.1.0](https://github.com/formcapture/form-backend/compare/v1.0.1...v1.1.0) (2025-06-24)
 
 

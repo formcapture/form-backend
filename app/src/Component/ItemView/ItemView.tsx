@@ -100,7 +100,9 @@ const ItemView: React.FC<ItemViewProps> = ({
       return;
     }
     if (editor) {
-      editor?.setValue(editorData);
+      if (editorData) {
+        editor?.setValue(editorData);
+      }
       return;
     }
     const editorEl = editorRef.current;
@@ -122,7 +124,7 @@ const ItemView: React.FC<ItemViewProps> = ({
       }
     });
     setEditor(editorInst);
-  }, [editorRef, editorData, internalMap, formId, data, editor, editable]);
+  }, [data, editable, editor, editorRef, editorData, formId, internalMap]);
 
   const onUpdateItem = async (e: any) => {
     e.preventDefault();

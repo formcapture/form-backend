@@ -191,6 +191,7 @@ const TableView: React.FC<TableViewProps> = ({
     );
   };
 
+
   const renderGeometryTooltip = useCallback(() => 'Geometrie', []);
 
   const zoomToFeature = useCallback((rowProps: any) => {
@@ -511,7 +512,7 @@ const TableView: React.FC<TableViewProps> = ({
   }, [data, filter, formId, order, page]);
 
   useEffect(() => {
-    if (!containsGeometryColumns) {
+    if (!containsGeometryColumns || !data || !data.config) {
       return;
     }
     const showFeaturesInMap = () => {

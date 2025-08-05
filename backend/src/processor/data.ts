@@ -135,7 +135,7 @@ class DataProcessor {
     sanitizedData = this.#fileProcessor.getItemWithoutFiles(sanitizedData, Object.keys(keysAndFiles));
 
     const response = await this.#pgClient
-      .schema(formConfig.dataSource.schema || this.#pgClient.schemaName!)
+      .schema(formConfig.dataSource.schema || this.#pgClient.schemaName)
       .from(tableName)
       .insert(sanitizedData)
       .select();

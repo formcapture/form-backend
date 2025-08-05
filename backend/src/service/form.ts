@@ -197,6 +197,7 @@ class FormService {
         userRoles,
         postgrestToken
       );
+
       const createResponse = await formProcessor.createFormItem(req.body);
 
       return res.json(createResponse);

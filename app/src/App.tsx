@@ -109,6 +109,9 @@ if (JSONEditor && JSONEditor.defaults && JSONEditor.defaults.editors && JSONEdit
   });
 }
 
+// @ts-expect-error This should be injected by vite
+const checkLoginIframe = import.meta.env.MODE !== 'development';
+
 const App: React.FC = () => {
   const view = new URLSearchParams(window.location.search).get('view');
   const formId = new URLSearchParams(window.location.search).get('formId');
@@ -146,7 +149,8 @@ const App: React.FC = () => {
       // Will force a reload afterwards so
       // we do not have to put this into state.
       await newKc.init({
-        onLoad: 'login-required'
+        onLoad: 'login-required',
+        checkLoginIframe
       });
     } catch (err) {
       Logger.error('Failed to initialize keycloak', err);
@@ -178,7 +182,7 @@ const App: React.FC = () => {
         throw new Error('Failed to fetch data');
       }
       const json = await response.json();
-      if (json.data === undefined) {
+      if (json.config === undefined) {
         throw new Error('Failed to fetch data');
       }
       return json;
@@ -209,7 +213,8 @@ const App: React.FC = () => {
 
     try {
       await kc.init({
-        onLoad: 'check-sso'
+        onLoad: 'check-sso',
+        checkLoginIframe
       });
     } catch (err) {
       Logger.error('Failed to initialize keycloak', err);

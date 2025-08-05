@@ -58,11 +58,15 @@ describe('FormProcessor', () => {
       }
     };
 
-    await FormProcessor.createFormProcessor(opts, formConfig, 'foo', userRoles, '');
+    const myToken = 'test-token';
+
+    await FormProcessor.createFormProcessor(opts, formConfig, 'foo', userRoles, myToken);
 
     expect(PostgrestClient).toHaveBeenCalledTimes(1);
     expect(PostgrestClient).toHaveBeenCalledWith(opts.POSTGREST_URL, {
-      fetch: expect.any(Function),
+      headers: {
+        Authorization: `Bearer ${myToken}`
+      },
       schema: opts.POSTGREST_DEFAULT_SCHEMA
     });
   });

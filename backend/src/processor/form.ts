@@ -35,11 +35,8 @@ export class FormProcessor {
   ) {
     const pgClient = new PostgrestClient(opts.POSTGREST_URL, {
       schema: opts.POSTGREST_DEFAULT_SCHEMA,
-      fetch: (resource, options) => {
-        options = options ?? {};
-        options.headers = options.headers as {} ?? {};
-        options.headers.Authorization = `Bearer ${postgrestToken}`;
-        return fetch(resource, options);
+      headers: {
+        Authorization: `Bearer ${postgrestToken}`
       }
     });
 

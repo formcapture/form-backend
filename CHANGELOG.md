@@ -1,3 +1,17 @@
+# [2.1.0](https://github.com/formcapture/form-backend/compare/v2.0.0...v2.1.0) (2025-08-05)
+
+
+### Bug Fixes
+
+* disable check for login iframe in dev mode ([a3b14df](https://github.com/formcapture/form-backend/commit/a3b14df6ad7e64ca7570e530b88c3eaab52175fd))
+* set header to PostgREST client directly ([e0e32fe](https://github.com/formcapture/form-backend/commit/e0e32fed01d6400882d645c3c0c17bbb9b871dc9))
+* test for form processor ([0eced31](https://github.com/formcapture/form-backend/commit/0eced3156c1348c36ba1268e6f82b33f13e43776))
+
+
+### Features
+
+* show env variables when form backend starts ([df91e5d](https://github.com/formcapture/form-backend/commit/df91e5df2667e37d469a9634a69049edc3bd1063))
+
 # [2.0.0](https://github.com/formcapture/form-backend/compare/v1.1.0...v2.0.0) (2025-07-31)
 
 

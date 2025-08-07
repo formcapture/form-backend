@@ -1,6 +1,7 @@
 import { PostgrestClient, PostgrestFilterBuilder, PostgrestResponse } from '@supabase/postgrest-js';
 import { Logger } from 'winston';
 
+import { DatabaseError, GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { DataItem } from '../types/data';
 import { DbAction } from '../types/dbAction';
@@ -76,7 +77,7 @@ class DataProcessor {
     }
 
     // Reconstruct to the flat data structure which is expected by the client,
-    // but was changed in order to allow for ordering by lookup display value.
+    // but was changed to allow for ordering by lookup display value.
     const reconstructedData = this.#reconstructTableData(data.data, formConfig);
 
     return {
@@ -144,7 +145,12 @@ class DataProcessor {
       this.#logger.error(
         `Could not create data for item ${JSON.stringify(item)} of table ${tableName}. ${response?.error?.message}`
       );
-      return { success: isSuccess };
+
+      return {
+        success: isSuccess,
+        code: response.error?.code,
+        message: response.error?.message
+      };
     }
 
     const createdItem = response.data?.[0] as DataItem;
@@ -251,7 +257,10 @@ class DataProcessor {
       case DbAction.CREATE: {
         const createdItem = await this.createItemData(item, formConfig, configKeys?.join('/'));
         if (!createdItem.success) {
-          throw new Error(`Could not create item ${item[formConfig.dataSource.idColumn]}`);
+          throw new DatabaseError('Could not create item. Please check your geometry.', {
+            code: createdItem.code,
+            message: createdItem.message
+          });
         }
         itemId = createdItem.id;
         break;
@@ -271,7 +280,7 @@ class DataProcessor {
         itemId = item[formConfig.dataSource.idColumn];
         break;
       default:
-        throw new Error(`Action ${action} not supported`);
+        throw new InternalServerError(`Action ${action} not supported`);
     }
 
     const propsWithManyToMany = FormConfigProcessor.getPropsWithJoinTables(formConfig, Relationship.MANY_TO_MANY);
@@ -304,12 +313,16 @@ class DataProcessor {
     this.#logger.debug(`Handling many-to-many join table data for configKeys ${configKeys.join('/')}`);
     const configKey = configKeys.at(-1);
     if (!configKey) {
-      throw new Error('Cannot handle manyToMany table. ConfigKeys is empty');
+      throw new DatabaseError('Cannot handle manyToMany table. ConfigKeys is empty', {
+        errorCode: 'CONFIG_KEY_IS_EMPTY'
+      });
     }
     // TODO this can probably be improved to only get the necessary data
     const dbJoinItems = (await this.getItemData(itemId, formConfig))?.data[0][configKey];
     if (!dbJoinItems) {
-      throw new Error(`Could not get db items for item ${itemId} and configKey ${configKeys.join('/')}`);
+      throw new DatabaseError(`Could not get db items for item ${itemId} and configKey ${configKeys.join('/')}`, {
+        errorCode: 'DB_JOIN_ITEMS_NOT_FOUND_FOR_CONFIG_KEYS'
+      });
     }
 
     if (JSON.stringify(items) === JSON.stringify(dbJoinItems)) {
@@ -355,11 +368,15 @@ class DataProcessor {
     this.#logger.debug(`Handling one-to-many join table data for configKeys ${configKeys.join('/')}`);
     const configKey = configKeys.at(-1);
     if (!configKey) {
-      throw new Error('Cannot handle oneToMany table. ConfigKeys is empty');
+      throw new DatabaseError('Cannot handle oneToMany table. ConfigKeys is empty', {
+        errorCode: 'CONFIG_KEY_IS_EMPTY'
+      });
     }
     const dbJoinItems = (await this.getItemData(itemId, formConfig))?.data[0][configKey];
     if (!dbJoinItems) {
-      throw new Error(`Could not get db items for item ${itemId} and configKey ${configKeys.join('/')}`);
+      throw new DatabaseError(`Could not get db items for item ${itemId} and configKey ${configKeys.join('/')}`, {
+        errorCode: 'DB_JOIN_ITEMS_NOT_FOUND_FOR_CONFIG_KEYS'
+      });
     }
 
     this.#logger.debug(`Received following existing dbJoinItems: ${JSON.stringify(dbJoinItems)}`);
@@ -411,7 +428,9 @@ class DataProcessor {
 
     const configKey = configKeys.at(-1);
     if (!configKey) {
-      throw new Error('Cannot handle oneToMany table. ConfigKeys is empty');
+      throw new DatabaseError('Cannot handle oneToMany table. ConfigKeys is empty', {
+        errorCode: 'CONFIG_KEY_IS_EMPTY'
+      });
     }
 
     const itemId = item[formConfig.dataSource.joinTables[configKey].dataSource.idColumn];
@@ -497,23 +516,32 @@ class DataProcessor {
         .insert(joinTableData);
 
       if (updateJoinTableResponse.status !== 201) {
-        throw new Error(`Could not create data for join table \
-          ${formConfig.via.tableName}. ${updateJoinTableResponse?.error?.message}`);
+        throw new DatabaseError(`Could not create data for join table \
+          ${formConfig.via.tableName}. ${updateJoinTableResponse?.error?.message}`, {
+          errorCode: 'JOIN_TABLE_DATA_CREATION_FAILED',
+          message: updateJoinTableResponse?.error?.message,
+          tableName: updateJoinTableResponse?.error?.message
+        });
       }
     }
   }
 
   async #removeFromJoinTable(itemId: string, joins: DataItem[], formConfig: FormConfigInternal | JoinTable) {
     this.#logger.debug(`Removing join table data for item ${itemId}`);
-    const response = await this.#pgClient
+    const deleteFromJoinTableResponse = await this.#pgClient
       .schema(formConfig.via.schema || this.#pgClient.schemaName!)
       .from(formConfig.via.tableName)
       .delete()
       .eq(formConfig.on.self, itemId)
       .in(formConfig.on.other, joins.map(j => j[formConfig.dataSource.idColumn]));
 
-    if (response.status !== 204) {
-      throw new Error(`Could not delete data for join table ${formConfig.via.tableName}. ${response?.error?.message}`);
+    if (deleteFromJoinTableResponse.status !== 204) {
+      throw new DatabaseError(`Could not delete data for join table \
+          ${formConfig.via.tableName}. ${deleteFromJoinTableResponse?.error?.message}`, {
+        errorCode: 'JOIN_TABLE_DATA_DELETION_FAILED',
+        message: deleteFromJoinTableResponse?.error?.message,
+        tableName: deleteFromJoinTableResponse?.error?.message
+      });
     }
   }
 
@@ -599,7 +627,7 @@ class DataProcessor {
     const dataWithEmptyGeometries = this.#replaceEmptyGeometries(dataWithoutJoinTables, formConfig);
     const filesValid = this.#fileProcessor.validateFileFields(dataWithEmptyGeometries, formConfig);
     if (!filesValid) {
-      throw new Error('Invalid file(s).');
+      throw new GenericError('Invalid file(s).');
     }
     // TODO check if we always want to remove the id or only if it is set to readonly
     return this.#removeId(dataWithEmptyGeometries, formConfig);
@@ -644,11 +672,11 @@ class DataProcessor {
         if (prop.resolveAsEnum && prop.resolveLookup) {
           const lookupTables = formConfig.dataSource.lookupTables;
           if (!lookupTables) {
-            throw new Error('Cannot create select statement. Missing lookupTables.');
+            throw new GenericError('Cannot create select statement. Missing lookupTables.');
           }
           const refCol = lookupTables[c].includedProperties?.[0];
           if (!refCol) {
-            throw new Error(`Cannot create select statement. Missing includedProperties in lookupTable ${c}.`);
+            throw new GenericError(`Cannot create select statement. Missing includedProperties in lookupTable ${c}.`);
           }
           return `${c}(${refCol},${prop.resolveToColumn})`;
         }
@@ -670,7 +698,7 @@ class DataProcessor {
         if (isJoinTable) {
           const joinConfig = formConfig.dataSource.joinTables?.[c];
           if (!joinConfig) {
-            throw new Error(`No join table config found for property ${c}`);
+            throw new GenericError(`No join table config found for property ${c}`);
           }
           if (joinConfig.relationship === Relationship.MANY_TO_ONE) {
             return `${c}:${joinConfig.dataSource.tableName}(${this.#createItemSelectStatement(joinConfig)})`;
@@ -740,11 +768,11 @@ class DataProcessor {
       colsToReconstruct.forEach((c: string) => {
         const lookupTables = formConfig.dataSource.lookupTables;
         if (!lookupTables) {
-          throw new Error('Cannot reconstruct data. Missing lookupTables.');
+          throw new GenericError('Cannot reconstruct data. Missing lookupTables.');
         }
         const refCol = lookupTables[c].includedProperties?.[0];
         if (!refCol) {
-          throw new Error(`Cannot reconstruct data. Missing includedProperties in lookupTable ${c}.`);
+          throw new GenericError(`Cannot reconstruct data. Missing includedProperties in lookupTable ${c}.`);
         }
         itemClone[c] = itemClone[c]?.[refCol];
       });

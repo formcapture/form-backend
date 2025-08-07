@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express';
 
-import { GenericRequestError } from '../errors/GenericRequestError';
+import { AuthenticationError } from '../errors/AuthenticationError';
 import { decodeToken, getRolesFromToken, getTokenFromHeader } from '../keycloak/keycloak';
 import { setupLogger } from '../logger';
 import FormConfigProcessor from '../processor/formConfig';
@@ -48,8 +48,9 @@ export const userRolesLoader = (userRolesLoaderOpts: UserRolesLoaderOpts) => {
       req.userRoles = userRoles ?? [];
       next();
     } catch (err) {
+      const e = new AuthenticationError('User roles loading failed');
       logger.debug('User roles loading failed', err);
-      next(err);
+      next(e);
     }
   };
 };
@@ -69,10 +70,11 @@ export const authorization = (authorizationOpts: AuthorizationOpts) => {
       if (hasPermission) {
         return next();
       }
-      throw new GenericRequestError(`Insufficient permissions for form ${req.params.formId}`);
+      next(new AuthenticationError(`Insufficient permissions for form ${req.params.formId}`));
     } catch (err) {
-      logger.debug('Authorization failed:', err);
-      next(err);
+      const msg = 'Authorization failed';
+      logger.debug(msg, err);
+      next(new AuthenticationError(msg));
     }
   };
 };

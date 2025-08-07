@@ -8,6 +8,7 @@ import { DataItem } from '../types/data';
 import { FormConfigInternal } from '../types/formConfigInternal';
 import { JoinTable } from '../types/joinTable';
 import { Opts } from '../types/opts';
+import { GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
 
 export interface FileProcessorOpts {
   opts: Opts;
@@ -248,7 +249,7 @@ export class FileProcessor {
       this.#logger.debug(`Created file ${filePath}`);
       return filePath;
     } catch (err) {
-      throw new Error(`Could not create file for key ${key} and configKey ${configKey}: ${err}`);
+      throw new InternalServerError(`Could not create file for key ${key} and configKey ${configKey}: ${err}`);
     }
   }
 

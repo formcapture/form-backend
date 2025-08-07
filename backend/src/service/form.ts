@@ -66,7 +66,7 @@ class FormService {
         try {
           parsedPage = parseInt(page, 10);
           if (isNaN(parsedPage)) {
-            throw new Error();
+            throw new GenericError()
           }
         } catch {
           throw new GenericRequestError('Invalid value for argument "page"');
@@ -202,11 +202,6 @@ class FormService {
 
       return res.json(createResponse);
     } catch (err) {
-      if (err instanceof GenericRequestError) {
-        this.#logger.debug(`Cannot create formItem: ${err.message}`);
-      } else if (err instanceof Error) {
-        this.#logger.error(`Cannot create formItem: ${err.message}`);
-      }
       next(err);
     }
   }

@@ -1,4 +1,5 @@
 import { createLogger, format, transports } from 'winston';
+
 const { combine, label, timestamp } = format;
 
 export const setupLogger = (opts: {label: string}) => {
@@ -15,13 +16,11 @@ export const setupLogger = (opts: {label: string}) => {
     formBackendFormat
   );
 
-  const logger = createLogger({
+  return createLogger({
     level,
     format: formatOpts,
     // When not in production, we need to write to console instead stdout
     // in order to see the logs in the attached process (e.g. in VSCode).
     transports: [new transports.Console({forceConsole: !isProduction})]
   });
-
-  return logger;
 };

@@ -5,12 +5,16 @@ import { formConfigLoader } from '../middleware/formConfigLoader';
 import FormService from '../service/form';
 import { FormConfigRequest } from '../types/formConfigRequest';
 import { Opts } from '../types/opts';
+import { errorMiddleware } from '../errors/errorMiddleware';
 
 export const createFormRouter = (opts: Opts) => {
   const router = express.Router();
   router.use(express.json({
     limit: opts.SIZE_LIMIT
   }));
+
+  router.use(errorMiddleware);
+
   const configLoader = formConfigLoader({ formConfigsDir: opts.FORM_CONFIGS_DIR });
   const userRolesLoader = userRolesLoaderCreator({ opts });
 

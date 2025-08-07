@@ -58,7 +58,7 @@ interface TableViewProps {
   keycloak?: Keycloak;
   order?: 'asc' | 'desc' | null;
   orderBy?: string | null;
-  showToast?: (message: TOAST_MESSAGE) => void;
+  showToast?: (message: TOAST_MESSAGE, additionalMessage?: string) => void;
 }
 
 const filterParams: any = {
@@ -108,25 +108,25 @@ const TableView: React.FC<TableViewProps> = ({
 
   const viewTooltip = useMemo(() => (
     <Tooltip id="tooltip">
-        Anzeigen
+      Anzeigen
     </Tooltip>
   ), []);
 
   const zoomToTooltip = useMemo(() => (
     <Tooltip id="zoom-to-tooltip">
-        Auf Geometrie zoomen
+      Auf Geometrie zoomen
     </Tooltip>
   ), []);
 
   const editTooltip = useMemo(() => (
     <Tooltip id="tooltip">
-        Bearbeiten
+      Bearbeiten
     </Tooltip>
   ), []);
 
   const deleteTooltip = useMemo(() => (
     <Tooltip id="tooltip">
-        Eintrag löschen
+      Eintrag löschen
     </Tooltip>
   ), []);
 
@@ -353,7 +353,7 @@ const TableView: React.FC<TableViewProps> = ({
         }
 
         if (colDef.field) {
-          const { type: dataType } = data.config.properties[colDef.field];
+          const {type: dataType} = data.config.properties[colDef.field];
           // exclude geometries, file uploads, enums and join tables from sorting
           if (isFilterableProp(data.config.properties[colDef.field])) {
             if (dataType === 'string') {
@@ -451,7 +451,7 @@ const TableView: React.FC<TableViewProps> = ({
     event.api.addEventListener('paginationChanged', onPaginationChanged);
   };
 
-  const onFilterChanged = ({ api: gridApi }: FilterChangedEvent) => {
+  const onFilterChanged = ({api: gridApi}: FilterChangedEvent) => {
     const filterModel = gridApi.getFilterModel();
 
     // We only allow one filter per table
@@ -629,10 +629,10 @@ const TableView: React.FC<TableViewProps> = ({
 
   return (
     <div>
-      <h3>{data.config.title ?? formId}</h3>
+      <h3 className="table-view-title">{data.config.title ?? formId}</h3>
       {
         data.config.description && (
-          <span>{data.config.description}</span>
+          <span className="table-view-description">{data.config.description}</span>
         )
       }
       {
@@ -653,7 +653,7 @@ const TableView: React.FC<TableViewProps> = ({
         >
           <i className="bi bi-plus-lg"></i><span className="d-none d-sm-inline">&ensp;Eintrag erstellen</span>
         </Button>
-        <div className="ag-theme-quartz" style={{ height: '100%', width: '100%' }}>
+        <div className="ag-theme-quartz" style={{height: '100%', width: '100%'}}>
           <AgGridReact
             columnDefs={columnDefs}
             // Automatically set the height of the table depending on the data.

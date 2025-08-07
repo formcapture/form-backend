@@ -9,7 +9,7 @@ import api from '../../util/api';
 import { createFileIdentifierFromPath } from '../../util/file';
 
 export class FileEditor extends Base64Editor {
-  build () {
+  build() {
     if (!this.options.compact) {
       this.title = this.header = this.label = this.theme.getFormInputLabel(this.getTitle(), this.isRequired());
     }

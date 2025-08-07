@@ -34,7 +34,7 @@ interface ItemViewProps {
   previousView: string | null;
   keycloak?: Keycloak;
   internalMap?: boolean;
-  showToast?: (message: TOAST_MESSAGE) => void;
+  showToast?: (message: TOAST_MESSAGE, additionalMessage?: string) => void;
 }
 
 const staticEditorConfig = {
@@ -162,6 +162,14 @@ const ItemView: React.FC<ItemViewProps> = ({
     const value = editor.getValue();
     try {
       const response = await api.createItem(formId, value, keycloak);
+      if (!response.ok) {
+        let additionalMessage = undefined;
+        if (response.status === 406) {
+          additionalMessage = await response.text();
+        }
+        showToast(TOAST_MESSAGE.createError, additionalMessage);
+        return;
+      }
       const responseData = await response.json();
       if (!responseData.success) {
         showToast(TOAST_MESSAGE.createError);
@@ -303,7 +311,7 @@ const ItemView: React.FC<ItemViewProps> = ({
             )
           }
           {
-            itemId && editable &&(
+            itemId && editable && (
               <button
                 className="btn btn-outline-danger"
                 type="button"

@@ -39,7 +39,7 @@ export const getGeometryColumns = (config: FormConfiguration['config']): string[
     return;
   }
   const geometryKeys = Object.keys(config.properties).filter(key => {
-    const { type, format } = config.properties[key];
+    const {type, format} = config.properties[key];
     return (
       type === 'string' &&
       format &&

@@ -22,7 +22,7 @@ describe('App', () => {
   function createFetchResponse(data: any, status: number) {
     return new Response(JSON.stringify(data), {
       status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
     });
   }
 
@@ -33,7 +33,7 @@ describe('App', () => {
         name: {},
         value: {},
         city: {
-          enumSource: [{ source: [{ value: 'BN', title: 'Bonn' }] }],
+          enumSource: [{source: [{value: 'BN', title: 'Bonn'}]}],
         },
       },
       views: {
@@ -49,7 +49,7 @@ describe('App', () => {
     data: {
       count: 1,
       data: [
-        { key: 'Item 1', id: 2, name: 'Test-Object 1', value: 20, city: 'BN' },
+        {key: 'Item 1', id: 2, name: 'Test-Object 1', value: 20, city: 'BN'},
       ]
     },
   };
@@ -60,7 +60,7 @@ describe('App', () => {
     clientId: 'myapp',
   };
 
-  const mockFetch = vi.fn(() => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 200 })));
+  const mockFetch = vi.fn(() => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200})));
 
   // TODO mock also JSONEditor.defaults (editors and resolvers)
   vi.mock('@json-editor/json-editor', () => {
@@ -133,7 +133,7 @@ describe('App', () => {
       expect(mockFetch).toHaveBeenCalledOnce();
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
       expect(screen.queryByText('Test-Object 1')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 
   it('handles Keycloak initialization errors', async () => {
@@ -144,7 +144,7 @@ describe('App', () => {
     (mockKeycloak.init as Mock).mockRejectedValueOnce(new Error('Initialization failed'));
 
     const localMockFetch = vi.fn(
-      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 200 }))
+      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
     global.fetch = localMockFetch;
 
@@ -161,10 +161,10 @@ describe('App', () => {
   });
 
   it('should return immediately if keycloak is already set', async () => {
-    const { rerender } = render(<App />);
+    const {rerender} = render(<App />);
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
 
     mockKeycloak.init.mockClear();
     mockKeycloak.token = 'new-token';
@@ -186,7 +186,7 @@ describe('App', () => {
 
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
 
     expect(loggerMock).toHaveBeenCalled();
     expect(loggerMock).toHaveBeenCalledWith(
@@ -209,7 +209,7 @@ describe('App', () => {
 
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
 
     expect(loggerError).toHaveBeenCalled();
     expect(loggerError).toHaveBeenCalledWith(
@@ -233,7 +233,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
       expect(screen.queryByText('Hoppla, da ist etwas schiefgelaufen!')).toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 
   it('shows error if unauthorized with token', async () => {
@@ -249,7 +249,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
       expect(screen.getByText('Hoppla, da ist etwas schiefgelaufen!')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 
   it('renderes content if authorized with token', async () => {
@@ -262,7 +262,7 @@ describe('App', () => {
       expect(mockFetch).toHaveBeenCalled();
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
       expect(screen.getByText('Speichern')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 
   it('takes the order URL parameter into account', async () => {
@@ -277,7 +277,7 @@ describe('App', () => {
         {headers: {'Content-Type': 'application/json'}},
         mockKeycloak
       );
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 
   it('takes the orderBy URL parameter into account', async () => {
@@ -292,6 +292,6 @@ describe('App', () => {
         {headers: {'Content-Type': 'application/json'}},
         mockKeycloak
       );
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 });

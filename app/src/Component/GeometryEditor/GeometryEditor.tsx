@@ -20,7 +20,9 @@ export class GeometryEditor extends AbstractEditor {
 
   postMessageListener(evt: MessageEvent) {
     const message = receiveMessage(window.parent, evt);
-    if (!message) { return; }
+    if (!message) {
+      return;
+    }
 
     const evtType = evt?.data?.type;
     const evtPayload = evt?.data?.payload;
@@ -85,9 +87,15 @@ export class GeometryEditor extends AbstractEditor {
   }
 
   getGeometryType(format: any): string {
-    if (isPoint(format)) {return 'Point';}
-    if (isLineString(format)) {return 'LineString';}
-    if (isPolygon(format)) {return 'Polygon';}
+    if (isPoint(format)) {
+      return 'Point';
+    }
+    if (isLineString(format)) {
+      return 'LineString';
+    }
+    if (isPolygon(format)) {
+      return 'Polygon';
+    }
     return 'Point';
   }
 
@@ -95,7 +103,7 @@ export class GeometryEditor extends AbstractEditor {
     this.label = this.theme.getFormInputLabel(this.getTitle(), this.isRequired());
 
     const descriptionText = this.schema.description ??
-      this.schema.readOnly ? '' : 'Bitte geben Sie eine GeoJSON Geometrie ein.';
+    this.schema.readOnly ? '' : 'Bitte geben Sie eine GeoJSON Geometrie ein.';
     this.description = this.theme.getFormInputDescription(descriptionText);
 
     // eslint-disable-next-line camelcase

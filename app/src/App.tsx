@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
 
@@ -46,7 +46,7 @@ export interface FormItem {
 }
 
 export type FormPropertyFormat = 'integer' | 'character varying' | 'table' | 'location' | 'double precision' |
-    'geometry' | 'geometrySelection' | `geometry.(${string})` | `${string}.geometry` | `${string}.geometry(${string})`;
+  'geometry' | 'geometrySelection' | `geometry.(${string})` | `${string}.geometry` | `${string}.geometry(${string})`;
 
 export interface FormProperty {
   format?: FormPropertyFormat;
@@ -132,6 +132,8 @@ const App: React.FC = () => {
   const [unauthorizedWithToken, setUnauthorizedWithToken] = useState(false);
   const [toastVisible, setToastVisible] = useState(!!message);
   const [toastMessageType, setToastMessageType] = useState<TOAST_MESSAGE>(message as TOAST_MESSAGE);
+  const [statusCode, setStatusCode] = useState<number>(200);
+  const [additionalMessage, setAdditionalMessage] = useState<string | undefined>('');
 
   const handleUnauthorized = async (keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
     if (kc?.token) {
@@ -173,9 +175,15 @@ const App: React.FC = () => {
       } else {
         response = await api.getEmptyForm(formId, kc);
       }
+      setStatusCode(response.status);
       if (response.status === 401) {
         return {
           error: 401
+        };
+      }
+      if (response.status === 404) {
+        return {
+          error: 404
         };
       }
       if (response.status !== 200) {
@@ -255,27 +263,31 @@ const App: React.FC = () => {
 
   const isValidUrl = (view === 'table' && formId && !itemId) || (view === 'item' && formId);
 
-  const shouldShowError = () => {
+  const shouldShowError = useMemo(() => {
+    if (statusCode !== 200) {
+      return true;
+    }
     if (!isLoading && !isValidUrl) {
       return true;
     }
     return unauthorizedWithToken;
-  };
+  }, [isLoading, isValidUrl, statusCode, unauthorizedWithToken]);
 
   const showTableView = data && formId && view === 'table';
   const showItemView = view === 'item' && data && formId;
 
-  if (shouldShowError()) {
-    return <ErrorPage />;
+  if (shouldShowError) {
+    return <ErrorPage statusCode={statusCode} />;
   }
 
   if (isLoading) {
     return <LoadingPage />;
   }
 
-  const onShowToast = (newMessage: TOAST_MESSAGE) => {
+  const onShowToast = (newMessage: TOAST_MESSAGE, aMsg?: string) => {
     setToastVisible(true);
     setToastMessageType(newMessage);
+    setAdditionalMessage(aMsg);
   };
 
   const onHideToast = () => {
@@ -285,6 +297,7 @@ const App: React.FC = () => {
   return (
     <div>
       <ToastAlert
+        additionalMessage={additionalMessage}
         messageType={toastMessageType}
         show={toastVisible}
         onClose={onHideToast}

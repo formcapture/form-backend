@@ -36,7 +36,7 @@
     "typecheck": "tsc --noEmit --skipLibCheck"
   },
   "dependencies": {
-    "@ag-grid-community/client-side-row-model": "^32.2.0",
+    "@ag-grid-community/client-side-row-model": "^32.3.8",
     "@ag-grid-community/core": "^32.2.0",
     "@ag-grid-community/locale": "^33.3.2",
     "@ag-grid-community/react": "^32.2.0",

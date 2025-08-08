@@ -134,6 +134,7 @@ const App: React.FC = () => {
   const [toastMessageType, setToastMessageType] = useState<TOAST_MESSAGE>(message as TOAST_MESSAGE);
   const [statusCode, setStatusCode] = useState<number>(200);
   const [additionalMessage, setAdditionalMessage] = useState<string | undefined>('');
+  const [errorInfo, setErrorInfo] = useState<any | undefined>(undefined); // TODO: type this properly
 
   const handleUnauthorized = async (keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
     if (kc?.token) {
@@ -175,21 +176,16 @@ const App: React.FC = () => {
       } else {
         response = await api.getEmptyForm(formId, kc);
       }
-      setStatusCode(response.status);
-      if (response.status === 401) {
-        return {
-          error: 401
-        };
-      }
-      if (response.status === 404) {
-        return {
-          error: 404
-        };
-      }
-      if (response.status !== 200) {
-        throw new Error('Failed to fetch data');
-      }
+      const status = response.status;
+      setStatusCode(status);
       const json = await response.json();
+      if (status >= 400) {
+        setAdditionalMessage(json.message);
+        setErrorInfo(json.extra);
+        return {
+          error: status
+        };
+      }
       if (json.config === undefined) {
         throw new Error('Failed to fetch data');
       }
@@ -277,7 +273,7 @@ const App: React.FC = () => {
   const showItemView = view === 'item' && data && formId;
 
   if (shouldShowError) {
-    return <ErrorPage statusCode={statusCode} />;
+    return <ErrorPage statusCode={statusCode} errorInfo={errorInfo} />;
   }
 
   if (isLoading) {
@@ -299,8 +295,8 @@ const App: React.FC = () => {
       <ToastAlert
         additionalMessage={additionalMessage}
         messageType={toastMessageType}
-        show={toastVisible}
         onClose={onHideToast}
+        show={toastVisible}
       />
       {
         showTableView && (

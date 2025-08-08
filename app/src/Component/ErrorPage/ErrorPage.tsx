@@ -5,12 +5,15 @@ import _isNil from 'lodash/isNil';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import './ErrorPage.css';
+import { errorCodeMap } from './errors.tsx';
 
 export interface ErrorPageProps {
+  errorInfo?: any;
   statusCode?: number;
 }
 
 const ErrorPage: React.FC<ErrorPageProps> = ({
+  errorInfo,
   statusCode = 401
 }: ErrorPageProps): JSX.Element => {
 
@@ -24,7 +27,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
     if (_isNil(view) && _isNil(formId)) {
       return 'Bitte geben Sie die `formId` und `view` Parameter in der URL an.';
     }
-    if (_isNil(formId)) {
+    if (_isNil(formId) ) {
       return 'Bitte prüfen Sie den `formId` Parameter in der URL.';
     }
     if (_isNil(view)) {
@@ -37,11 +40,9 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
     if (_isNil(statusCode)) {
       return <></>;
     }
-    if (statusCode === 404) {
+    if (errorInfo && errorInfo.errorCode === 'FORM_CONFIG_NOT_FOUND' && !_isNil(formId)) {
       return (
-        <p>
-          Das angeforderte Formular mit der ID <strong>{formId}</strong> wurde nicht gefunden.
-        </p>
+        errorCodeMap.FORM_CONFIG_NOT_FOUND(formId)
       );
     }
     if (!_isNil(view) && statusCode === 200 && !['item', 'table'].includes(view)) {
@@ -57,7 +58,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         {errorMessage}
       </p>
     );
-  }, [errorMessage, formId, statusCode]);
+  }, [errorInfo, errorMessage, formId, statusCode, view]);
 
   return (
     <div className="content">

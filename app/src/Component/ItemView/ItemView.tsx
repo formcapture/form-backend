@@ -5,6 +5,8 @@ import { ISimpleFilterModel } from '@ag-grid-community/core';
 import { JSONEditor } from '@json-editor/json-editor';
 
 import Keycloak from 'keycloak-js';
+import _isNil from 'lodash/isNil';
+
 
 import Logger from '@terrestris/base-util/dist/Logger';
 
@@ -26,6 +28,7 @@ import ConfirmDelete from '../ConfirmDelete/ConfirmDelete';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ItemView.css';
+import { errorCodeToMessage } from '../ErrorPage/errors.tsx';
 
 interface ItemViewProps {
   data: FormConfiguration;
@@ -162,15 +165,17 @@ const ItemView: React.FC<ItemViewProps> = ({
     const value = editor.getValue();
     try {
       const response = await api.createItem(formId, value, keycloak);
+      const responseData = await response.json();
       if (!response.ok) {
-        let additionalMessage = undefined;
-        if (response.status === 406) {
-          additionalMessage = await response.text();
+        let additionalMessage = responseData.message;
+
+        if (!_isNil(responseData?.extra)) {
+          additionalMessage = errorCodeToMessage(responseData?.extra);
         }
+
         showToast(TOAST_MESSAGE.createError, additionalMessage);
         return;
       }
-      const responseData = await response.json();
       if (!responseData.success) {
         showToast(TOAST_MESSAGE.createError);
         return;
@@ -184,6 +189,7 @@ const ItemView: React.FC<ItemViewProps> = ({
       const itemViewUrl = createItemViewUrl(window.location.href, queryParams);
       window.location.assign(itemViewUrl);
     } catch (err) {
+      showToast(TOAST_MESSAGE.createError);
       Logger.error('failed to update item', err);
     }
   };

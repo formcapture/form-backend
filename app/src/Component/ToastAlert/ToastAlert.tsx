@@ -9,10 +9,10 @@ import { TOAST_MESSAGE } from '../../constants/toastMessage';
 import './ToastAlert.css';
 
 export interface ToastAlertProps {
-  messageType?: TOAST_MESSAGE;
   additionalMessage?: string;
-  show: boolean;
+  messageType?: TOAST_MESSAGE;
   onClose: () => void;
+  show: boolean;
 }
 
 const ToastAlert: React.FC<ToastAlertProps> = ({

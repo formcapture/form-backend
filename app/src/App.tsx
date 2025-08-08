@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
 
-import LanguageDetector from 'i18next-browser-languagedetector';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
 
 import Logger from '@terrestris/base-util/dist/Logger';
@@ -186,6 +185,7 @@ const App: React.FC = () => {
       if (status >= 400) {
         setAdditionalMessage(json.message);
         setErrorInfo(json.extra);
+        Logger.error('An error occurred while fetching data, passing error to ErrorPage', new Error(json.message));
         return {
           error: status
         };
@@ -238,7 +238,6 @@ const App: React.FC = () => {
     const initialize = async () => {
 
       // initialize i18n
-      i18n.use(LanguageDetector);
       await i18n.init(initOpts);
 
       const start = Date.now();

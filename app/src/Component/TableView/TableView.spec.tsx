@@ -97,6 +97,7 @@ describe('<TableView />', () => {
       />
     );
 
-    expect(screen.getAllByLabelText('Auf Geometrie zoomen')).toBeDefined();
+    // use i18n key to check if the button is rendered
+    expect(screen.getAllByLabelText('TableView.zoomToGeometryTooltip')).toBeDefined();
   });
 });

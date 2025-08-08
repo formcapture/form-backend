@@ -98,7 +98,7 @@ describe('<ItemView />', () => {
       />
     );
 
-    const backButton = screen.getByText('< Zurück');
+    const backButton = screen.getByText('< ItemView.backTxt');
     expect(backButton).not.toBeNull();
 
     fireEvent.click(backButton);
@@ -127,7 +127,7 @@ describe('<ItemView />', () => {
 
     global.fetch = vi.fn().mockResolvedValue(createFetchResponse({success: true}));
 
-    const saveButton = await screen.findByText('Speichern');
+    const saveButton = await screen.findByText('ItemView.saveTxt');
     expect(saveButton).not.toBeNull();
     fireEvent.click(saveButton);
     await new Promise(process.nextTick);

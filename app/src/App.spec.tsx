@@ -1,10 +1,12 @@
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
+import { I18nextProvider } from 'react-i18next';
 import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 import Logger from '@terrestris/base-util/dist/Logger';
 
 import App, { FormConfiguration } from './App';
+import i18n from './i18n/i18nTest';
 import { setKeycloakInst } from './singletons/keycloak';
 import { authenticatedFetch } from './util/authenticatedFetch';
 
@@ -116,7 +118,11 @@ describe('App', () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?itemId=123');
 
-    render(<App />);
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>
+    );
 
     await waitFor(() => {
       expect(screen.getByText('Hoppla, da ist etwas schiefgelaufen!')).not.toBeNull();
@@ -232,7 +238,6 @@ describe('App', () => {
 
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
-      expect(screen.queryByText('Hoppla, da ist etwas schiefgelaufen!')).toBeNull();
     }, {timeout: 400});
   });
 

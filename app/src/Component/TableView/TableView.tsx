@@ -30,13 +30,12 @@ import { FormConfiguration, ItemId } from '../../App';
 import { RECEIVE_EVENTS, SEND_EVENTS } from '../../constants/events';
 import { TOAST_MESSAGE } from '../../constants/toastMessage';
 
+import i18n from '../../i18n/i18n.ts';
 import api from '../../util/api';
 import { isGeometryType } from '../../util/jsonEditor';
 import { receiveMessage, sendMessage } from '../../util/postMessage';
 import { getFeaturesFromTableData, getGeometryColumns, isFilterableProp, isSortableProp } from '../../util/table';
 import { createItemViewUrl, createTableViewUrl, ItemViewQueryParams, TableViewQueryParams } from '../../util/url';
-
-import i18n from '../../i18n/i18n.ts';
 
 import ConfirmDelete from '../ConfirmDelete/ConfirmDelete';
 import '@ag-grid-community/styles/ag-grid.css';

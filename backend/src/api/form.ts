@@ -1,11 +1,11 @@
 import express from 'express';
 
+import { errorMiddleware } from '../errors/errorMiddleware';
 import { authorization, userRolesLoader as userRolesLoaderCreator } from '../middleware/authorization';
 import { formConfigLoader } from '../middleware/formConfigLoader';
 import FormService from '../service/form';
 import { FormConfigRequest } from '../types/formConfigRequest';
 import { Opts } from '../types/opts';
-import { errorMiddleware } from '../errors/errorMiddleware';
 
 export const createFormRouter = (opts: Opts) => {
   const router = express.Router();

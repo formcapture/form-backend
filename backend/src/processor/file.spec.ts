@@ -1,8 +1,7 @@
-import { readdir, readFile, unlink, writeFile } from '../../__mocks__/node:fs/promises';
+import { readdir, unlink, writeFile } from '../../__mocks__/node:fs/promises';
 import { FormConfigInternal } from '../types/formConfigInternal';
 
 import FileProcessor, { FileProcessorOpts } from './file';
-
 
 jest.mock('node:fs/promises');
 

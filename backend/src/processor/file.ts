@@ -3,12 +3,12 @@ import { mkdir, readdir, stat, unlink, writeFile } from 'node:fs/promises';
 import mime from 'mime-types';
 import { Logger } from 'winston';
 
+import { InternalServerError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { DataItem } from '../types/data';
 import { FormConfigInternal } from '../types/formConfigInternal';
 import { JoinTable } from '../types/joinTable';
 import { Opts } from '../types/opts';
-import { GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
 
 export interface FileProcessorOpts {
   opts: Opts;

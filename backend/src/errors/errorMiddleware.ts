@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import { setupLogger } from '../logger';
 
-import { GenericRequestError, isGenericRequestError } from './GenericRequestError';
+import { isGenericRequestError } from './GenericRequestError';
 
 const logger = setupLogger({ label: 'errorMiddleware' });
 

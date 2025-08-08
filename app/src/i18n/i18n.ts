@@ -1,6 +1,7 @@
 import i18n, {
   InitOptions
 } from 'i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 import {
   initReactI18next
 } from 'react-i18next';
@@ -19,6 +20,7 @@ export const initOpts: InitOptions = {
 
 // eslint-disable-next-line import/no-named-as-default-member
 i18n
+  .use(LanguageDetector)
   .use(initReactI18next);
 
 i18n.options = initOpts;

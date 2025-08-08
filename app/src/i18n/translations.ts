@@ -36,6 +36,11 @@ export default {
         DATABASE: {
           XX000: 'Geometrie-Fehler: Invalide / Leere Geometrie kann nicht gespeichert werden.'
         }
+      },
+      ItemView: {
+        deleteEntryMsg: 'Eintrag löschen',
+        saveTxt: 'Speichern',
+        backTxt: 'Zurück'
       }
     }
   },
@@ -75,6 +80,11 @@ export default {
         DATABASE: {
           XX000: 'Geometry error: Invalid/empty geometry cannot be saved.'
         }
+      },
+      ItemView: {
+        deleteEntryMsg: 'Delete entry',
+        saveTxt: 'Save',
+        backTxt: 'Back'
       }
     }
   }

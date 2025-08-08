@@ -281,10 +281,10 @@ const ItemView: React.FC<ItemViewProps> = ({
   return (
     <div>
       <ConfirmDelete
-        show={showDeleteDialog}
         itemId={itemId}
         onCancel={onCancelDelete}
         onDelete={onDelete}
+        show={showDeleteDialog}
       />
       <form>
         <div className="navigation-actions">
@@ -295,7 +295,7 @@ const ItemView: React.FC<ItemViewProps> = ({
                 type="button"
                 onClick={onGoBack}
               >
-                &lt; Zurück
+                &lt; {t('ItemView.backTxt')}
               </button>
             )
           }
@@ -307,10 +307,11 @@ const ItemView: React.FC<ItemViewProps> = ({
               <button
                 className="btn btn-primary"
                 type="submit"
-                aria-label="speichern"
+                aria-label={t('ItemView.saveTxt')}
                 onClick={onUpdateItem}
               >
-                <i className="bi bi-floppy"></i><span className="d-none d-sm-inline">&ensp;Speichern</span>
+                <i className="bi bi-floppy"></i>
+                <span className="d-none d-sm-inline">&ensp;{t('ItemView.saveTxt')}</span>
               </button>
             )
           }
@@ -319,10 +320,11 @@ const ItemView: React.FC<ItemViewProps> = ({
               <button
                 className="btn btn-primary"
                 type="submit"
-                aria-label="speichern"
+                aria-label={t('ItemView.saveTxt')}
                 onClick={onCreateItem}
               >
-                <i className="bi bi-floppy"></i><span className="d-none d-sm-inline">&ensp;Speichern</span>
+                <i className="bi bi-floppy"></i>
+                <span className="d-none d-sm-inline">&ensp;{t('ItemView.saveTxt')}</span>
               </button>
             )
           }
@@ -331,12 +333,13 @@ const ItemView: React.FC<ItemViewProps> = ({
               <button
                 className="btn btn-outline-danger"
                 type="button"
-                aria-label="löschen"
+                aria-label={t('ItemView.deleteEntryMsg')}
                 onClick={() => {
                   setShowDeleteDialog(true);
                 }}
               >
-                <i className="bi bi-trash3"></i><span className="d-none d-sm-inline">&ensp;Eintrag löschen</span>
+                <i className="bi bi-trash3"></i>
+                <span className="d-none d-sm-inline">&ensp;{t('ItemView.deleteEntryMsg')}</span>
               </button>
             )
           }

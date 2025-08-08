@@ -1,7 +1,8 @@
 import { NextFunction, Response } from 'express';
 import { Logger } from 'winston';
 
-import { GenericRequestError } from '../errors/GenericRequestError';
+import { AuthenticationError } from '../errors/AuthenticationError';
+import { FormRequestError, GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
 import { checkFilterParams } from '../filter/filter';
 import { getPostgrestJwt } from '../keycloak/keycloak';
 import { setupLogger } from '../logger';
@@ -37,20 +38,36 @@ class FormService {
       } = req.query;
       let parsedPage;
       if (order !== null && order !== undefined && order !== 'asc' && order !== 'desc') {
-        throw new GenericRequestError('Invalid value for argument "order"');
+        next(new FormRequestError(
+          'Invalid value for argument "order". Must be "asc" or "desc"', 400, {
+            errorCode: 'INVALID_ORDER'
+          }));
+        return;
       }
       // Query params are strings or arrays. We only support strings.
       if (orderBy !== null && orderBy !== undefined && typeof orderBy !== 'string') {
-        throw new GenericRequestError('Invalid value for argument "orderBy"');
+        next(new FormRequestError(
+          'Invalid value for argument "orderBy"', 400, {
+            errorCode: 'INVALID_ORDER_BY'
+          }));
+        return;
       }
       // Query params are strings or arrays. We only support strings.
       if (page !== null && page !== undefined && typeof page !== 'string') {
-        throw new GenericRequestError('Invalid value for argument "page"');
+        next(new FormRequestError(
+          'Invalid value for argument "page"', 400, {
+            errorCode: 'INVALID_PAGE'
+          }));
+        return;
       }
       let filter;
       if (!checkFilterParams(filterKey as string, filterOp as string, filterValue as string)) {
         // Invalid set of filter params
-        throw new GenericRequestError('Invalid filter parameter combination.');
+        next(new FormRequestError(
+          'Invalid filter parameter combination.', 400, {
+            errorCode: 'INVALID_FILTER'
+          }));
+        return;
       } else if (filterKey && typeof filterKey === 'string' &&
         filterOp && typeof filterOp === 'string' &&
         filterValue && typeof filterValue === 'string'
@@ -66,15 +83,21 @@ class FormService {
         try {
           parsedPage = parseInt(page, 10);
           if (isNaN(parsedPage)) {
-            throw new GenericError()
+            next(new InternalServerError('Could not parse page number'));
+            return;
           }
         } catch {
-          throw new GenericRequestError('Invalid value for argument "page"');
+          next(new FormRequestError(
+            'Invalid value for argument "page"', 400, {
+              errorCode: 'INVALID_PAGE'
+            }));
+          return;
         }
       }
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
-        throw new GenericRequestError('Failed to get postgrest token');
+        next(new AuthenticationError('Failed to get postgrest token'));
+        return;
       }
 
       const formProcessor = await FormProcessor.createFormProcessor(
@@ -112,7 +135,8 @@ class FormService {
 
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
-        throw new GenericRequestError('Failed to get postgrest token');
+        next(new AuthenticationError('Failed to get postgrest token'));
+        return;
       }
 
       const formProcessor = await FormProcessor.createFormProcessor(
@@ -146,13 +170,19 @@ class FormService {
         userRoles
       } = req;
 
-      if (itemId === undefined || itemId === null) {
-        throw new GenericRequestError('No formId or itemId provided');
+      if (!formId) {
+        next(new GenericRequestError('No formId provided', 400, {errorCode: 'FORM_ID_MISSING'}));
+        return;
+      }
+      if (!itemId) {
+        next(new GenericRequestError('No itemId provided', 400, {errorCode: 'ITEM_ID_MISSING'}));
+        return;
       }
 
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
-        throw new GenericRequestError('Failed to get postgrest token');
+        next(new AuthenticationError('Failed to get postgrest token'));
+        return;
       }
 
       const formProcessor = await FormProcessor.createFormProcessor(
@@ -187,7 +217,8 @@ class FormService {
 
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
-        throw new GenericRequestError('Failed to get postgrest token');
+        next(new AuthenticationError('Failed to get postgrest token'));
+        return;
       }
 
       const formProcessor = await FormProcessor.createFormProcessor(
@@ -217,15 +248,17 @@ class FormService {
         userRoles
       } = req;
 
-      if (itemId === undefined || itemId === null) {
-        throw new GenericRequestError('No itemId provided');
+      if (!itemId) {
+        next(new GenericRequestError('No itemId provided', 400, {errorCode: 'ITEM_ID_MISSING'}));
+        return;
       }
 
       this.#logger.debug(`Updating form item ${JSON.stringify(req.body)} for formId ${formId}`);
 
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
-        throw new GenericRequestError('Failed to get postgrest token');
+        next(new AuthenticationError('Failed to get postgrest token'));
+        return;
       }
 
       // TODO should we also check for active table/item view here?
@@ -260,13 +293,15 @@ class FormService {
         userRoles
       } = req;
 
-      if (itemId === undefined || itemId === null) {
-        throw new GenericRequestError('No itemId provided');
+      if (!itemId) {
+        next(new GenericRequestError('No itemId provided', 400, {errorCode: 'ITEM_ID_MISSING'}));
+        return;
       }
 
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
-        throw new GenericRequestError('Failed to get postgrest token');
+        next(new AuthenticationError('Failed to get postgrest token'));
+        return;
       }
 
       const formProcessor = await FormProcessor.createFormProcessor(
@@ -297,11 +332,15 @@ class FormService {
       const fileIdentifier = req.params[0];
 
       const fileProcessor = new FileProcessor({ opts: this.#opts, formId });
-      // Making sure file exists in expected directory
-      // in order to prevent disclosing files from other directories/forms
+      // Making sure that file exists in the expected directory
+      // to prevent disclosing files from other directories/forms
       const fileExists = await fileProcessor.fileExists(fileIdentifier);
       if (!fileExists) {
-        throw new GenericRequestError('File not found');
+        next(new GenericRequestError('Invalid file(s).', 500, {
+          errorCode: 'INVALID_FILE',
+          detailedMessage: 'One or more files are invalid or missing.'
+        }));
+        return;
       }
       const filePath = fileProcessor.getFilePath(fileIdentifier);
       return res.sendFile(filePath, { root: this.#opts.FILE_UPLOAD_DIR });

@@ -2,7 +2,7 @@ import { PostgrestClient } from '@supabase/postgrest-js';
 import merge from 'lodash.merge';
 import { Logger } from 'winston';
 
-import { DatabaseError, GenericRequestError } from '../errors/GenericRequestError';
+import { DatabaseError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { isFormConfig } from '../typeguards/formConfig';
 import { FormConfig } from '../types/formConfig';

@@ -257,9 +257,10 @@ class DataProcessor {
       case DbAction.CREATE: {
         const createdItem = await this.createItemData(item, formConfig, configKeys?.join('/'));
         if (!createdItem.success) {
-          throw new DatabaseError('Could not create item. Please check your geometry.', {
-            code: createdItem.code,
-            message: createdItem.message
+          throw new DatabaseError(`Could not create item. ${createdItem.message}`, {
+            errorCode: 'ITEM_CREATION_FAILED',
+            detailedMessage: createdItem.message,
+            dbErrorCode: createdItem.code
           });
         }
         itemId = createdItem.id;
@@ -519,7 +520,7 @@ class DataProcessor {
         throw new DatabaseError(`Could not create data for join table \
           ${formConfig.via.tableName}. ${updateJoinTableResponse?.error?.message}`, {
           errorCode: 'JOIN_TABLE_DATA_CREATION_FAILED',
-          message: updateJoinTableResponse?.error?.message,
+          detailedMessage: updateJoinTableResponse?.error?.message,
           tableName: updateJoinTableResponse?.error?.message
         });
       }
@@ -539,7 +540,7 @@ class DataProcessor {
       throw new DatabaseError(`Could not delete data for join table \
           ${formConfig.via.tableName}. ${deleteFromJoinTableResponse?.error?.message}`, {
         errorCode: 'JOIN_TABLE_DATA_DELETION_FAILED',
-        message: deleteFromJoinTableResponse?.error?.message,
+        detailedMessage: deleteFromJoinTableResponse?.error?.message,
         tableName: deleteFromJoinTableResponse?.error?.message
       });
     }
@@ -627,7 +628,10 @@ class DataProcessor {
     const dataWithEmptyGeometries = this.#replaceEmptyGeometries(dataWithoutJoinTables, formConfig);
     const filesValid = this.#fileProcessor.validateFileFields(dataWithEmptyGeometries, formConfig);
     if (!filesValid) {
-      throw new GenericError('Invalid file(s).');
+      throw new GenericRequestError('Invalid file(s).', 400, {
+        errorCode: 'INVALID_FILE',
+        detailedMessage: 'One or more files are invalid or missing.'
+      });
     }
     // TODO check if we always want to remove the id or only if it is set to readonly
     return this.#removeId(dataWithEmptyGeometries, formConfig);
@@ -672,11 +676,16 @@ class DataProcessor {
         if (prop.resolveAsEnum && prop.resolveLookup) {
           const lookupTables = formConfig.dataSource.lookupTables;
           if (!lookupTables) {
-            throw new GenericError('Cannot create select statement. Missing lookupTables.');
+            throw new GenericRequestError('Cannot create select statement. Missing lookupTables.', 500, {
+              errorCode: 'MISSING_LOOKUP_TABLES'
+            });
           }
           const refCol = lookupTables[c].includedProperties?.[0];
           if (!refCol) {
-            throw new GenericError(`Cannot create select statement. Missing includedProperties in lookupTable ${c}.`);
+            throw new GenericRequestError(`Cannot create select statement. Missing includedProperties in
+            lookupTable ${c}.`, 500, {
+              errorCode: 'MISSING_LOOKUP_COLUMNS'
+            });
           }
           return `${c}(${refCol},${prop.resolveToColumn})`;
         }
@@ -698,7 +707,9 @@ class DataProcessor {
         if (isJoinTable) {
           const joinConfig = formConfig.dataSource.joinTables?.[c];
           if (!joinConfig) {
-            throw new GenericError(`No join table config found for property ${c}`);
+            throw new GenericRequestError(`No join table config found for property ${c}`, 500, {
+              errorCode: 'MISSING_LOOKUP_COLUMNS'
+            });
           }
           if (joinConfig.relationship === Relationship.MANY_TO_ONE) {
             return `${c}:${joinConfig.dataSource.tableName}(${this.#createItemSelectStatement(joinConfig)})`;
@@ -754,7 +765,7 @@ class DataProcessor {
   }
 
   /**
-   * Reconstruct table data from a orderable structure to a flat structure.
+   * Reconstruct table data from an orderable structure to a flat structure.
    * @param data The data to reconstruct.
    * @param formConfig The formConfig.
    * @returns The reconstructed table data.
@@ -768,11 +779,16 @@ class DataProcessor {
       colsToReconstruct.forEach((c: string) => {
         const lookupTables = formConfig.dataSource.lookupTables;
         if (!lookupTables) {
-          throw new GenericError('Cannot reconstruct data. Missing lookupTables.');
+          throw new GenericRequestError('Cannot reconstruct data. Missing lookupTables.', 500, {
+            errorCode: 'MISSING_LOOKUP_COLUMNS'
+          });
         }
         const refCol = lookupTables[c].includedProperties?.[0];
         if (!refCol) {
-          throw new GenericError(`Cannot reconstruct data. Missing includedProperties in lookupTable ${c}.`);
+          throw new GenericRequestError(`Cannot reconstruct data. Missing includedProperties in
+           lookupTable ${c}.`, 500, {
+            errorCode: 'MISSING_LOOKUP_COLUMNS'
+          });
         }
         itemClone[c] = itemClone[c]?.[refCol];
       });

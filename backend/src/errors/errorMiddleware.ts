@@ -1,11 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 
-import _set from 'lodash/set';
-
 import { setupLogger } from '../logger';
 
-
-import { GenericRequestError } from './GenericRequestError';
+import { GenericRequestError, isGenericRequestError } from './GenericRequestError';
 
 const logger = setupLogger({ label: 'errorMiddleware' });
 
@@ -26,21 +23,23 @@ export function errorMiddleware(
     logger.error(err);
   }
 
-  if (err instanceof GenericRequestError) {
+  if (isGenericRequestError(err)) {
     logger.debug(`Generic request error: ${err.message}`);
     statusCode = err.status || statusCode;
   } else {
     logger.error(`Cannot create formItem: ${err.message}`);
   }
 
-  const responseObject = {
+  const responseObject: any = {
     success: false,
+    name: err.name || 'InternalServerError',
+    statusCode,
     message,
     ...(process.env.NODE_ENV && process.env.NODE_ENV !== 'production' && { stack: err.stack }),
   };
 
-  if (err instanceof GenericRequestError) {
-    _set(responseObject, 'extra', err.extra || {});
+  if (isGenericRequestError(err)) {
+    responseObject.extra = err.extra || {};
   }
 
   res.status(statusCode).json(responseObject);

@@ -43,4 +43,6 @@ export function errorMiddleware(
   }
 
   res.status(statusCode).json(responseObject);
+
+  next();
 }

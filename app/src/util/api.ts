@@ -69,7 +69,7 @@ const getFormItem = async (formId: string, itemId: ItemId, kc?: Keycloak) => {
 const deleteItem = async (formId: string, itemId: ItemId, kc?: Keycloak) => {
   const url = `../form/${formId}/item/${itemId}`;
 
-  return authenticatedFetch(url, { method: 'DELETE' }, kc);
+  return authenticatedFetch(url, {method: 'DELETE'}, kc);
 };
 
 const updateItem = async (formId: string, itemId: ItemId, body: object, kc?: Keycloak) => {
@@ -100,7 +100,7 @@ const fetchKeycloakConfig = async () => {
 };
 
 const fetchFile = async (fileIdentifier: string, kc?: Keycloak) => {
-  const fileUrl =  `../form/files/${fileIdentifier}`;
+  const fileUrl = `../form/files/${fileIdentifier}`;
   return authenticatedFetch(fileUrl, {
     headers: {
       'Content-Type': 'application/octet-stream'

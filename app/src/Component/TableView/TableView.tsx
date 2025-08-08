@@ -13,7 +13,7 @@ import {
   PaginationChangedEvent,
   SortChangedEvent
 } from '@ag-grid-community/core';
-import { AG_GRID_LOCALE_DE } from '@ag-grid-community/locale';
+import { AG_GRID_LOCALE_DE, AG_GRID_LOCALE_EN } from '@ag-grid-community/locale';
 import { AgGridReact, CustomCellEditorProps } from '@ag-grid-community/react';
 
 import Keycloak from 'keycloak-js';
@@ -22,12 +22,15 @@ import _isNil from 'lodash/isNil';
 
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
+import { useTranslation } from 'react-i18next';
+
 import Logger from '@terrestris/base-util/dist/Logger';
 
 import { FormConfiguration, ItemId } from '../../App';
 import { RECEIVE_EVENTS, SEND_EVENTS } from '../../constants/events';
 import { TOAST_MESSAGE } from '../../constants/toastMessage';
 
+import i18n from '../../i18n/i18n.ts';
 import api from '../../util/api';
 import { isGeometryType } from '../../util/jsonEditor';
 import { receiveMessage, sendMessage } from '../../util/postMessage';
@@ -36,7 +39,6 @@ import { createItemViewUrl, createTableViewUrl, ItemViewQueryParams, TableViewQu
 
 import ConfirmDelete from '../ConfirmDelete/ConfirmDelete';
 import '@ag-grid-community/styles/ag-grid.css';
-
 import '@ag-grid-community/styles/ag-theme-quartz.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -58,7 +60,7 @@ interface TableViewProps {
   keycloak?: Keycloak;
   order?: 'asc' | 'desc' | null;
   orderBy?: string | null;
-  showToast?: (message: TOAST_MESSAGE) => void;
+  showToast?: (message: TOAST_MESSAGE, additionalMessage?: string) => void;
 }
 
 const filterParams: any = {
@@ -85,6 +87,9 @@ const TableView: React.FC<TableViewProps> = ({
   page,
   showToast = () => undefined
 }) => {
+
+  const { t } = useTranslation();
+
   /**
    *
    * @param colNames string[] The column names to filter.
@@ -106,29 +111,39 @@ const TableView: React.FC<TableViewProps> = ({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [idToDelete, setIdToDelete] = useState<ItemId>();
 
+  const agGridLocale = useMemo(() => {
+    const lang = i18n.language ||
+      (typeof window !== 'undefined' && window.localStorage.i18nextLng) ||
+      'de-DE';
+    if (lang === 'de-DE') {
+      return AG_GRID_LOCALE_DE;
+    }
+    return AG_GRID_LOCALE_EN;
+  }, []);
+
   const viewTooltip = useMemo(() => (
     <Tooltip id="tooltip">
-        Anzeigen
+      {t('TableView.viewTooltip')}
     </Tooltip>
-  ), []);
+  ), [t]);
 
   const zoomToTooltip = useMemo(() => (
     <Tooltip id="zoom-to-tooltip">
-        Auf Geometrie zoomen
+      {t('TableView.zoomToGeometryTooltip')}
     </Tooltip>
-  ), []);
+  ), [t]);
 
   const editTooltip = useMemo(() => (
     <Tooltip id="tooltip">
-        Bearbeiten
+      {t('TableView.editTooltip')}
     </Tooltip>
-  ), []);
+  ), [t]);
 
   const deleteTooltip = useMemo(() => (
     <Tooltip id="tooltip">
-        Eintrag löschen
+      {t('ItemView.deleteTooltip')}
     </Tooltip>
-  ), []);
+  ), [t]);
 
   const deleteItem = async (fId: string, itemId: ItemId) => {
     try {
@@ -157,7 +172,7 @@ const TableView: React.FC<TableViewProps> = ({
 
   const renderCell = useCallback((colName: string, value: unknown | unknown[]) => {
     if (colsWithSubitems.includes(colName)) {
-      return 'Siehe Detailansicht';
+      return t('TableView.seeItemViewText');
     }
 
     if (data.config.properties?.[colName]?.enumSource) {
@@ -177,7 +192,7 @@ const TableView: React.FC<TableViewProps> = ({
     }
 
     return value;
-  }, [data, colsWithSubitems]);
+  }, [data, colsWithSubitems, t]);
 
   const renderGeometryCell = (value: unknown) => {
     if (!value) {
@@ -262,7 +277,7 @@ const TableView: React.FC<TableViewProps> = ({
                 className="btn btn-link actions"
                 type="button"
                 onClick={() => zoomToFeature(rowProps)}
-                aria-label="Auf Geometrie zoomen"
+                aria-label={t('TableView.zoomToGeometryTooltip')}
               >
                 <i className="bi bi-search"></i><span className="d-none d-sm-inline">&ensp;</span>
               </button>
@@ -295,7 +310,7 @@ const TableView: React.FC<TableViewProps> = ({
                   setShowDeleteDialog(true);
                   setIdToDelete(rowProps.data[data.config.idColumn] as ItemId);
                 }}
-                aria-label="Eintrag löschen"
+                aria-label={t('TableView.deleteTooltip')}
               >
                 <i className="bi bi-trash3"></i><span className="d-none d-sm-inline">&ensp;</span>
               </button>
@@ -306,7 +321,7 @@ const TableView: React.FC<TableViewProps> = ({
     );
   }, [
     allowItemView, containsGeometryColumns, data, deleteTooltip, editTooltip, editable,
-    filter, formId, order, page, viewTooltip, zoomToFeature, zoomToTooltip
+    filter, formId, order, page, viewTooltip, zoomToFeature, zoomToTooltip, t
   ]);
 
   const renderColumnTitle = useCallback((colName: any) => {
@@ -353,7 +368,7 @@ const TableView: React.FC<TableViewProps> = ({
         }
 
         if (colDef.field) {
-          const { type: dataType } = data.config.properties[colDef.field];
+          const {type: dataType} = data.config.properties[colDef.field];
           // exclude geometries, file uploads, enums and join tables from sorting
           if (isFilterableProp(data.config.properties[colDef.field])) {
             if (dataType === 'string') {
@@ -451,7 +466,7 @@ const TableView: React.FC<TableViewProps> = ({
     event.api.addEventListener('paginationChanged', onPaginationChanged);
   };
 
-  const onFilterChanged = ({ api: gridApi }: FilterChangedEvent) => {
+  const onFilterChanged = ({api: gridApi}: FilterChangedEvent) => {
     const filterModel = gridApi.getFilterModel();
 
     // We only allow one filter per table
@@ -563,7 +578,7 @@ const TableView: React.FC<TableViewProps> = ({
 
   const onCellClicked = (event: CellClickedEvent) => {
     if (!event.colDef.field) {
-      // do not trigger highlighting when the options column has been clicked
+      // do not trigger highlighting when the option column has been clicked
       return;
     }
     const geometryColumns = getGeometryColumns(data.config);
@@ -629,10 +644,10 @@ const TableView: React.FC<TableViewProps> = ({
 
   return (
     <div>
-      <h3>{data.config.title ?? formId}</h3>
+      <h3 className="table-view-title">{data.config.title ?? formId}</h3>
       {
         data.config.description && (
-          <span>{data.config.description}</span>
+          <span className="table-view-description">{data.config.description}</span>
         )
       }
       {
@@ -649,18 +664,19 @@ const TableView: React.FC<TableViewProps> = ({
           className='create-button'
           variant='primary'
           onClick={onCreateBtnClick}
-          aria-label="Eintrag erstellen"
+          aria-label={t('TableView.createEntryText')}
         >
-          <i className="bi bi-plus-lg"></i><span className="d-none d-sm-inline">&ensp;Eintrag erstellen</span>
+          <i className="bi bi-plus-lg"></i>
+          <span className="d-none d-sm-inline">&ensp;{t('TableView.createEntryText')}</span>
         </Button>
-        <div className="ag-theme-quartz" style={{ height: '100%', width: '100%' }}>
+        <div className="ag-theme-quartz" style={{height: '100%', width: '100%'}}>
           <AgGridReact
             columnDefs={columnDefs}
             // Automatically set the height of the table depending on the data.
             // Might become slow with a lot of data (1000+ rows).
             domLayout='autoHeight'
             defaultColDef={defaultColumnDefs}
-            localeText={AG_GRID_LOCALE_DE}
+            localeText={agGridLocale}
             onCellClicked={onCellClicked}
             onCellMouseOut={onCellMouseOut}
             onCellMouseOver={onCellMouseOver}

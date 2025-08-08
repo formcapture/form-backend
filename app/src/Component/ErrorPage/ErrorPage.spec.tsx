@@ -23,9 +23,9 @@ describe('<ErrorPage />', () => {
 
   it('can be rendered', () => {
     render(<ErrorPage />);
-    expect(screen.getByText('Hoppla, da ist etwas schiefgelaufen!')).toBeDefined();
+    expect(screen.getByText('ErrorPage.headingText')).toBeDefined();
+    expect(screen.getByText('ErrorPage.checkParametersMsg')).toBeDefined();
     expect(document.querySelector('.content')).toBeDefined();
     expect(document.querySelector('.bi-emoji-dizzy')).toBeDefined();
-    expect(document.querySelector('.content')?.innerHTML).toContain('richtige Adresse eingegeben');
   });
 });

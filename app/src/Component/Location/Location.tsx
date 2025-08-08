@@ -37,7 +37,7 @@ export class Location extends AbstractEditor {
    * Builds the editor UI including input field, label, description, and buttons.
    */
   build(): void {
-    const { description, readOnly } = this.schema;
+    const {description, readOnly} = this.schema;
     const descriptionText = description || (readOnly ? '' : 'Standort ermitteln und bearbeiten.');
 
     this.label = this.theme.getFormInputLabel(this.getTitle(), this.isRequired());
@@ -103,7 +103,7 @@ export class Location extends AbstractEditor {
     const formButtons = document.createElement('div');
     formButtons.classList.add('form-buttons');
     // TODO improve styling of buttons
-    Object.assign(formButtons.style, { display: 'flex', gap: '8px' });
+    Object.assign(formButtons.style, {display: 'flex', gap: '8px'});
     formButtons.append(startLocate, startModifyLocation, stopModifyLocation, zoomToFeatureButton);
 
     return formButtons;

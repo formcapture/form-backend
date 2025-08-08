@@ -1,5 +1,6 @@
 import express from 'express';
 
+import { errorMiddleware } from '../errors/errorMiddleware';
 import { Opts } from '../types/opts';
 
 import createFormRouter from './form';
@@ -10,6 +11,9 @@ const createApiRouter = (opts: Opts) => {
 
   router.use('/form', createFormRouter(opts));
   router.use('/keycloak', createKeycloakRouter(opts));
+
+  // add error handling middleware
+  router.use(errorMiddleware);
 
   return router;
 };

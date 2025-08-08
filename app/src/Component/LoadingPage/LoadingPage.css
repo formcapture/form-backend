@@ -2,12 +2,12 @@
   margin-top: 1rem;
   flex-direction: column;
   align-items: center;
-  
+
   .load-text {
     margin-top: 3rem;
     font-size: 2rem;
   }
-  
+
   .load-spinner {
     width: 3rem;
     height: 3rem;

@@ -3,6 +3,7 @@ import { mkdir, readdir, stat, unlink, writeFile } from 'node:fs/promises';
 import mime from 'mime-types';
 import { Logger } from 'winston';
 
+import { InternalServerError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { DataItem } from '../types/data';
 import { FormConfigInternal } from '../types/formConfigInternal';
@@ -248,7 +249,7 @@ export class FileProcessor {
       this.#logger.debug(`Created file ${filePath}`);
       return filePath;
     } catch (err) {
-      throw new Error(`Could not create file for key ${key} and configKey ${configKey}: ${err}`);
+      throw new InternalServerError(`Could not create file for key ${key} and configKey ${configKey}: ${err}`);
     }
   }
 

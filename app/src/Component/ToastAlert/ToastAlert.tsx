@@ -9,12 +9,14 @@ import { TOAST_MESSAGE } from '../../constants/toastMessage';
 import './ToastAlert.css';
 
 export interface ToastAlertProps {
+  additionalMessage?: string;
   messageType?: TOAST_MESSAGE;
-  show: boolean;
   onClose: () => void;
+  show: boolean;
 }
 
 const ToastAlert: React.FC<ToastAlertProps> = ({
+  additionalMessage,
   messageType,
   show,
   onClose
@@ -36,6 +38,9 @@ const ToastAlert: React.FC<ToastAlertProps> = ({
   }
 
   let confirmationMessage = `Eintrag konnte nicht ${actionText} werden`;
+  if (additionalMessage && additionalMessage.length > 0) {
+    confirmationMessage = `${confirmationMessage}: ${additionalMessage}`;
+  }
   if (success) {
     confirmationMessage = `Eintrag erfolgreich ${actionText}`;
   }

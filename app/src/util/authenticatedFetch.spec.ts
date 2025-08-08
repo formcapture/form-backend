@@ -57,7 +57,7 @@ describe('authenticatedFetch', () => {
       'Content-Type': 'application/json',
     };
 
-    await authenticatedFetch('https://example.com', { headers: existingHeaders }, mockKeycloak);
+    await authenticatedFetch('https://example.com', {headers: existingHeaders}, mockKeycloak);
 
     expect(fetch).toHaveBeenCalledWith('https://example.com', {
       headers: {

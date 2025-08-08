@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
 
@@ -16,6 +16,9 @@ import Location from './Component/Location/Location';
 import TableView from './Component/TableView/TableView';
 import ToastAlert from './Component/ToastAlert/ToastAlert';
 import { TOAST_MESSAGE } from './constants/toastMessage';
+import i18n, {
+  initOpts
+} from './i18n/i18n';
 import { getKeycloakInst, setKeycloakInst } from './singletons/keycloak';
 import api from './util/api';
 import { DE, isGeometryType } from './util/jsonEditor';
@@ -46,7 +49,7 @@ export interface FormItem {
 }
 
 export type FormPropertyFormat = 'integer' | 'character varying' | 'table' | 'location' | 'double precision' |
-    'geometry' | 'geometrySelection' | `geometry.(${string})` | `${string}.geometry` | `${string}.geometry(${string})`;
+  'geometry' | 'geometrySelection' | `geometry.(${string})` | `${string}.geometry` | `${string}.geometry(${string})`;
 
 export interface FormProperty {
   format?: FormPropertyFormat;
@@ -132,6 +135,9 @@ const App: React.FC = () => {
   const [unauthorizedWithToken, setUnauthorizedWithToken] = useState(false);
   const [toastVisible, setToastVisible] = useState(!!message);
   const [toastMessageType, setToastMessageType] = useState<TOAST_MESSAGE>(message as TOAST_MESSAGE);
+  const [statusCode, setStatusCode] = useState<number>(200);
+  const [additionalMessage, setAdditionalMessage] = useState<string | undefined>('');
+  const [errorInfo, setErrorInfo] = useState<any | undefined>(undefined); // TODO: type this properly
 
   const handleUnauthorized = async (keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
     if (kc?.token) {
@@ -173,15 +179,17 @@ const App: React.FC = () => {
       } else {
         response = await api.getEmptyForm(formId, kc);
       }
-      if (response.status === 401) {
+      const status = response.status;
+      setStatusCode(status);
+      const json = await response.json();
+      if (status >= 400) {
+        setAdditionalMessage(json.message);
+        setErrorInfo(json.extra);
+        Logger.error('An error occurred while fetching data, passing error to ErrorPage', new Error(json.message));
         return {
-          error: 401
+          error: status
         };
       }
-      if (response.status !== 200) {
-        throw new Error('Failed to fetch data');
-      }
-      const json = await response.json();
       if (json.config === undefined) {
         throw new Error('Failed to fetch data');
       }
@@ -228,6 +236,10 @@ const App: React.FC = () => {
       return;
     }
     const initialize = async () => {
+
+      // initialize i18n
+      await i18n.init(initOpts);
+
       const start = Date.now();
       const keycloakConfig = await fetchKeycloakConfig();
       const kc = await initializeKeycloak(keycloakConfig);
@@ -255,27 +267,31 @@ const App: React.FC = () => {
 
   const isValidUrl = (view === 'table' && formId && !itemId) || (view === 'item' && formId);
 
-  const shouldShowError = () => {
+  const shouldShowError = useMemo(() => {
+    if (statusCode !== 200) {
+      return true;
+    }
     if (!isLoading && !isValidUrl) {
       return true;
     }
     return unauthorizedWithToken;
-  };
+  }, [isLoading, isValidUrl, statusCode, unauthorizedWithToken]);
 
   const showTableView = data && formId && view === 'table';
   const showItemView = view === 'item' && data && formId;
 
-  if (shouldShowError()) {
-    return <ErrorPage />;
+  if (shouldShowError) {
+    return <ErrorPage statusCode={statusCode} errorInfo={errorInfo} />;
   }
 
   if (isLoading) {
     return <LoadingPage />;
   }
 
-  const onShowToast = (newMessage: TOAST_MESSAGE) => {
+  const onShowToast = (newMessage: TOAST_MESSAGE, aMsg?: string) => {
     setToastVisible(true);
     setToastMessageType(newMessage);
+    setAdditionalMessage(aMsg);
   };
 
   const onHideToast = () => {
@@ -285,9 +301,10 @@ const App: React.FC = () => {
   return (
     <div>
       <ToastAlert
+        additionalMessage={additionalMessage}
         messageType={toastMessageType}
-        show={toastVisible}
         onClose={onHideToast}
+        show={toastVisible}
       />
       {
         showTableView && (

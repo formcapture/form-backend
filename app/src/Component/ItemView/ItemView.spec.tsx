@@ -22,8 +22,8 @@ describe('<ItemView />', () => {
   const mockData: FormConfiguration = {
     config: {
       properties: {
-        name: { type: 'string' },
-        value: { type: 'integer' },
+        name: {type: 'string'},
+        value: {type: 'integer'},
       },
       editable: true,
       idColumn: '1',
@@ -38,7 +38,7 @@ describe('<ItemView />', () => {
     data: {
       count: 1,
       data: [
-        { name: 'Test-Object 1', value: 1 },
+        {name: 'Test-Object 1', value: 1},
       ]
     },
   };
@@ -51,7 +51,7 @@ describe('<ItemView />', () => {
     JSONEditor: vi.fn().mockImplementation(() => ({
       on: vi.fn(),
       setValue: vi.fn(),
-      getValue: () => ({ name: 'Test-Object 1', value: 1 }),
+      getValue: () => ({name: 'Test-Object 1', value: 1}),
     })),
   }));
 
@@ -98,7 +98,7 @@ describe('<ItemView />', () => {
       />
     );
 
-    const backButton = screen.getByText('< Zurück');
+    const backButton = screen.getByText('< ItemView.backTxt');
     expect(backButton).not.toBeNull();
 
     fireEvent.click(backButton);
@@ -125,9 +125,9 @@ describe('<ItemView />', () => {
       };
     }
 
-    global.fetch = vi.fn().mockResolvedValue(createFetchResponse({ success: true }));
+    global.fetch = vi.fn().mockResolvedValue(createFetchResponse({success: true}));
 
-    const saveButton = await screen.findByText('Speichern');
+    const saveButton = await screen.findByText('ItemView.saveTxt');
     expect(saveButton).not.toBeNull();
     fireEvent.click(saveButton);
     await new Promise(process.nextTick);
@@ -138,7 +138,7 @@ describe('<ItemView />', () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name: 'Test-Object 1', value: 1 })
+        body: JSON.stringify({name: 'Test-Object 1', value: 1})
       }));
     });
   });

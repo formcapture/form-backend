@@ -41,6 +41,14 @@ export default {
         deleteEntryMsg: 'Eintrag löschen',
         saveTxt: 'Speichern',
         backTxt: 'Zurück'
+      },
+      TableView: {
+        viewTooltip: 'Anzeigen',
+        zoomToGeometryTooltip: 'Auf Geometrie zoomen',
+        editTooltip: 'Bearbeiten',
+        deleteTooltip: 'Eintrag löschen',
+        seeItemViewText: 'Siehe Detailansicht',
+        createEntryText: 'Eintrag erstellen',
       }
     }
   },
@@ -85,6 +93,14 @@ export default {
         deleteEntryMsg: 'Delete entry',
         saveTxt: 'Save',
         backTxt: 'Back'
+      },
+      TableView: {
+        viewTooltip: 'View',
+        zoomToGeometryTooltip: 'Zoom to geometry',
+        editTooltip: 'Edit',
+        deleteTooltip: 'Delete entry',
+        seeItemViewText: 'See detail view',
+        createEntryText: 'Create entry'
       }
     }
   }

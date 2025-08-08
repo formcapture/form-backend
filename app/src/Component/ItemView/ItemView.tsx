@@ -5,8 +5,7 @@ import { ISimpleFilterModel } from '@ag-grid-community/core';
 import { JSONEditor } from '@json-editor/json-editor';
 
 import Keycloak from 'keycloak-js';
-import _isNil from 'lodash/isNil';
-
+import _isEmpty from 'lodash/isEmpty';
 
 import { useTranslation } from 'react-i18next';
 
@@ -76,8 +75,13 @@ const ItemView: React.FC<ItemViewProps> = ({
     try {
       const response = await api.deleteItem(fId, iId, keycloak);
       if (!response.ok) {
+        const responseData = await response.json();
         setShowDeleteDialog(false);
-        showToast(TOAST_MESSAGE.deleteError);
+        let additionalMessage = responseData.message;
+        if (!_isEmpty(responseData?.extra)) {
+          additionalMessage = errorCodeToMessage(responseData?.extra, t, formId);
+        }
+        showToast(TOAST_MESSAGE.deleteError, additionalMessage);
         return;
       }
       if (previousView) {
@@ -146,8 +150,12 @@ const ItemView: React.FC<ItemViewProps> = ({
     try {
       const response = await api.updateItem(formId, itemId, value, keycloak);
       const responseData = await response.json();
-      if (!responseData.success) {
-        showToast(TOAST_MESSAGE.updateError);
+      if (!response.ok) {
+        let additionalMessage = responseData.message;
+        if (!_isEmpty(responseData?.extra)) {
+          additionalMessage = errorCodeToMessage(responseData?.extra, t, formId);
+        }
+        showToast(TOAST_MESSAGE.updateError, additionalMessage);
         return;
       }
       const queryParams: ItemViewQueryParams = {
@@ -173,11 +181,9 @@ const ItemView: React.FC<ItemViewProps> = ({
       const responseData = await response.json();
       if (!response.ok) {
         let additionalMessage = responseData.message;
-
-        if (!_isNil(responseData?.extra)) {
+        if (!_isEmpty(responseData?.extra)) {
           additionalMessage = errorCodeToMessage(responseData?.extra, t, formId);
         }
-
         showToast(TOAST_MESSAGE.createError, additionalMessage);
         return;
       }

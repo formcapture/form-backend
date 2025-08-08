@@ -8,6 +8,8 @@ import Keycloak from 'keycloak-js';
 import _isNil from 'lodash/isNil';
 
 
+import { useTranslation } from 'react-i18next';
+
 import Logger from '@terrestris/base-util/dist/Logger';
 
 import { FormConfiguration, ItemId } from '../../App';
@@ -25,10 +27,11 @@ import {
 } from '../../util/url';
 import ConfirmDelete from '../ConfirmDelete/ConfirmDelete';
 
+import { errorCodeToMessage } from '../ErrorPage/errors.ts';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ItemView.css';
-import { errorCodeToMessage } from '../ErrorPage/errors.tsx';
 
 interface ItemViewProps {
   data: FormConfiguration;
@@ -59,6 +62,8 @@ const ItemView: React.FC<ItemViewProps> = ({
   internalMap,
   showToast = () => undefined
 }) => {
+
+  const { t } = useTranslation();
 
   const [editor, setEditor] = useState<any>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -170,7 +175,7 @@ const ItemView: React.FC<ItemViewProps> = ({
         let additionalMessage = responseData.message;
 
         if (!_isNil(responseData?.extra)) {
-          additionalMessage = errorCodeToMessage(responseData?.extra);
+          additionalMessage = errorCodeToMessage(responseData?.extra, t, formId);
         }
 
         showToast(TOAST_MESSAGE.createError, additionalMessage);
@@ -220,9 +225,8 @@ const ItemView: React.FC<ItemViewProps> = ({
 
   useEffect(() => {
     const displayFeatures = () => {
-      // Find columns of geometry type
+      // Find columns having type geometry
       const geometryColumns = getGeometryColumns(data.config);
-
       if (!geometryColumns || !geometryColumns.length) {
         return;
       }

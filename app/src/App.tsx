@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import { JSONEditor } from '@json-editor/json-editor';
 
+import LanguageDetector from 'i18next-browser-languagedetector';
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
 
 import Logger from '@terrestris/base-util/dist/Logger';
@@ -16,6 +17,9 @@ import Location from './Component/Location/Location';
 import TableView from './Component/TableView/TableView';
 import ToastAlert from './Component/ToastAlert/ToastAlert';
 import { TOAST_MESSAGE } from './constants/toastMessage';
+import i18n, {
+  initOpts
+} from './i18n/i18n';
 import { getKeycloakInst, setKeycloakInst } from './singletons/keycloak';
 import api from './util/api';
 import { DE, isGeometryType } from './util/jsonEditor';
@@ -232,6 +236,11 @@ const App: React.FC = () => {
       return;
     }
     const initialize = async () => {
+
+      // initialize i18n
+      i18n.use(LanguageDetector);
+      await i18n.init(initOpts);
+
       const start = Date.now();
       const keycloakConfig = await fetchKeycloakConfig();
       const kc = await initializeKeycloak(keycloakConfig);

@@ -2,10 +2,10 @@ import React, { JSX, useMemo } from 'react';
 
 import _isNil from 'lodash/isNil';
 
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import { useTranslation } from 'react-i18next';
 
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ErrorPage.css';
-import { errorCodeMap } from './errors.tsx';
 
 export interface ErrorPageProps {
   errorInfo?: any;
@@ -17,39 +17,38 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
   statusCode = 401
 }: ErrorPageProps): JSX.Element => {
 
+  const { t } = useTranslation();
+
   const view = new URLSearchParams(window.location.search).get('view');
   const formId = new URLSearchParams(window.location.search).get('formId');
 
   const errorMessage = useMemo(() => {
     if (!_isNil(view) && !_isNil(formId)) {
-      return 'Bitte überprüfen Sie, ob Sie die richtige Adresse eingegeben haben oder versuchen Sie es später erneut.';
+      return t('ErrorPage.checkUrlMsg');
     }
     if (_isNil(view) && _isNil(formId)) {
-      return 'Bitte geben Sie die `formId` und `view` Parameter in der URL an.';
+      return t('ErrorPage.checkParametersMsg');
     }
     if (_isNil(formId) ) {
-      return 'Bitte prüfen Sie den `formId` Parameter in der URL.';
+      return t('ErrorCodes.FORM_ID_MISSING');
     }
     if (_isNil(view)) {
-      return 'Bitte prüfen Sie den `view` Parameter in der URL.';
+      return t('ErrorPage.checkViewParameterMsg');
     }
-    return 'Bitte überprüfen Sie die URL oder versuchen Sie es später erneut.';
-  }, [formId, view]);
+    return t('ErrorPage.checkUrlMsg');
+  }, [formId, t, view]);
 
   const errorComponent = useMemo(() => {
     if (_isNil(statusCode)) {
       return <></>;
     }
     if (errorInfo && errorInfo.errorCode === 'FORM_CONFIG_NOT_FOUND' && !_isNil(formId)) {
-      return (
-        errorCodeMap.FORM_CONFIG_NOT_FOUND(formId)
-      );
+      return t('ErrorCodes.FORM_CONFIG_NOT_FOUND', { formId } );
     }
     if (!_isNil(view) && statusCode === 200 && !['item', 'table'].includes(view)) {
       return (
         <p>
-          Die angeforderte Ansicht <strong>{view}</strong> ist nicht verfügbar.
-          Bitte verwenden Sie entweder <strong>item</strong> oder <strong>table</strong> als View.
+          t('ErrorPage.viewNotSupportedMsg', { view })
         </p>
       );
     }
@@ -58,11 +57,11 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         {errorMessage}
       </p>
     );
-  }, [errorInfo, errorMessage, formId, statusCode, view]);
+  }, [errorInfo, errorMessage, formId, statusCode, t, view]);
 
   return (
     <div className="content">
-      <h1 className="heading">Hoppla, da ist etwas schiefgelaufen!</h1>
+      <h1 className="heading">{t('ErrorPage.headingText')}</h1>
       <i className="bi bi-emoji-dizzy error-icon"></i>
       {
         errorComponent

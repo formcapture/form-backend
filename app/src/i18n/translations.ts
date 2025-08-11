@@ -12,7 +12,7 @@ export default {
       },
       ErrorCodes: {
         unknownError: 'Unbekannter Fehler',
-        unknownDatabaseError: 'Unbekannter Fehler bei der Datenbank - Abfrage',
+        unknownDatabaseError: 'Unbekannter Fehler bei der Datenbankabfrage',
         CONFIG_KEY_IS_EMPTY: 'Konfigurationsschlüssel ist leer',
         DB_JOIN_ITEMS_NOT_FOUND_FOR_CONFIG_KEYS: 'Keine Join-Items für Konfigurationsschlüssel gefunden',
         FORM_CONFIG_NOT_FOUND: 'Das angeforderte Formular mit der ID {{formId}} wurde nicht gefunden',

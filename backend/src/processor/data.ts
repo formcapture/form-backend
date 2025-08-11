@@ -530,6 +530,8 @@ class DataProcessor {
 
   async #removeFromJoinTable(itemId: string, joins: DataItem[], formConfig: FormConfigInternal | JoinTable) {
     this.#logger.debug(`Removing join table data for item ${itemId}`);
+
+    // @ts-ignore
     const deleteFromJoinTableResponse = await this.#pgClient
       .schema(formConfig.via.schema || this.#pgClient.schemaName!)
       .from(formConfig.via.tableName)

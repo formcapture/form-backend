@@ -1,6 +1,7 @@
 import { PostgrestClient, PostgrestFilterBuilder, PostgrestResponse } from '@supabase/postgrest-js';
 import { Logger } from 'winston';
 
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 import { DatabaseError, GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { DataItem } from '../types/data';
@@ -258,7 +259,7 @@ class DataProcessor {
         const createdItem = await this.createItemData(item, formConfig, configKeys?.join('/'));
         if (!createdItem.success) {
           throw new DatabaseError(`Could not create item. ${createdItem.message}`, {
-            errorCode: 'ITEM_CREATION_FAILED',
+            errorCode: FormBackendErrorCode.ITEM_CREATION_FAILED,
             detailedMessage: createdItem.message,
             dbErrorCode: createdItem.code
           });
@@ -315,14 +316,14 @@ class DataProcessor {
     const configKey = configKeys.at(-1);
     if (!configKey) {
       throw new DatabaseError('Cannot handle manyToMany table. ConfigKeys is empty', {
-        errorCode: 'CONFIG_KEY_IS_EMPTY'
+        errorCode: FormBackendErrorCode.CONFIG_KEY_IS_EMPTY
       });
     }
     // TODO this can probably be improved to only get the necessary data
     const dbJoinItems = (await this.getItemData(itemId, formConfig))?.data[0][configKey];
     if (!dbJoinItems) {
       throw new DatabaseError(`Could not get db items for item ${itemId} and configKey ${configKeys.join('/')}`, {
-        errorCode: 'DB_JOIN_ITEMS_NOT_FOUND_FOR_CONFIG_KEYS'
+        errorCode: FormBackendErrorCode.DB_JOIN_ITEMS_NOT_FOUND_FOR_CONFIG_KEYS
       });
     }
 
@@ -370,13 +371,13 @@ class DataProcessor {
     const configKey = configKeys.at(-1);
     if (!configKey) {
       throw new DatabaseError('Cannot handle oneToMany table. ConfigKeys is empty', {
-        errorCode: 'CONFIG_KEY_IS_EMPTY'
+        errorCode: FormBackendErrorCode.CONFIG_KEY_IS_EMPTY
       });
     }
     const dbJoinItems = (await this.getItemData(itemId, formConfig))?.data[0][configKey];
     if (!dbJoinItems) {
       throw new DatabaseError(`Could not get db items for item ${itemId} and configKey ${configKeys.join('/')}`, {
-        errorCode: 'DB_JOIN_ITEMS_NOT_FOUND_FOR_CONFIG_KEYS'
+        errorCode: FormBackendErrorCode.DB_JOIN_ITEMS_NOT_FOUND_FOR_CONFIG_KEYS
       });
     }
 
@@ -430,7 +431,7 @@ class DataProcessor {
     const configKey = configKeys.at(-1);
     if (!configKey) {
       throw new DatabaseError('Cannot handle oneToMany table. ConfigKeys is empty', {
-        errorCode: 'CONFIG_KEY_IS_EMPTY'
+        errorCode: FormBackendErrorCode.CONFIG_KEY_IS_EMPTY
       });
     }
 
@@ -519,7 +520,7 @@ class DataProcessor {
       if (updateJoinTableResponse.status !== 201) {
         throw new DatabaseError(`Could not create data for join table \
           ${formConfig.via.tableName}. ${updateJoinTableResponse?.error?.message}`, {
-          errorCode: 'JOIN_TABLE_DATA_CREATION_FAILED',
+          errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_CREATION_FAILED,
           detailedMessage: updateJoinTableResponse?.error?.message,
           tableName: updateJoinTableResponse?.error?.message
         });
@@ -539,7 +540,7 @@ class DataProcessor {
     if (deleteFromJoinTableResponse.status !== 204) {
       throw new DatabaseError(`Could not delete data for join table \
           ${formConfig.via.tableName}. ${deleteFromJoinTableResponse?.error?.message}`, {
-        errorCode: 'JOIN_TABLE_DATA_DELETION_FAILED',
+        errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_DELETION_FAILED,
         detailedMessage: deleteFromJoinTableResponse?.error?.message,
         tableName: deleteFromJoinTableResponse?.error?.message
       });
@@ -629,7 +630,7 @@ class DataProcessor {
     const filesValid = this.#fileProcessor.validateFileFields(dataWithEmptyGeometries, formConfig);
     if (!filesValid) {
       throw new GenericRequestError('Invalid file(s).', 400, {
-        errorCode: 'INVALID_FILE',
+        errorCode: FormBackendErrorCode.INVALID_FILE,
         detailedMessage: 'One or more files are invalid or missing.'
       });
     }
@@ -677,14 +678,14 @@ class DataProcessor {
           const lookupTables = formConfig.dataSource.lookupTables;
           if (!lookupTables) {
             throw new GenericRequestError('Cannot create select statement. Missing lookupTables.', 500, {
-              errorCode: 'MISSING_LOOKUP_TABLES'
+              errorCode: FormBackendErrorCode.MISSING_LOOKUP_TABLES
             });
           }
           const refCol = lookupTables[c].includedProperties?.[0];
           if (!refCol) {
             throw new GenericRequestError(`Cannot create select statement. Missing includedProperties in
             lookupTable ${c}.`, 500, {
-              errorCode: 'MISSING_LOOKUP_COLUMNS'
+              errorCode: FormBackendErrorCode.MISSING_LOOKUP_COLUMNS
             });
           }
           return `${c}(${refCol},${prop.resolveToColumn})`;
@@ -708,7 +709,7 @@ class DataProcessor {
           const joinConfig = formConfig.dataSource.joinTables?.[c];
           if (!joinConfig) {
             throw new GenericRequestError(`No join table config found for property ${c}`, 500, {
-              errorCode: 'MISSING_LOOKUP_COLUMNS'
+              errorCode: FormBackendErrorCode.MISSING_LOOKUP_COLUMNS
             });
           }
           if (joinConfig.relationship === Relationship.MANY_TO_ONE) {
@@ -780,14 +781,14 @@ class DataProcessor {
         const lookupTables = formConfig.dataSource.lookupTables;
         if (!lookupTables) {
           throw new GenericRequestError('Cannot reconstruct data. Missing lookupTables.', 500, {
-            errorCode: 'MISSING_LOOKUP_COLUMNS'
+            errorCode: FormBackendErrorCode.MISSING_LOOKUP_COLUMNS
           });
         }
         const refCol = lookupTables[c].includedProperties?.[0];
         if (!refCol) {
           throw new GenericRequestError(`Cannot reconstruct data. Missing includedProperties in
            lookupTable ${c}.`, 500, {
-            errorCode: 'MISSING_LOOKUP_COLUMNS'
+            errorCode: FormBackendErrorCode.MISSING_LOOKUP_COLUMNS
           });
         }
         itemClone[c] = itemClone[c]?.[refCol];

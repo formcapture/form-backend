@@ -11,6 +11,7 @@ import { FormConfigPublic } from '../types/formConfigPublic';
 import { JoinTable } from '../types/joinTable';
 import { Opts } from '../types/opts';
 import { Relationship } from '../types/relationship';
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 
 class FormConfigProcessor {
 
@@ -358,7 +359,7 @@ class FormConfigProcessor {
           const joinTable = formConfig.dataSource.joinTables?.[key];
           if (!joinTable) {
             throw new DatabaseError(`Join table ${key} not found in joinTables`, {
-              errorCode: 'JOIN_TABLE_NOT_FOUND'
+              errorCode: FormBackendErrorCode.JOIN_TABLE_NOT_FOUND
             });
           }
           const joinTableIncludedProperties = joinTable.includedProperties;
@@ -544,7 +545,7 @@ class FormConfigProcessor {
       const joinTable = config.dataSource.joinTables?.[prop];
       if (!joinTable) {
         throw new DatabaseError(`Join table ${prop} not found in joinTables`, {
-          errorCode: 'JOIN_TABLE_PROP_NOT_FOUND'
+          errorCode: FormBackendErrorCode.JOIN_TABLE_PROP_NOT_FOUND
         });
       }
       switch (joinTable.relationship) {
@@ -567,7 +568,7 @@ class FormConfigProcessor {
           break;
         default:
           throw new DatabaseError('Relationship not supported', {
-            errorCode: 'JOIN_TABLE_RELATIONSHIP_NOT_SUPPORTED'
+            errorCode: FormBackendErrorCode.JOIN_TABLE_RELATIONSHIP_NOT_SUPPORTED
           });
       }
     }
@@ -597,7 +598,7 @@ class FormConfigProcessor {
       const lookupTable = config.dataSource.lookupTables?.[prop];
       if (!lookupTable) {
         throw new DatabaseError(`Lookup table ${prop} not found in lookupTables`, {
-          errorCode: 'LOOKUP_TABLE_PROPERTY_NOT_FOUND'
+          errorCode: FormBackendErrorCode.LOOKUP_TABLE_PROPERTY_NOT_FOUND
         });
       }
       config.properties[prop] = {

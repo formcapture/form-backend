@@ -24,7 +24,7 @@ export class GenericRequestError extends Error {
 
 export class InternalServerError extends GenericRequestError {
   constructor(message?: string) {
-    super(message ?? 'Internal Server Error', 500, { errorCode: 'INTERNAL_SERVER_ERROR' });
+    super(message ?? 'Internal Server Error', 500, { errorCode: FormBackendErrorCode.INTERNAL_SERVER_ERROR });
     this.name = 'InternalServerError';
   }
 }

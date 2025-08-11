@@ -3,6 +3,7 @@ import path from 'path';
 
 import { NextFunction, Request, Response } from 'express';
 
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 import { GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { FormConfig } from '../types/formConfig';
@@ -22,7 +23,7 @@ export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => 
     try {
       const formId = req.params.formId;
       if (!formId) {
-        next(new GenericRequestError('No formId provided', 400, {errorCode: 'FORM_ID_MISSING'}));
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
       }
       // TODO validate formConfig
       const formConfigPath = path.join(configsDir, formId + '.json');
@@ -34,7 +35,9 @@ export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => 
         .filter(f => f.endsWith('.json'))
         .map(f => f.split('.')[0]);
       if (!formConfigs.includes(formId)) {
-        next(new GenericRequestError('No formId provided', 404, {errorCode: 'FORM_CONFIG_NOT_FOUND'}));
+        next(new GenericRequestError(
+          'No formId provided', 404, {errorCode: FormBackendErrorCode.FORM_CONFIG_NOT_FOUND})
+        );
         return;
       }
       const formConfigStr = await fs.readFile(formConfigPath, { encoding: 'utf-8' });

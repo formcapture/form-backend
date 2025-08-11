@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express';
 import { Logger } from 'winston';
 
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 import {
   AuthenticationError,
   FormRequestError,
@@ -44,7 +45,7 @@ class FormService {
       if (order !== null && order !== undefined && order !== 'asc' && order !== 'desc') {
         next(new FormRequestError(
           'Invalid value for argument "order". Must be "asc" or "desc"', 400, {
-            errorCode: 'INVALID_ORDER'
+            errorCode: FormBackendErrorCode.INVALID_ORDER
           }));
         return;
       }
@@ -52,7 +53,7 @@ class FormService {
       if (orderBy !== null && orderBy !== undefined && typeof orderBy !== 'string') {
         next(new FormRequestError(
           'Invalid value for argument "orderBy"', 400, {
-            errorCode: 'INVALID_ORDER_BY'
+            errorCode: FormBackendErrorCode.INVALID_ORDER_BY
           }));
         return;
       }
@@ -60,7 +61,7 @@ class FormService {
       if (page !== null && page !== undefined && typeof page !== 'string') {
         next(new FormRequestError(
           'Invalid value for argument "page"', 400, {
-            errorCode: 'INVALID_PAGE'
+            errorCode: FormBackendErrorCode.INVALID_PAGE
           }));
         return;
       }
@@ -69,7 +70,7 @@ class FormService {
         // Invalid set of filter params
         next(new FormRequestError(
           'Invalid filter parameter combination.', 400, {
-            errorCode: 'INVALID_FILTER'
+            errorCode: FormBackendErrorCode.INVALID_FILTER
           }));
         return;
       } else if (filterKey && typeof filterKey === 'string' &&
@@ -93,7 +94,7 @@ class FormService {
         } catch {
           next(new FormRequestError(
             'Invalid value for argument "page"', 400, {
-              errorCode: 'INVALID_PAGE'
+              errorCode: FormBackendErrorCode.INVALID_PAGE
             }));
           return;
         }
@@ -175,11 +176,11 @@ class FormService {
       } = req;
 
       if (!formId) {
-        next(new GenericRequestError('No formId provided', 400, {errorCode: 'FORM_ID_MISSING'}));
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
         return;
       }
       if (!itemId) {
-        next(new GenericRequestError('No itemId provided', 400, {errorCode: 'ITEM_ID_MISSING'}));
+        next(new GenericRequestError('No itemId provided', 400, {errorCode: FormBackendErrorCode.ITEM_ID_MISSING}));
         return;
       }
 
@@ -253,7 +254,7 @@ class FormService {
       } = req;
 
       if (!itemId) {
-        next(new GenericRequestError('No itemId provided', 400, {errorCode: 'ITEM_ID_MISSING'}));
+        next(new GenericRequestError('No itemId provided', 400, {errorCode: FormBackendErrorCode.ITEM_ID_MISSING}));
         return;
       }
 
@@ -298,7 +299,7 @@ class FormService {
       } = req;
 
       if (!itemId) {
-        next(new GenericRequestError('No itemId provided', 400, {errorCode: 'ITEM_ID_MISSING'}));
+        next(new GenericRequestError('No itemId provided', 400, {errorCode: FormBackendErrorCode.ITEM_ID_MISSING}));
         return;
       }
 
@@ -341,7 +342,7 @@ class FormService {
       const fileExists = await fileProcessor.fileExists(fileIdentifier);
       if (!fileExists) {
         next(new GenericRequestError('Invalid file(s).', 500, {
-          errorCode: 'INVALID_FILE',
+          errorCode: FormBackendErrorCode.INVALID_FILE,
           detailedMessage: 'One or more files are invalid or missing.'
         }));
         return;

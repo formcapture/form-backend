@@ -24,6 +24,7 @@ export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => 
       const formId = req.params.formId;
       if (!formId) {
         next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
+        return;
       }
       // TODO validate formConfig
       const formConfigPath = path.join(configsDir, formId + '.json');

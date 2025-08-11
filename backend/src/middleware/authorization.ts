@@ -48,7 +48,7 @@ export const userRolesLoader = (userRolesLoaderOpts: UserRolesLoaderOpts) => {
       req.userRoles = userRoles ?? [];
       next();
     } catch (err) {
-      const e = new AuthenticationError('User roles loading failed');
+      const e = new AuthenticationError('Failed loading user roles');
       logger.debug('User roles loading failed', err);
       next(e);
     }

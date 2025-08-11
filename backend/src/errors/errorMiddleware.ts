@@ -35,7 +35,7 @@ export function errorMiddleware(
     name: err.name || 'InternalServerError',
     statusCode,
     message,
-    ...(process.env.NODE_ENV && process.env.NODE_ENV !== 'production' && { stack: err.stack }),
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
   };
 
   if (isGenericRequestError(err)) {

@@ -51,3 +51,13 @@ export function isGenericRequestError(err: any): err is GenericRequestError {
     (err && err.name === 'AuthenticationError') ||
     (err && err.name === 'InternalServerError');
 }
+
+export class AuthenticationError extends Error {
+  status: number;
+
+  constructor(message: string) {
+    super(message);
+    this.name = 'AuthenticationError';
+    this.status = 401;
+  }
+}

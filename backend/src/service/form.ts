@@ -1,8 +1,12 @@
 import { NextFunction, Response } from 'express';
 import { Logger } from 'winston';
 
-import { AuthenticationError } from '../errors/AuthenticationError';
-import { FormRequestError, GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
+import {
+  AuthenticationError,
+  FormRequestError,
+  GenericRequestError,
+  InternalServerError
+} from '../errors/GenericRequestError';
 import { checkFilterParams } from '../filter/filter';
 import { getPostgrestJwt } from '../keycloak/keycloak';
 import { setupLogger } from '../logger';

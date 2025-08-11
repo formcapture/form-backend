@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express';
 
-import { AuthenticationError } from '../errors/AuthenticationError';
+import { AuthenticationError } from '../errors/GenericRequestError';
 import { decodeToken, getRolesFromToken, getTokenFromHeader } from '../keycloak/keycloak';
 import { setupLogger } from '../logger';
 import FormConfigProcessor from '../processor/formConfig';

@@ -20,7 +20,7 @@ describe('<TableView />', () => {
         Name: {},
         Value: {},
         City: {
-          enumSource: [{ source: [{ value: 'BN', title: 'Bonn' }, { value: 'K', title: 'Cologne' }] }],
+          enumSource: [{source: [{value: 'BN', title: 'Bonn'}, {value: 'K', title: 'Cologne'}]}],
         },
         geom: {
           type: 'string',
@@ -40,8 +40,8 @@ describe('<TableView />', () => {
     data: {
       count: 2,
       data: [
-        { key: 'Item 1', id: 1, Name: 'Test-Object 1', Value: 10, City: 'BN', geom: 'Point(1,2)'},
-        { key: 'Item 2', id: 2, Name: 'Test-Object 2', Value: 20, City: 'K' , geom: 'Point(2,1)'},
+        {key: 'Item 1', id: 1, Name: 'Test-Object 1', Value: 10, City: 'BN', geom: 'Point(1,2)'},
+        {key: 'Item 2', id: 2, Name: 'Test-Object 2', Value: 20, City: 'K', geom: 'Point(2,1)'},
       ]
     },
   };
@@ -97,6 +97,7 @@ describe('<TableView />', () => {
       />
     );
 
-    expect(screen.getAllByLabelText('Auf Geometrie zoomen')).toBeDefined();
+    // use i18n key to check if the button is rendered
+    expect(screen.getAllByLabelText('TableView.zoomToGeometryTooltip')).toBeDefined();
   });
 });

@@ -2,7 +2,7 @@ import { PostgrestClient } from '@supabase/postgrest-js';
 import merge from 'lodash.merge';
 import { Logger } from 'winston';
 
-import { GenericRequestError } from '../errors/GenericRequestError';
+import { DatabaseError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { isFormConfig } from '../typeguards/formConfig';
 import { FormConfig } from '../types/formConfig';
@@ -11,6 +11,7 @@ import { FormConfigPublic } from '../types/formConfigPublic';
 import { JoinTable } from '../types/joinTable';
 import { Opts } from '../types/opts';
 import { Relationship } from '../types/relationship';
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 
 class FormConfigProcessor {
 
@@ -357,7 +358,9 @@ class FormConfigProcessor {
         if (properties[key].resolveTable) {
           const joinTable = formConfig.dataSource.joinTables?.[key];
           if (!joinTable) {
-            throw new Error(`Join table ${key} not found in joinTables`);
+            throw new DatabaseError(`Join table ${key} not found in joinTables`, {
+              errorCode: FormBackendErrorCode.JOIN_TABLE_NOT_FOUND
+            });
           }
           const joinTableIncludedProperties = joinTable.includedProperties;
           const filteredJoinTableProperties = this.#filterByIncludedProperties(joinTable, joinTableIncludedProperties);
@@ -541,7 +544,9 @@ class FormConfigProcessor {
       }
       const joinTable = config.dataSource.joinTables?.[prop];
       if (!joinTable) {
-        throw new Error(`Join table ${prop} not found in joinTables`);
+        throw new DatabaseError(`Join table ${prop} not found in joinTables`, {
+          errorCode: FormBackendErrorCode.JOIN_TABLE_PROP_NOT_FOUND
+        });
       }
       switch (joinTable.relationship) {
         case Relationship.MANY_TO_MANY:
@@ -562,7 +567,9 @@ class FormConfigProcessor {
           };
           break;
         default:
-          throw new GenericRequestError('Relationship not supported');
+          throw new DatabaseError('Relationship not supported', {
+            errorCode: FormBackendErrorCode.JOIN_TABLE_RELATIONSHIP_NOT_SUPPORTED
+          });
       }
     }
 
@@ -590,7 +597,9 @@ class FormConfigProcessor {
       }
       const lookupTable = config.dataSource.lookupTables?.[prop];
       if (!lookupTable) {
-        throw new Error(`Lookup table ${prop} not found in lookupTables`);
+        throw new DatabaseError(`Lookup table ${prop} not found in lookupTables`, {
+          errorCode: FormBackendErrorCode.LOOKUP_TABLE_PROPERTY_NOT_FOUND
+        });
       }
       config.properties[prop] = {
         ...config.properties[prop],

@@ -3,7 +3,8 @@ import path from 'path';
 
 import { NextFunction, Request, Response } from 'express';
 
-import { GenericRequestError } from '../errors/GenericRequestError';
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
+import { GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { FormConfig } from '../types/formConfig';
 import { FormConfigRequest } from '../types/formConfigRequest';
@@ -22,7 +23,8 @@ export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => 
     try {
       const formId = req.params.formId;
       if (!formId) {
-        throw new GenericRequestError('No formId provided');
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
+        return;
       }
       // TODO validate formConfig
       const formConfigPath = path.join(configsDir, formId + '.json');
@@ -34,17 +36,20 @@ export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => 
         .filter(f => f.endsWith('.json'))
         .map(f => f.split('.')[0]);
       if (!formConfigs.includes(formId)) {
-        throw new GenericRequestError(`FormConfig not found for id ${formId}`);
+        next(new GenericRequestError(
+          'No formId provided', 404, {errorCode: FormBackendErrorCode.FORM_CONFIG_NOT_FOUND})
+        );
+        return;
       }
       const formConfigStr = await fs.readFile(formConfigPath, { encoding: 'utf-8' });
       const formConfig: FormConfig = JSON.parse(formConfigStr);
-      // minor hack to allows overwriting the type of req
+      // minor hack to allow overwriting the type of req
       const modifiedRequest = req as FormConfigRequest;
       modifiedRequest.formConfig = formConfig;
       next();
     } catch (err) {
       logger.debug('Cannot get form.', err);
-      next(err);
+      next(new InternalServerError());
     }
   };
 };

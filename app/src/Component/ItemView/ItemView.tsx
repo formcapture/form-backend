@@ -5,6 +5,9 @@ import { ISimpleFilterModel } from '@ag-grid-community/core';
 import { JSONEditor } from '@json-editor/json-editor';
 
 import Keycloak from 'keycloak-js';
+import _isEmpty from 'lodash/isEmpty';
+
+import { useTranslation } from 'react-i18next';
 
 import Logger from '@terrestris/base-util/dist/Logger';
 
@@ -23,6 +26,8 @@ import {
 } from '../../util/url';
 import ConfirmDelete from '../ConfirmDelete/ConfirmDelete';
 
+import { errorCodeToMessage } from '../ErrorPage/errors.ts';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ItemView.css';
@@ -34,7 +39,7 @@ interface ItemViewProps {
   previousView: string | null;
   keycloak?: Keycloak;
   internalMap?: boolean;
-  showToast?: (message: TOAST_MESSAGE) => void;
+  showToast?: (message: TOAST_MESSAGE, additionalMessage?: string) => void;
 }
 
 const staticEditorConfig = {
@@ -57,6 +62,8 @@ const ItemView: React.FC<ItemViewProps> = ({
   showToast = () => undefined
 }) => {
 
+  const { t } = useTranslation();
+
   const [editor, setEditor] = useState<any>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -68,8 +75,13 @@ const ItemView: React.FC<ItemViewProps> = ({
     try {
       const response = await api.deleteItem(fId, iId, keycloak);
       if (!response.ok) {
+        const responseData = await response.json();
         setShowDeleteDialog(false);
-        showToast(TOAST_MESSAGE.deleteError);
+        let additionalMessage = responseData.message;
+        if (!_isEmpty(responseData?.extra)) {
+          additionalMessage = errorCodeToMessage(responseData?.extra, t, formId);
+        }
+        showToast(TOAST_MESSAGE.deleteError, additionalMessage);
         return;
       }
       if (previousView) {
@@ -138,8 +150,12 @@ const ItemView: React.FC<ItemViewProps> = ({
     try {
       const response = await api.updateItem(formId, itemId, value, keycloak);
       const responseData = await response.json();
-      if (!responseData.success) {
-        showToast(TOAST_MESSAGE.updateError);
+      if (!response.ok) {
+        let additionalMessage = responseData.message;
+        if (!_isEmpty(responseData?.extra)) {
+          additionalMessage = errorCodeToMessage(responseData?.extra, t, formId);
+        }
+        showToast(TOAST_MESSAGE.updateError, additionalMessage);
         return;
       }
       const queryParams: ItemViewQueryParams = {
@@ -163,6 +179,14 @@ const ItemView: React.FC<ItemViewProps> = ({
     try {
       const response = await api.createItem(formId, value, keycloak);
       const responseData = await response.json();
+      if (!response.ok) {
+        let additionalMessage = responseData.message;
+        if (!_isEmpty(responseData?.extra)) {
+          additionalMessage = errorCodeToMessage(responseData?.extra, t, formId);
+        }
+        showToast(TOAST_MESSAGE.createError, additionalMessage);
+        return;
+      }
       if (!responseData.success) {
         showToast(TOAST_MESSAGE.createError);
         return;
@@ -176,6 +200,7 @@ const ItemView: React.FC<ItemViewProps> = ({
       const itemViewUrl = createItemViewUrl(window.location.href, queryParams);
       window.location.assign(itemViewUrl);
     } catch (err) {
+      showToast(TOAST_MESSAGE.createError);
       Logger.error('failed to update item', err);
     }
   };
@@ -206,9 +231,8 @@ const ItemView: React.FC<ItemViewProps> = ({
 
   useEffect(() => {
     const displayFeatures = () => {
-      // Find columns of geometry type
+      // Find columns having type geometry
       const geometryColumns = getGeometryColumns(data.config);
-
       if (!geometryColumns || !geometryColumns.length) {
         return;
       }
@@ -257,10 +281,10 @@ const ItemView: React.FC<ItemViewProps> = ({
   return (
     <div>
       <ConfirmDelete
-        show={showDeleteDialog}
         itemId={itemId}
         onCancel={onCancelDelete}
         onDelete={onDelete}
+        show={showDeleteDialog}
       />
       <form>
         <div className="navigation-actions">
@@ -271,7 +295,7 @@ const ItemView: React.FC<ItemViewProps> = ({
                 type="button"
                 onClick={onGoBack}
               >
-                &lt; Zurück
+                &lt; {t('ItemView.backTxt')}
               </button>
             )
           }
@@ -283,10 +307,11 @@ const ItemView: React.FC<ItemViewProps> = ({
               <button
                 className="btn btn-primary"
                 type="submit"
-                aria-label="speichern"
+                aria-label={t('ItemView.saveTxt')}
                 onClick={onUpdateItem}
               >
-                <i className="bi bi-floppy"></i><span className="d-none d-sm-inline">&ensp;Speichern</span>
+                <i className="bi bi-floppy"></i>
+                <span className="d-none d-sm-inline">&ensp;{t('ItemView.saveTxt')}</span>
               </button>
             )
           }
@@ -295,24 +320,26 @@ const ItemView: React.FC<ItemViewProps> = ({
               <button
                 className="btn btn-primary"
                 type="submit"
-                aria-label="speichern"
+                aria-label={t('ItemView.saveTxt')}
                 onClick={onCreateItem}
               >
-                <i className="bi bi-floppy"></i><span className="d-none d-sm-inline">&ensp;Speichern</span>
+                <i className="bi bi-floppy"></i>
+                <span className="d-none d-sm-inline">&ensp;{t('ItemView.saveTxt')}</span>
               </button>
             )
           }
           {
-            itemId && editable &&(
+            itemId && editable && (
               <button
                 className="btn btn-outline-danger"
                 type="button"
-                aria-label="löschen"
+                aria-label={t('ItemView.deleteEntryMsg')}
                 onClick={() => {
                   setShowDeleteDialog(true);
                 }}
               >
-                <i className="bi bi-trash3"></i><span className="d-none d-sm-inline">&ensp;Eintrag löschen</span>
+                <i className="bi bi-trash3"></i>
+                <span className="d-none d-sm-inline">&ensp;{t('ItemView.deleteEntryMsg')}</span>
               </button>
             )
           }

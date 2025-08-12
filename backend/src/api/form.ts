@@ -11,6 +11,7 @@ export const createFormRouter = (opts: Opts) => {
   router.use(express.json({
     limit: opts.SIZE_LIMIT
   }));
+
   const configLoader = formConfigLoader({ formConfigsDir: opts.FORM_CONFIGS_DIR });
   const userRolesLoader = userRolesLoaderCreator({ opts });
 

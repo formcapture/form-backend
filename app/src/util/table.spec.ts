@@ -29,8 +29,8 @@ describe('Table', () => {
     data: {
       count: 2,
       data: [
-        { key: 'Item 1', id: 1, Name: 'Test-Object 1', Value: 10, City: 'BN', geom: 'Point(1,2)'},
-        { key: 'Item 2', id: 2, Name: 'Test-Object 2', Value: 20, City: 'K' , geom: 'Point(2,1)'},
+        {key: 'Item 1', id: 1, Name: 'Test-Object 1', Value: 10, City: 'BN', geom: 'Point(1,2)'},
+        {key: 'Item 2', id: 2, Name: 'Test-Object 2', Value: 20, City: 'K', geom: 'Point(2,1)'},
       ]
     },
   };
@@ -54,58 +54,58 @@ describe('Table', () => {
     data: {
       count: 2,
       data: [
-        { key: 'Item 1', id: 1, Name: 'Test-Object 1', Value: 10, City: 'BN'},
-        { key: 'Item 2', id: 2, Name: 'Test-Object 2', Value: 20, City: 'K'},
+        {key: 'Item 1', id: 1, Name: 'Test-Object 1', Value: 10, City: 'BN'},
+        {key: 'Item 2', id: 2, Name: 'Test-Object 2', Value: 20, City: 'K'},
       ]
     },
   };
 
   describe('isFilterableProp', () => {
     it('returns true if prop is a string', () => {
-      expect(isFilterableProp({ type: 'string' })).toBe(true);
+      expect(isFilterableProp({type: 'string'})).toBe(true);
     });
     it('returns true if prop is a number', () => {
-      expect(isFilterableProp({ type: 'number' })).toBe(true);
+      expect(isFilterableProp({type: 'number'})).toBe(true);
     });
     it('returns true if prop is an integer', () => {
-      expect(isFilterableProp({ type: 'integer' })).toBe(true);
+      expect(isFilterableProp({type: 'integer'})).toBe(true);
     });
     it('returns false if prop is a boolean', () => {
-      expect(isFilterableProp({ type: 'boolean' })).toBe(false);
+      expect(isFilterableProp({type: 'boolean'})).toBe(false);
     });
     it('returns false if prop is a file upload', () => {
-      expect(isFilterableProp({ type: 'string', media: { binaryEncoding: 'base64' } })).toBe(false);
+      expect(isFilterableProp({type: 'string', media: {binaryEncoding: 'base64'}})).toBe(false);
     });
     it('returns false if prop is a geometry', () => {
-      expect(isFilterableProp({ type: 'string', format: 'geometry' })).toBe(false);
+      expect(isFilterableProp({type: 'string', format: 'geometry'})).toBe(false);
     });
     it('returns false if prop is an enum', () => {
-      expect(isFilterableProp({ type: 'string', enumSource: [] })).toBe(false);
+      expect(isFilterableProp({type: 'string', enumSource: []})).toBe(false);
     });
   });
 
   describe('isSortableProp', () => {
     it('returns true if prop is a string', () => {
-      expect(isSortableProp({ type: 'string' })).toBe(true);
+      expect(isSortableProp({type: 'string'})).toBe(true);
     });
     it('returns true if prop is a number', () => {
-      expect(isSortableProp({ type: 'number' })).toBe(true);
+      expect(isSortableProp({type: 'number'})).toBe(true);
     });
     it('returns true if prop is an integer', () => {
-      expect(isSortableProp({ type: 'integer' })).toBe(true);
+      expect(isSortableProp({type: 'integer'})).toBe(true);
 
     });
     it('returns true if prop is a boolean', () => {
-      expect(isSortableProp({ type: 'boolean' })).toBe(true);
+      expect(isSortableProp({type: 'boolean'})).toBe(true);
     });
     it('returns true if prop is an enum', () => {
-      expect(isSortableProp({ type: 'string', enumSource: [] })).toBe(true);
+      expect(isSortableProp({type: 'string', enumSource: []})).toBe(true);
     });
     it('returns false if prop is a file upload', () => {
-      expect(isSortableProp({ type: 'string', media: { binaryEncoding: 'base64' } })).toBe(false);
+      expect(isSortableProp({type: 'string', media: {binaryEncoding: 'base64'}})).toBe(false);
     });
     it('returns false if prop is a geometry', () => {
-      expect(isSortableProp({ type: 'string', format: 'geometry' })).toBe(false);
+      expect(isSortableProp({type: 'string', format: 'geometry'})).toBe(false);
     });
   });
 

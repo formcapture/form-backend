@@ -7,17 +7,17 @@
   background-color: white !important;
 }
 
-.formbackend-editor .btn-group, .btn-group-vertical  {
+.formbackend-editor .btn-group, .btn-group-vertical {
   flex-wrap: wrap;
 }
 
-.formbackend-editor .btn-group>.btn {
+.formbackend-editor .btn-group > .btn {
   margin-right: 8px;
   margin-top: 8px;
   border-radius: var(--bs-border-radius) !important;
 }
 
-.formbackend-editor .btn-group>.btn:last-of-type {
+.formbackend-editor .btn-group > .btn:last-of-type {
   margin-right: 0;
 }
 

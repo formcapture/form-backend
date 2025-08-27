@@ -2,6 +2,7 @@ import { PostgrestClient } from '@supabase/postgrest-js';
 import merge from 'lodash.merge';
 import { Logger } from 'winston';
 
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 import { DatabaseError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { isFormConfig } from '../typeguards/formConfig';
@@ -11,7 +12,6 @@ import { FormConfigPublic } from '../types/formConfigPublic';
 import { JoinTable } from '../types/joinTable';
 import { Opts } from '../types/opts';
 import { Relationship } from '../types/relationship';
-import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 
 class FormConfigProcessor {
 

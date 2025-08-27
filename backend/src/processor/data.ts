@@ -188,7 +188,10 @@ class DataProcessor {
     formConfig: FormConfigInternal | JoinTable,
     configKey?: string
   ) {
-    this.#logger.debug(`Updating item ${itemId} for configKey ${configKey}`);
+    this.#logger.debug(`Updating item ${itemId}`);
+    if (configKey) {
+      this.#logger.debug(`for configKey ${configKey}`);
+    }
     let sanitizedData = this.#sanitizeData(item, formConfig);
     const keysAndFiles = this.#fileProcessor.getFilesFromItem(sanitizedData, formConfig);
     sanitizedData = await this.#fileProcessor.createFiles({
@@ -275,7 +278,10 @@ class DataProcessor {
           configKeys?.join('/')
         );
         itemId = updatedItem.id;
-        this.#logger.debug(`Updated item ${itemId} for configKeys ${configKeys}`);
+        this.#logger.debug(`Updated item ${itemId}`);
+        if (configKeys) {
+          this.#logger.debug(`for configKeys ${configKeys}`);
+        }
         break;
       }
       case DbAction.DELETE:

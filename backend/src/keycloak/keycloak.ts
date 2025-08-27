@@ -86,5 +86,12 @@ export const getPostgrestJwt = async (opts: Opts) => {
     return;
   }
   const data = await response.json();
+
+  if (opts.LOG_LEVEL === 'verbose') {
+    logger.verbose('Got postgrest jwt');
+    const jwtPayload = decodeToken(data.access_token, opts);
+    logger.verbose(`Granted resources: ${JSON.stringify(jwtPayload?.resource_access ?? {})}`);
+  }
+
   return data.access_token;
 };

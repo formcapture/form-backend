@@ -1,3 +1,31 @@
+# [2.2.0](https://github.com/formcapture/form-backend/compare/v2.1.0...v2.2.0) (2025-08-27)
+
+
+### Bug Fixes
+
+* adds missing return ([465c33b](https://github.com/formcapture/form-backend/commit/465c33b219e56f3e7ea1f14ffd6017ffbe85d919))
+* apply editorconfig ([f5c919d](https://github.com/formcapture/form-backend/commit/f5c919d750f148bcecb024ded14caf919f83eca5))
+* call next() function ([cfb4f8b](https://github.com/formcapture/form-backend/commit/cfb4f8b947d4eff7eab608f4e56e9280fe2f7141))
+* format error message ([0e5c89a](https://github.com/formcapture/form-backend/commit/0e5c89afbdd05e4162a05232dec912acb5edfdbd))
+* harmonize endings of error messages ([63a6aad](https://github.com/formcapture/form-backend/commit/63a6aaddfc4e0d129eb6b76b17d35e90af3f5edf))
+* merge authentisation error to error class files ([2a8571e](https://github.com/formcapture/form-backend/commit/2a8571e50e185804df64c65f513deebccf31e484))
+* on verbose -> show granted keycloak resources ([51d2365](https://github.com/formcapture/form-backend/commit/51d236592e0c64004a82ada8871f24c37b0718e1))
+* pass log level correctly to env variables ([8a4c20c](https://github.com/formcapture/form-backend/commit/8a4c20c130313bdda223daca4e891d9407018c68))
+* remove duplicate registration of error middleware ([9554be9](https://github.com/formcapture/form-backend/commit/9554be9a47270464f06feab662dd22dc3c8ff59e))
+* tests for i18n usage ([eff9bb5](https://github.com/formcapture/form-backend/commit/eff9bb59bfdc4e4b88a80fb3e5ecfaf32f9b724a))
+* use enum for FormBackendErrorCode ([db7bb4a](https://github.com/formcapture/form-backend/commit/db7bb4a5cd8b551a52b77fe9eb984fd7ef515c42))
+
+
+### Features
+
+* **backend:** introduce error handling middleware ([f038a53](https://github.com/formcapture/form-backend/commit/f038a53b2ff9f4b5fbda48abc01c68e5a9fa155f))
+* check connection via postgrest client on startup ([7e5fa38](https://github.com/formcapture/form-backend/commit/7e5fa38142ba7234d02e5ef690b85b59bae401b5))
+* i18n for ItemView ([07d6734](https://github.com/formcapture/form-backend/commit/07d6734a82c083d18e3fb9024ef2cba4e5bea8b3))
+* i18n for TableView ([1b04d7b](https://github.com/formcapture/form-backend/commit/1b04d7b731cba334f1efcb243934feba29399b0e))
+* introduce i18n for error messages ([9512150](https://github.com/formcapture/form-backend/commit/95121506c782fa56154398fdce1f7344bd8efe3e))
+* pass error instances to error middleware ([a4d99e3](https://github.com/formcapture/form-backend/commit/a4d99e320b34c729d12551b9f42773afdb07197c))
+* show error messages in frontend ([c39d0cb](https://github.com/formcapture/form-backend/commit/c39d0cb782d3edda11dcc8d8f789965d016a94e6))
+
 # [2.1.0](https://github.com/formcapture/form-backend/compare/v2.0.0...v2.1.0) (2025-08-05)
 
 

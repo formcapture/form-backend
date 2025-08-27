@@ -31,6 +31,7 @@ const prepare = async () => {
     KC_CLIENT_APP_ID: process.env.KC_CLIENT_APP_ID,
     KC_PUBLIC_KEY: harmonizePublicKey(process.env.KC_PUBLIC_KEY),
     KC_REALM: process.env.KC_REALM,
+    LOG_LEVEL: process.env.LOG_LEVEL ?? 'info',
     POSTGREST_DEFAULT_SCHEMA: process.env.POSTGREST_DEFAULT_SCHEMA ?? 'public',
     POSTGREST_JWT_CLIENT_ID: process.env.POSTGREST_JWT_CLIENT_ID,
     POSTGREST_KEYCLOAK_CLIENT_SECRET: process.env.POSTGREST_KEYCLOAK_CLIENT_SECRET,

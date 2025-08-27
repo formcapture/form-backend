@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@ag-grid-community/client-side-row-model": "^32.2.0",
-    "@ag-grid-community/core": "^32.2.0",
+    "@ag-grid-community/core": "^32.3.9",
     "@ag-grid-community/locale": "^34.1.2",
     "@ag-grid-community/react": "^32.2.0",
     "@ag-grid-community/styles": "^32.3.9",

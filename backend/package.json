@@ -55,7 +55,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/lodash.merge": "^4.6.9",
     "@types/mime-types": "^3.0.1",
-    "@types/node": "^24.2.0",
+    "@types/node": "^24.7.1",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "eslint": "^9.34.0",

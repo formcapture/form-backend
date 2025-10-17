@@ -1,4 +1,4 @@
-FROM node:24-alpine AS builder
+FROM node:25-alpine AS builder
 
 RUN mkdir -p /form-backend/app /form-backend/backend
 
@@ -17,7 +17,7 @@ COPY app app/
 RUN cd app && npm run build
 
 
-FROM node:24-alpine AS runner
+FROM node:25-alpine AS runner
 
 RUN apk add dumb-init
 

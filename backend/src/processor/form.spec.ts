@@ -35,6 +35,7 @@ describe('FormProcessor', () => {
       SIZE_LIMIT: '',
       KC_AUTH_SERVER_URL: '',
       KC_CLIENT_APP_ID: '',
+      KC_PUBLIC_URL: 'my-kc-url',
       KC_PUBLIC_KEY: '',
       KC_REALM: '',
       POSTGREST_DEFAULT_SCHEMA: 'my-public-schema',

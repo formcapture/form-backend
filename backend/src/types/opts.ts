@@ -26,8 +26,10 @@ export interface Opts {
   POSTGREST_KEYCLOAK_CLIENT_SECRET: string;
   /** Keycloak realm */
   KC_REALM: string;
-  /** Keycloak auth url */
+  /** Keycloak auth url (internal backend use) */
   KC_AUTH_SERVER_URL: string;
+  /** Keycloak public url */
+  KC_PUBLIC_URL: string;
   /**
    * The public key of the keycloak realm.
    * Works with both PEM and JWK format.

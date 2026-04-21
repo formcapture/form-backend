@@ -164,6 +164,18 @@ const ItemView: React.FC<ItemViewProps> = ({
         message: TOAST_MESSAGE.updateSuccess,
         prev: previousView ?? undefined
       };
+      // Send postMessage to refresh layers
+      const geometryColumns = getGeometryColumns(data.config);
+      if (geometryColumns && geometryColumns.length) {
+        geometryColumns.forEach((column) => {
+          const { options } = editor.schema.properties[column] || {};
+          const refreshLayerId = options?.refreshLayerId;
+
+          if (refreshLayerId) {
+            sendMessage(window.parent, SEND_EVENTS.refreshLayer, refreshLayerId);
+          }
+        });
+      }
       const nextUrl = createItemViewUrl(window.location.href, queryParams);
       window.location.assign(nextUrl);
     } catch (err) {

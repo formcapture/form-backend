@@ -606,6 +606,39 @@ import { Views } from './views';
  * }
  * ```
  *
+ * @example Geometry that refers to a layer
+ * Configuration for a geometry input. The optional `refreshLayerId` refers to a layer that
+ * shall be refreshed after the update process.
+ *
+ * ```json
+ * {
+ *  "dataSource": {
+ *    "table": "my_table",
+ *    "idColumn": "id"
+ *  },
+ *  "access": {
+ *    "read": true,
+ *    "write": true
+ *  },
+ *  "views": {
+ *    "item": true,
+ *    "table": true
+ *  },
+ *  "includedProperties": [
+ *    "id",
+ *    "geom"
+ *  ],
+ *  "properties": {
+ *    "geom": {
+ *      "format": "geometry",
+ *      "options": {
+ *        "refreshLayerId": "fountains"
+ *      }
+ *    }
+ *  }
+ * }
+ * ```
+ *
  * @example File upload
  * Configuration with file upload:
  *

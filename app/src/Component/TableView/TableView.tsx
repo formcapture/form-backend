@@ -106,6 +106,8 @@ const TableView: React.FC<TableViewProps> = ({
   const allowItemView = data.config.views?.item;
   const editable = data.config.editable;
 
+  const refreshLayerIds = data.config.refreshLayersIds;
+
   const containsGeometryColumns = useMemo(() => !!getGeometryColumns(data.config)?.length, [data]);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -418,6 +420,11 @@ const TableView: React.FC<TableViewProps> = ({
       return;
     }
     await deleteItem(formId, idToDelete);
+    if (refreshLayerIds) {
+      refreshLayerIds.forEach(layerId => {
+        sendMessage(window.parent, SEND_EVENTS.refreshLayer, layerId);
+      });
+    }
   };
 
   const onSortChanged = (event: SortChangedEvent) => {

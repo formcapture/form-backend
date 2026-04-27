@@ -250,7 +250,6 @@ class FormConfigProcessor {
     if (!postProcessedConfig) {
       return;
     }
-
     const filteredProperties = this.#filterByIncludedProperties(formConfig, formConfig.includedPropertiesTable);
     postProcessedConfig.properties = this.#postProcessProperties(filteredProperties);
 
@@ -274,6 +273,7 @@ class FormConfigProcessor {
       description: this.#formConfig.description,
       idColumn: this.#formConfig.dataSource.idColumn,
       editable: FormConfigProcessor.allowsWriteForm(this.#formConfig, userRoles),
+      refreshLayersIds: this.#formConfig.refreshLayersIds ? this.#formConfig.refreshLayersIds : [],
       views: this.#formConfig.views,
       order: this.#formConfig.dataSource.order,
       orderBy: this.#formConfig.dataSource.orderBy

@@ -606,9 +606,9 @@ import { Views } from './views';
  * }
  * ```
  *
- * @example Geometry that refers to a layer
- * Configuration for a geometry input. The optional `refreshLayerId` refers to a layer that
- * shall be refreshed after the update process.
+ * @example Definition of layer ids that shall be refreshed.
+ * The optional list `refreshLayerIds` refers to layers that
+ * shall be refreshed after create, update or delete process.
  *
  * ```json
  * {
@@ -624,18 +624,7 @@ import { Views } from './views';
  *    "item": true,
  *    "table": true
  *  },
- *  "includedProperties": [
- *    "id",
- *    "geom"
- *  ],
- *  "properties": {
- *    "geom": {
- *      "format": "geometry",
- *      "options": {
- *        "refreshLayerId": "fountains"
- *      }
- *    }
- *  }
+ *  "refreshLayerIds": ["fountains", "parks"]
  * }
  * ```
  *
@@ -772,4 +761,6 @@ export interface FormConfig {
    * properties for an included column can be configured.
    */
   properties?: FormConfigProperties;
+  /** List of layer ids that shall be refreshed after the create, update or delete process. */
+  refreshLayersIds?: string[];
 }

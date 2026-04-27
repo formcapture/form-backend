@@ -31,6 +31,7 @@ import { errorCodeToMessage } from '../ErrorPage/errors.ts';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ItemView.css';
+import { refreshLayers } from '../../util/refreshLayer.ts';
 
 interface ItemViewProps {
   data: FormConfiguration;
@@ -106,6 +107,7 @@ const ItemView: React.FC<ItemViewProps> = ({
   };
 
   const editable = data?.config?.editable;
+  const refreshLayerIds = data?.config?.refreshLayersIds;
 
   useEffect(() => {
     if (!data) {
@@ -158,7 +160,9 @@ const ItemView: React.FC<ItemViewProps> = ({
         showToast(TOAST_MESSAGE.updateError, additionalMessage);
         return;
       }
-      refreshLayers();
+      if (refreshLayerIds) {
+        refreshLayers(refreshLayerIds);
+      }
       const queryParams: ItemViewQueryParams = {
         formId,
         itemId,
@@ -192,7 +196,9 @@ const ItemView: React.FC<ItemViewProps> = ({
         showToast(TOAST_MESSAGE.createError);
         return;
       }
-      refreshLayers();
+      if (refreshLayerIds) {
+        refreshLayers(refreshLayerIds);
+      }
       const queryParams: ItemViewQueryParams = {
         formId,
         itemId: responseData.id,
@@ -229,15 +235,8 @@ const ItemView: React.FC<ItemViewProps> = ({
       return;
     }
     await deleteItem(formId, itemId);
-    refreshLayers();
-  };
-
-  const refreshLayers = () => {
-    const refreshLayerIds = data?.config?.refreshLayersIds;
     if (refreshLayerIds) {
-      refreshLayerIds.forEach(layerId => {
-        sendMessage(window.parent, SEND_EVENTS.refreshLayer, layerId);
-      });
+      refreshLayers(refreshLayerIds);
     }
   };
 

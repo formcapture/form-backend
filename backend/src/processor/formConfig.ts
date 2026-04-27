@@ -250,6 +250,7 @@ class FormConfigProcessor {
     if (!postProcessedConfig) {
       return;
     }
+
     const filteredProperties = this.#filterByIncludedProperties(formConfig, formConfig.includedPropertiesTable);
     postProcessedConfig.properties = this.#postProcessProperties(filteredProperties);
 

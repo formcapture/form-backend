@@ -43,6 +43,7 @@ import '@ag-grid-community/styles/ag-theme-quartz.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './TableView.css';
+import { refreshLayers } from '../../util/refreshLayer.ts';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -421,9 +422,7 @@ const TableView: React.FC<TableViewProps> = ({
     }
     await deleteItem(formId, idToDelete);
     if (refreshLayerIds) {
-      refreshLayerIds.forEach(layerId => {
-        sendMessage(window.parent, SEND_EVENTS.refreshLayer, layerId);
-      });
+      refreshLayers(refreshLayerIds);
     }
   };
 

@@ -16,6 +16,7 @@ import { RECEIVE_EVENTS, SEND_EVENTS } from '../../constants/events';
 import { TOAST_MESSAGE } from '../../constants/toastMessage';
 import api from '../../util/api';
 import { receiveMessage, sendMessage } from '../../util/postMessage';
+import { refreshLayers } from '../../util/refreshLayer.ts';
 import { getFeaturesFromTableData, getGeometryColumns } from '../../util/table';
 import {
   createItemViewUrl,
@@ -31,7 +32,6 @@ import { errorCodeToMessage } from '../ErrorPage/errors.ts';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ItemView.css';
-import { refreshLayers } from '../../util/refreshLayer.ts';
 
 interface ItemViewProps {
   data: FormConfiguration;

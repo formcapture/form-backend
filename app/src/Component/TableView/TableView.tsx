@@ -34,6 +34,7 @@ import i18n from '../../i18n/i18n.ts';
 import api from '../../util/api';
 import { isGeometryType } from '../../util/jsonEditor';
 import { receiveMessage, sendMessage } from '../../util/postMessage';
+import { refreshLayers } from '../../util/refreshLayer.ts';
 import { getFeaturesFromTableData, getGeometryColumns, isFilterableProp, isSortableProp } from '../../util/table';
 import { createItemViewUrl, createTableViewUrl, ItemViewQueryParams, TableViewQueryParams } from '../../util/url';
 
@@ -43,7 +44,6 @@ import '@ag-grid-community/styles/ag-theme-quartz.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './TableView.css';
-import { refreshLayers } from '../../util/refreshLayer.ts';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 

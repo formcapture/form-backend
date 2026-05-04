@@ -53,7 +53,7 @@ describe('<TableView />', () => {
     expect(TableView).not.toBeNull();
   });
 
-  it('renders the table with correct headers and data', () => {
+  it('renders the table with correct headers and data', async () => {
     render(
       <TableView
         data={mockData}
@@ -62,21 +62,24 @@ describe('<TableView />', () => {
       />
     );
 
-    Object.keys(mockData.config.properties).forEach(col => {
-      expect(screen.getByText(col)).toBeDefined();
+    await waitFor(() => {
+      Object.keys(mockData.config.properties).forEach(col => {
+        expect(screen.getByText(col)).toBeDefined();
+      });
+
+      mockData.data.data.forEach(record => {
+        Object.keys(mockData.config.properties)
+          // we only render an icon for geometries, so we filter them out in this test
+          .filter(col => mockData.config.properties[col].format !== 'geometry')
+          .forEach(col => {
+            const cellValue = record[col] as string;
+            const expectedValue = col === 'City' ? (cellValue === 'BN' ? 'Bonn' : 'Cologne') : cellValue;
+            expect(screen.getByText(expectedValue)).not.toBeNull();
+          });
+
+      });
     });
 
-    mockData.data.data.forEach(record => {
-      Object.keys(mockData.config.properties)
-        // we only render an icon for geometries, so we filter them out in this test
-        .filter(col => mockData.config.properties[col].format !== 'geometry')
-        .forEach(col => {
-          const cellValue = record[col] as string;
-          const expectedValue = col === 'City' ? (cellValue === 'BN' ? 'Bonn' : 'Cologne') : cellValue;
-          expect(screen.getByText(expectedValue)).not.toBeNull();
-        });
-
-    });
   });
 
   it('creates correct edit URL', () => {

@@ -28,6 +28,7 @@ const prepare = async () => {
     FILE_UPLOAD_DIR: process.env.FILE_UPLOAD_DIR ?? 'files',
     FORM_CONFIGS_DIR: process.env.FORM_CONFIGS_DIR ?? 'form_configs',
     KC_AUTH_SERVER_URL: process.env.KC_AUTH_SERVER_URL,
+    KC_PUBLIC_URL: process.env.KC_PUBLIC_URL,
     KC_CLIENT_APP_ID: process.env.KC_CLIENT_APP_ID,
     KC_PUBLIC_KEY: harmonizePublicKey(process.env.KC_PUBLIC_KEY),
     KC_REALM: process.env.KC_REALM,
@@ -41,6 +42,7 @@ const prepare = async () => {
 
   const requiredKeys: (keyof Opts)[] = [
     'KC_AUTH_SERVER_URL',
+    'KC_PUBLIC_URL',
     'KC_CLIENT_APP_ID',
     'KC_PUBLIC_KEY',
     'KC_REALM',

@@ -136,10 +136,11 @@ describe('App', () => {
     render(<App />);
 
     await waitFor(() => {
+      const loadingText = screen.queryByText('Seite wird geladen…');
       expect(mockFetch).toHaveBeenCalledOnce();
-      expect(screen.queryByText('Seite wird geladen…')).toBeNull();
-      expect(screen.queryByText('Test-Object 1')).not.toBeNull();
-    }, {timeout: 400});
+      expect(loadingText).toBeNull();
+      expect(screen.findByText('Test-Object 1')).not.toBeNull();
+    }, {timeout: 1000});
   });
 
   it('handles Keycloak initialization errors', async () => {

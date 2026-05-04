@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/formcapture/form-backend/compare/v2.2.0...v3.0.0) (2026-02-17)
+
+
+### Features
+
+* add KC_PUBLIC_URL env variable ([07ee5d4](https://github.com/formcapture/form-backend/commit/07ee5d4986965b36c4d583921f1ff4a7b8d15027))
+
+
+### BREAKING CHANGES
+
+* KC_PUBLIC_URL was introduced as required env var
+
 # [2.2.0](https://github.com/formcapture/form-backend/compare/v2.1.0...v2.2.0) (2025-08-27)
 
 

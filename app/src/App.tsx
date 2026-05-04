@@ -77,6 +77,7 @@ export interface FormConfiguration {
     };
     order: 'asc' | 'desc';
     orderBy: string;
+    refreshLayersIds?: string[];
   };
   data: {
     count: number;

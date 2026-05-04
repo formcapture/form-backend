@@ -24,7 +24,7 @@ describe('Table', () => {
         pageSize: 10
       },
       order: 'desc',
-      orderBy: 'name',
+      orderBy: 'name'
     },
     data: {
       count: 2,

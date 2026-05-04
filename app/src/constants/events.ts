@@ -92,5 +92,9 @@ export const SEND_EVENTS = {
   /**
    * Disables item selection on the map.
    */
-  disableItemSelection: 'embedit/disableItemSelection'
+  disableItemSelection: 'embedit/disableItemSelection',
+  /**
+   * Refreshes a layer source.
+   */
+  refreshLayer: 'embedit/refreshLayer'
 };

@@ -16,6 +16,7 @@ import { RECEIVE_EVENTS, SEND_EVENTS } from '../../constants/events';
 import { TOAST_MESSAGE } from '../../constants/toastMessage';
 import api from '../../util/api';
 import { receiveMessage, sendMessage } from '../../util/postMessage';
+import { refreshLayers } from '../../util/refreshLayer.ts';
 import { getFeaturesFromTableData, getGeometryColumns } from '../../util/table';
 import {
   createItemViewUrl,
@@ -106,6 +107,7 @@ const ItemView: React.FC<ItemViewProps> = ({
   };
 
   const editable = data?.config?.editable;
+  const refreshLayerIds = data?.config?.refreshLayersIds;
 
   useEffect(() => {
     if (!data) {
@@ -158,6 +160,9 @@ const ItemView: React.FC<ItemViewProps> = ({
         showToast(TOAST_MESSAGE.updateError, additionalMessage);
         return;
       }
+      if (refreshLayerIds) {
+        refreshLayers(refreshLayerIds);
+      }
       const queryParams: ItemViewQueryParams = {
         formId,
         itemId,
@@ -190,6 +195,9 @@ const ItemView: React.FC<ItemViewProps> = ({
       if (!responseData.success) {
         showToast(TOAST_MESSAGE.createError);
         return;
+      }
+      if (refreshLayerIds) {
+        refreshLayers(refreshLayerIds);
       }
       const queryParams: ItemViewQueryParams = {
         formId,
@@ -227,6 +235,9 @@ const ItemView: React.FC<ItemViewProps> = ({
       return;
     }
     await deleteItem(formId, itemId);
+    if (refreshLayerIds) {
+      refreshLayers(refreshLayerIds);
+    }
   };
 
   useEffect(() => {

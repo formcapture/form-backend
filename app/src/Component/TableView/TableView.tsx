@@ -34,6 +34,7 @@ import i18n from '../../i18n/i18n.ts';
 import api from '../../util/api';
 import { isGeometryType } from '../../util/jsonEditor';
 import { receiveMessage, sendMessage } from '../../util/postMessage';
+import { refreshLayers } from '../../util/refreshLayer.ts';
 import { getFeaturesFromTableData, getGeometryColumns, isFilterableProp, isSortableProp } from '../../util/table';
 import { createItemViewUrl, createTableViewUrl, ItemViewQueryParams, TableViewQueryParams } from '../../util/url';
 
@@ -105,6 +106,8 @@ const TableView: React.FC<TableViewProps> = ({
 
   const allowItemView = data.config.views?.item;
   const editable = data.config.editable;
+
+  const refreshLayerIds = data.config.refreshLayersIds;
 
   const containsGeometryColumns = useMemo(() => !!getGeometryColumns(data.config)?.length, [data]);
 
@@ -418,6 +421,9 @@ const TableView: React.FC<TableViewProps> = ({
       return;
     }
     await deleteItem(formId, idToDelete);
+    if (refreshLayerIds) {
+      refreshLayers(refreshLayerIds);
+    }
   };
 
   const onSortChanged = (event: SortChangedEvent) => {

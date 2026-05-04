@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources 🔰
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js 👷🏻
         uses: actions/setup-node@v6
@@ -27,7 +27,7 @@ jobs:
 
       - name: Checkout sources 🔰 again # Needed to ensure the latest commit is checked out after semantic-release has run
         if: steps.semantic.outputs.new_release_published == 'true'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Log in to the Container registry
         if: steps.semantic.outputs.new_release_published == 'true'

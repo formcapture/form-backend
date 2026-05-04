@@ -8,6 +8,7 @@ import { GenericRequestError, InternalServerError } from '../errors/GenericReque
 import { setupLogger } from '../logger';
 import { FormConfig } from '../types/formConfig';
 import { FormConfigRequest } from '../types/formConfigRequest';
+import { FormConfigLoaderRequest } from '../types/FormConfigLoaderRequest';
 
 export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => {
 
@@ -19,7 +20,7 @@ export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => 
    * Middleware loading the form config from the file system.
    * Adds the formConfig to the request object.
    */
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: FormConfigLoaderRequest, res: Response, next: NextFunction) => {
     try {
       const formId = req.params.formId;
       if (!formId) {

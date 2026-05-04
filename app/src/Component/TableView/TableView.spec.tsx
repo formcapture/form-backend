@@ -1,6 +1,7 @@
 import {
   render,
-  screen
+  screen,
+  waitFor
 } from '@testing-library/react';
 import {
   describe,
@@ -88,7 +89,7 @@ describe('<TableView />', () => {
     );
   });
 
-  it('renders the zoomToFeatures button correctly', () => {
+  it('renders the zoomToFeatures button correctly', async () => {
     render(
       <TableView
         data={mockData}
@@ -96,8 +97,9 @@ describe('<TableView />', () => {
         page={0}
       />
     );
-
-    // use i18n key to check if the button is rendered
-    expect(screen.getAllByLabelText('TableView.zoomToGeometryTooltip')).toBeDefined();
+    await waitFor(() => {
+      // use i18n key to check if the button is rendered
+      expect(screen.getAllByLabelText('TableView.zoomToGeometryTooltip')).toBeDefined();
+    });
   });
 });

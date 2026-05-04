@@ -12,7 +12,7 @@ class KeycloakService {
 
   async getPublicKeycloakConfig(req: Request, res: Response) {
     const config: PublicKeycloakConfig = {
-      url: this.#opts.KC_AUTH_SERVER_URL,
+      url: this.#opts.KC_PUBLIC_URL,
       realm: this.#opts.KC_REALM,
       clientId: this.#opts.KC_CLIENT_APP_ID
     };

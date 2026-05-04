@@ -16,7 +16,7 @@ describe('KeycloakService', () => {
   describe('getPublicKeycloakConfig', () => {
     it('should return the public keycloak config', () => {
       const opts: Opts = {
-        KC_AUTH_SERVER_URL: 'foo',
+        KC_PUBLIC_URL: 'foo',
         KC_REALM: 'bar',
         KC_CLIENT_APP_ID: 'baz'
       } as Opts;

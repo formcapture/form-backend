@@ -13,4 +13,5 @@ export type FormConfigPublic = Omit<FormConfigInternal, OmittedProps> & {
   editable: boolean;
   order: FormConfigInternal['dataSource']['order'];
   orderBy: FormConfigInternal['dataSource']['orderBy'];
+  refreshLayersIds?: FormConfigInternal['refreshLayersIds'];
 };

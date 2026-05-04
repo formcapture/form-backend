@@ -606,6 +606,28 @@ import { Views } from './views';
  * }
  * ```
  *
+ * @example Definition of layer ids that shall be refreshed.
+ * The optional list `refreshLayerIds` refers to layers that
+ * shall be refreshed after create, update or delete process.
+ *
+ * ```json
+ * {
+ *  "dataSource": {
+ *    "table": "my_table",
+ *    "idColumn": "id"
+ *  },
+ *  "access": {
+ *    "read": true,
+ *    "write": true
+ *  },
+ *  "views": {
+ *    "item": true,
+ *    "table": true
+ *  },
+ *  "refreshLayerIds": ["fountains", "parks"]
+ * }
+ * ```
+ *
  * @example File upload
  * Configuration with file upload:
  *
@@ -739,4 +761,6 @@ export interface FormConfig {
    * properties for an included column can be configured.
    */
   properties?: FormConfigProperties;
+  /** List of layer ids that shall be refreshed after the create, update or delete process. */
+  refreshLayersIds?: string[];
 }

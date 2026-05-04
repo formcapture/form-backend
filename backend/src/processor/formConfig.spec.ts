@@ -1031,6 +1031,29 @@ describe('FormConfigProcessor', () => {
       const processedConfig = formProcessor.postProcessItemConfig(['foo']);
       expect(processedConfig!.format).toBe('grid');
     });
+    it('passes the refreshLayersIds prop through', () => {
+      const formConfig: FormConfigInternal = {
+        format: 'grid',
+        dataSource: {
+          tableName: 'test'
+        },
+        access: {
+          write: []
+        },
+        refreshLayersIds: ['layer1', 'layer2'],
+        properties: {
+          foo: {
+            type: 'integer'
+          }
+        }
+      } as unknown as FormConfigInternal;
+      const opts = {} as Opts;
+      const pgClient = {} as PostgrestClient<any, any, any>;
+      const formProcessor = new FormConfigProcessor(opts, pgClient, '');
+      formProcessor.setFormConfig(formConfig);
+      const processedConfig = formProcessor.postProcessItemConfig(['foo']);
+      expect(processedConfig!.refreshLayersIds).toStrictEqual(['layer1', 'layer2']);
+    });
   });
 
   describe('postProcessTableConfig', () => {
@@ -1223,6 +1246,29 @@ describe('FormConfigProcessor', () => {
       formProcessor.setFormConfig(formConfig);
       const processedConfig = formProcessor.postProcessTableConfig(['foo']);
       expect(processedConfig!.format).toBe('grid');
+    });
+    it('passes the refreshLayersIds property through', () => {
+      const formConfig: FormConfigInternal = {
+        format: 'grid',
+        dataSource: {
+          tableName: 'test'
+        },
+        access: {
+          write: []
+        },
+        refreshLayersIds: ['layer1', 'layer2'],
+        properties: {
+          foo: {
+            type: 'integer'
+          }
+        }
+      } as unknown as FormConfigInternal;
+      const opts = {} as Opts;
+      const pgClient = {} as PostgrestClient<any, any, any>;
+      const formProcessor = new FormConfigProcessor(opts, pgClient, '');
+      formProcessor.setFormConfig(formConfig);
+      const processedConfig = formProcessor.postProcessTableConfig(['foo']);
+      expect(processedConfig!.refreshLayersIds).toStrictEqual(['layer1', 'layer2']);
     });
   });
   describe('allowsReadForm', () => {

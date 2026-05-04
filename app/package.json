@@ -54,8 +54,8 @@
     "mime": "^4.0.7",
     "react": "^19.2.5",
     "react-bootstrap": "^2.10.4",
-    "react-dom": "^19.2.5",
-    "react-i18next": "^15.6.1"
+    "react-i18next": "^16.2.1",
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

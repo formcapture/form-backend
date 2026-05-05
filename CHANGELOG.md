@@ -1,3 +1,23 @@
+# [3.1.0](https://github.com/formcapture/form-backend/compare/v3.0.0...v3.1.0) (2026-05-05)
+
+
+### Bug Fixes
+
+* add formConfig test ([72df4ae](https://github.com/formcapture/form-backend/commit/72df4aeb148462b7cb28d50a204fb91eb35e1939))
+* docs example ([1a87a92](https://github.com/formcapture/form-backend/commit/1a87a923de0ceb569487727bda5d58e337101e88))
+* improve error page login ([74cf95c](https://github.com/formcapture/form-backend/commit/74cf95cf9e03499dc4c0eaeb8b4eb7d64c15236c))
+* lint ([a2b4473](https://github.com/formcapture/form-backend/commit/a2b447383fcaab041d793b6d190bd325f6a3796e))
+* package.json ([068c8b8](https://github.com/formcapture/form-backend/commit/068c8b89c0107825044a4b335220d732d0be5831))
+* refactor ([f4e602e](https://github.com/formcapture/form-backend/commit/f4e602e21b0473f1788e62682a66c0dbc3d39796))
+* refreshLayerIds config ([42ccd04](https://github.com/formcapture/form-backend/commit/42ccd0451d7a115b01222b2ae57ebde611f3efa0))
+* sync package-lock ([51fa5f9](https://github.com/formcapture/form-backend/commit/51fa5f9a111de5f69521a100c924b283a7191972))
+* test without token ([b99a930](https://github.com/formcapture/form-backend/commit/b99a930ae0cce2e0790650871422b756b0ceba0a))
+
+
+### Features
+
+* add refreshlayer message ([b823fab](https://github.com/formcapture/form-backend/commit/b823fabba7203a3277c42203b915677d762bf135))
+
 # [3.0.0](https://github.com/formcapture/form-backend/compare/v2.2.0...v3.0.0) (2026-02-17)
 
 

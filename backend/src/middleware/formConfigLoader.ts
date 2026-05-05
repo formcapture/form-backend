@@ -7,8 +7,8 @@ import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 import { GenericRequestError, InternalServerError } from '../errors/GenericRequestError';
 import { setupLogger } from '../logger';
 import { FormConfig } from '../types/formConfig';
-import { FormConfigRequest } from '../types/formConfigRequest';
 import { FormConfigLoaderRequest } from '../types/FormConfigLoaderRequest';
+import { FormConfigRequest } from '../types/formConfigRequest';
 
 export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => {
 

@@ -1,12 +1,10 @@
 import path from 'path';
 
-import { Request } from 'express';
-
 import { readdir, readFile } from '../../__mocks__/node:fs/promises';
+import { FormConfigLoaderRequest } from '../types/FormConfigLoaderRequest';
 import { FormConfigRequest } from '../types/formConfigRequest';
 
 import { formConfigLoader } from './formConfigLoader';
-import { FormConfigLoaderRequest } from '../types/FormConfigLoaderRequest';
 
 jest.mock('node:fs/promises');
 

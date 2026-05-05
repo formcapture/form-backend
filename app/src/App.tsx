@@ -134,6 +134,7 @@ const App: React.FC = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [unauthorizedWithToken, setUnauthorizedWithToken] = useState(false);
+  const [isRedirectingToLogin, setIsRedirectingToLogin] = useState(false);
   const [toastVisible, setToastVisible] = useState(!!message);
   const [toastMessageType, setToastMessageType] = useState<TOAST_MESSAGE>(message as TOAST_MESSAGE);
   const [statusCode, setStatusCode] = useState<number>(200);
@@ -142,9 +143,12 @@ const App: React.FC = () => {
 
   const handleUnauthorized = async (keycloakConfig: KeycloakConfig, kc?: Keycloak) => {
     if (kc?.token) {
+      // User is authenticated but lacks permission (403-equivalent) → show error page
       setUnauthorizedWithToken(true);
       return;
     }
+    // User is not logged in at all → redirect silently without showing an error page
+    setIsRedirectingToLogin(true);
     await redirectToLogin(keycloakConfig);
   };
 
@@ -181,15 +185,19 @@ const App: React.FC = () => {
         response = await api.getEmptyForm(formId, kc);
       }
       const status = response.status;
-      setStatusCode(status);
       const json = await response.json();
+      if (status === 401) {
+        // Not authenticated — do not set statusCode here; caller will trigger
+        // a Keycloak redirect and we do not want to flash an error page.
+        return { error: status };
+      }
       if (status >= 400) {
+        // Authenticated but forbidden (403) or another server error
+        setStatusCode(status);
         setAdditionalMessage(json.message);
         setErrorInfo(json.extra);
         Logger.error('An error occurred while fetching data, passing error to ErrorPage', new Error(json.message));
-        return {
-          error: status
-        };
+        return { error: status };
       }
       if (json.config === undefined) {
         throw new Error('Failed to fetch data');
@@ -269,6 +277,11 @@ const App: React.FC = () => {
   const isValidUrl = (view === 'table' && formId && !itemId) || (view === 'item' && formId);
 
   const shouldShowError = useMemo(() => {
+    // Never show an error page while Keycloak is redirecting to login —
+    // the user simply isn't authenticated yet.
+    if (isRedirectingToLogin) {
+      return false;
+    }
     if (statusCode !== 200) {
       return true;
     }
@@ -276,7 +289,7 @@ const App: React.FC = () => {
       return true;
     }
     return unauthorizedWithToken;
-  }, [isLoading, isValidUrl, statusCode, unauthorizedWithToken]);
+  }, [isLoading, isRedirectingToLogin, isValidUrl, statusCode, unauthorizedWithToken]);
 
   const showTableView = data && formId && view === 'table';
   const showItemView = view === 'item' && data && formId;
@@ -285,7 +298,7 @@ const App: React.FC = () => {
     return <ErrorPage statusCode={statusCode} errorInfo={errorInfo} />;
   }
 
-  if (isLoading) {
+  if (isLoading || isRedirectingToLogin) {
     return <LoadingPage />;
   }
 

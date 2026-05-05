@@ -238,8 +238,19 @@ describe('App', () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Seite wird geladen…')).toBeNull();
+      // Keycloak redirect is in progress — the loading page must stay visible
+      // so the user never sees a blank screen or an error page.
+      expect(screen.getByText('Seite wird geladen…')).not.toBeNull();
     }, {timeout: 400});
+
+    // No error page should be rendered — the 401 is not a permission error,
+    // it just means the user is not logged in yet.
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    // Keycloak should have been initialised with login-required to trigger the redirect.
+    expect(mockKeycloak.init).toHaveBeenCalledWith(
+      expect.objectContaining({ onLoad: 'login-required' })
+    );
   });
 
   it('shows error if unauthorized with token', async () => {

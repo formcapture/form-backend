@@ -43,7 +43,7 @@ jobs:
 
       - name: Set up Docker Buildx
         if: steps.semantic.outputs.new_release_published == 'true'
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build and push Docker image 🐳
         if: steps.semantic.outputs.new_release_published == 'true'

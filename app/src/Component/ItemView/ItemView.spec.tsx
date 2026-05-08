@@ -22,8 +22,8 @@ describe('<ItemView />', () => {
   const mockData: FormConfiguration = {
     config: {
       properties: {
-        name: {type: 'string'},
-        value: {type: 'integer'},
+        name: { type: 'string' },
+        value: { type: 'integer' },
       },
       editable: true,
       idColumn: '1',
@@ -38,7 +38,7 @@ describe('<ItemView />', () => {
     data: {
       count: 1,
       data: [
-        {name: 'Test-Object 1', value: 1},
+        { name: 'Test-Object 1', value: 1 },
       ]
     },
   };
@@ -49,9 +49,14 @@ describe('<ItemView />', () => {
 
   vi.mock('@json-editor/json-editor', () => ({
     JSONEditor: vi.fn().mockImplementation(() => ({
-      on: vi.fn(),
+      on: vi.fn().mockImplementation((event, callback) => {
+        if (event === 'ready') {
+          // Fire synchronously so editorReady becomes true
+          callback();
+        }
+      }),
       setValue: vi.fn(),
-      getValue: () => ({name: 'Test-Object 1', value: 1}),
+      getValue: () => ({ name: 'Test-Object 1', value: 1 }),
     })),
   }));
 
@@ -125,7 +130,7 @@ describe('<ItemView />', () => {
       };
     }
 
-    global.fetch = vi.fn().mockResolvedValue(createFetchResponse({success: true}));
+    global.fetch = vi.fn().mockResolvedValue(createFetchResponse({ success: true }));
 
     const saveButton = await screen.findByText('ItemView.saveTxt');
     expect(saveButton).not.toBeNull();
@@ -138,7 +143,7 @@ describe('<ItemView />', () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({name: 'Test-Object 1', value: 1})
+        body: JSON.stringify({ name: 'Test-Object 1', value: 1 })
       }));
     });
   });

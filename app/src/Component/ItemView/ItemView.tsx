@@ -110,13 +110,7 @@ const ItemView: React.FC<ItemViewProps> = ({
   const refreshLayerIds = data?.config?.refreshLayersIds;
 
   useEffect(() => {
-    if (!data) {
-      return;
-    }
-    if (editor) {
-      if (editorData) {
-        editor?.setValue(editorData);
-      }
+    if (!data || !editorRef.current) {
       return;
     }
     const editorEl = editorRef.current;
@@ -138,7 +132,7 @@ const ItemView: React.FC<ItemViewProps> = ({
       }
     });
     setEditor(editorInst);
-  }, [data, editable, editor, editorRef, editorData, formId, internalMap]);
+  }, [data, editable, formId, internalMap]);
 
   const onUpdateItem = async (e: any) => {
     e.preventDefault();
@@ -148,7 +142,7 @@ const ItemView: React.FC<ItemViewProps> = ({
     }
 
     sendMessage(window.parent, SEND_EVENTS.stopDrawing);
-    const value = editor.getValue();
+    const value = editorData;
     try {
       const response = await api.updateItem(formId, itemId, value, keycloak);
       const responseData = await response.json();
@@ -180,7 +174,7 @@ const ItemView: React.FC<ItemViewProps> = ({
     e.preventDefault();
 
     sendMessage(window.parent, SEND_EVENTS.stopDrawing);
-    const value = editor.getValue();
+    const value = editorData;
     try {
       const response = await api.createItem(formId, value, keycloak);
       const responseData = await response.json();

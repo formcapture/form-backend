@@ -1,3 +1,12 @@
+## [3.1.1](https://github.com/formcapture/form-backend/compare/v3.1.0...v3.1.1) (2026-05-11)
+
+
+### Bug Fixes
+
+* format ([553e473](https://github.com/formcapture/form-backend/commit/553e47344f1a9d7875d3a76d3dfcd1046b2dcc8a))
+* itemview rendering ([e1a55fe](https://github.com/formcapture/form-backend/commit/e1a55fe553f2d62e7657fa681689b5974a21e992))
+* minor refactor itemview ([47a3c0c](https://github.com/formcapture/form-backend/commit/47a3c0c1e05ec13f9f0fc2306b13893f2a8be910))
+
 # [3.1.0](https://github.com/formcapture/form-backend/compare/v3.0.0...v3.1.0) (2026-05-05)
 
 

@@ -27,7 +27,7 @@ const mockData: FormConfiguration = {
       name: {},
       value: {},
       city: {
-        enumSource: [{ source: [{ value: 'BN', title: 'Bonn' }] }],
+        enumSource: [{source: [{value: 'BN', title: 'Bonn'}]}],
       },
     },
     views: {
@@ -43,7 +43,7 @@ const mockData: FormConfiguration = {
   data: {
     count: 1,
     data: [
-      { key: 'Item 1', id: 2, name: 'Test-Object 1', value: 20, city: 'BN' },
+      {key: 'Item 1', id: 2, name: 'Test-Object 1', value: 20, city: 'BN'},
     ]
   },
 };
@@ -52,10 +52,9 @@ describe('App', () => {
   function createFetchResponse(data: any, status: number) {
     return new Response(JSON.stringify(data), {
       status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
     });
   }
-
 
   const mockKeycloakConfig: KeycloakConfig = {
     url: 'http://keycloak-server/auth',
@@ -63,19 +62,19 @@ describe('App', () => {
     clientId: 'myapp',
   };
 
-  const mockFetch = vi.fn(() => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 200 })));
+  const mockFetch = vi.fn(() => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200})));
 
   // TODO mock also JSONEditor.defaults (editors and resolvers)
   vi.mock('@json-editor/json-editor', () => {
     return {
       JSONEditor: vi.fn().mockImplementation(() => ({
+        setValue: vi.fn(),
         on: vi.fn().mockImplementation((event, callback) => {
           if (event === 'ready') {
             // Fire synchronously so editorReady becomes true
             callback();
           }
         }),
-        setValue: vi.fn(),
         getValue: vi.fn(() => mockData.config)
       })),
     };
@@ -146,7 +145,7 @@ describe('App', () => {
       expect(mockFetch).toHaveBeenCalledOnce();
       expect(loadingText).toBeNull();
       expect(screen.findByText('Test-Object 1')).not.toBeNull();
-    }, { timeout: 1000 });
+    }, {timeout: 1000});
   });
 
   it('handles Keycloak initialization errors', async () => {
@@ -157,7 +156,7 @@ describe('App', () => {
     (mockKeycloak.init as Mock).mockRejectedValueOnce(new Error('Initialization failed'));
 
     const localMockFetch = vi.fn(
-      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 200 }))
+      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
     global.fetch = localMockFetch;
 
@@ -174,10 +173,10 @@ describe('App', () => {
   });
 
   it('should return immediately if keycloak is already set', async () => {
-    const { rerender } = render(<App />);
+    const {rerender} = render(<App />);
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
 
     mockKeycloak.init.mockClear();
     mockKeycloak.token = 'new-token';
@@ -199,7 +198,7 @@ describe('App', () => {
 
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
 
     expect(loggerMock).toHaveBeenCalled();
     expect(loggerMock).toHaveBeenCalledWith(
@@ -215,14 +214,14 @@ describe('App', () => {
     const loggerError = vi.spyOn(Logger, 'error').mockImplementation(() => undefined);
 
     global.fetch = vi.fn(
-      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 500 }))
+      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 500}))
     );
 
     render(<App />);
 
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
 
     expect(loggerError).toHaveBeenCalled();
     expect(loggerError).toHaveBeenCalledWith(
@@ -237,7 +236,7 @@ describe('App', () => {
     (global as any).window.location = new URL('http://localhost?view=item&formId=abc&itemId=123');
     mockKeycloak.token = null;
     global.fetch = vi.fn(
-      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 200 }))
+      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 401));
 
@@ -247,7 +246,7 @@ describe('App', () => {
       // Keycloak redirect is in progress — the loading page must stay visible
       // so the user never sees a blank screen or an error page.
       expect(screen.getByText('Seite wird geladen…')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
 
     // No error page should be rendered — the 401 is not a permission error,
     // it just means the user is not logged in yet.
@@ -263,7 +262,7 @@ describe('App', () => {
     delete (global as any).window.location;
     (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
     global.fetch = vi.fn(
-      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), { status: 200 }))
+      () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 401));
 
@@ -272,7 +271,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
       expect(screen.getByText('Hoppla, da ist etwas schiefgelaufen!')).not.toBeNull();
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 
   it('renderes content if authorized with token', async () => {
@@ -284,8 +283,8 @@ describe('App', () => {
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalled();
       expect(screen.queryByText('Seite wird geladen…')).toBeNull();
-      expect(screen.queryByText('Speichern')).not.toBeNull();
-    }, { timeout: 400 });
+      expect(screen.getByText('Speichern')).not.toBeNull();
+    }, {timeout: 400});
   });
 
   it('takes the order URL parameter into account', async () => {
@@ -297,10 +296,10 @@ describe('App', () => {
     await waitFor(() => {
       expect(authenticatedFetch).toHaveBeenCalledWith(
         '../form/abc?page=0&order=asc',
-        { headers: { 'Content-Type': 'application/json' } },
+        {headers: {'Content-Type': 'application/json'}},
         mockKeycloak
       );
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 
   it('takes the orderBy URL parameter into account', async () => {
@@ -312,9 +311,9 @@ describe('App', () => {
     await waitFor(() => {
       expect(authenticatedFetch).toHaveBeenCalledWith(
         '../form/abc?page=0&orderBy=foo',
-        { headers: { 'Content-Type': 'application/json' } },
+        {headers: {'Content-Type': 'application/json'}},
         mockKeycloak
       );
-    }, { timeout: 400 });
+    }, {timeout: 400});
   });
 });

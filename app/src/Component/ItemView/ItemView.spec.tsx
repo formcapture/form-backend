@@ -49,7 +49,12 @@ describe('<ItemView />', () => {
 
   vi.mock('@json-editor/json-editor', () => ({
     JSONEditor: vi.fn().mockImplementation(() => ({
-      on: vi.fn(),
+      on: vi.fn().mockImplementation((event, callback) => {
+        if (event === 'ready') {
+          // Fire synchronously so editorReady becomes true
+          callback();
+        }
+      }),
       setValue: vi.fn(),
       getValue: () => ({name: 'Test-Object 1', value: 1}),
     })),

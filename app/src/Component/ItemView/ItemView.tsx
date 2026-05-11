@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ISimpleFilterModel } from '@ag-grid-community/core';
 import { JSONEditor } from '@json-editor/json-editor';
@@ -65,12 +65,108 @@ const ItemView: React.FC<ItemViewProps> = ({
 
   const { t } = useTranslation();
 
-  const [editor, setEditor] = useState<any>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
+  const editorInstanceRef = useRef<any>(null);
+  const editorDomRef = useRef<HTMLDivElement>(null);
+
+  const [editorReady, setEditorReady] = useState(false);
 
   const [editorData, setEditorData] = useState<any>(data?.data?.data?.[0]);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const editable = data?.config?.editable;
+  const refreshLayerIds = data?.config?.refreshLayersIds;
+
+  useEffect(() => {
+    if (!data || !editorDomRef.current) {
+      return;
+    }
+
+    const editorEl = editorDomRef.current;
+    const editorInst = new JSONEditor(editorEl, {
+      ...staticEditorConfig,
+      disable_array_add: !editable,
+      disable_array_delete: !editable,
+      form_name_root: formId,
+      schema: data.config,
+      // TODO check embedded mode
+      internalMap: internalMap
+    });
+
+    editorInst.on('ready', () => {
+      const initialData = data?.data?.data?.[0];
+      if (initialData) {
+        editorInst.setValue(initialData);
+      }
+      if (!editable) {
+        editorInst.disable();
+      }
+      editorInstanceRef.current = editorInst;
+      // Seed React state with the initial value so editorData is never stale
+      // right after mount.
+      setEditorData(editorInst.getValue());
+      setEditorReady(true);
+    });
+
+    editorInst.on('change', () => {
+      if (editorInstanceRef.current) {
+        setEditorData(editorInstanceRef.current.getValue());
+      }
+    });
+
+    return () => {
+      editorInstanceRef.current = null;
+      setEditorReady(false);
+    };
+  }, [data, editable, formId, internalMap]);
+
+  const displayFeatures = useCallback(() => {
+    const geometryColumns = getGeometryColumns(data.config);
+    if (!geometryColumns || !geometryColumns.length) {
+      return;
+    }
+    const featuresToMap = getFeaturesFromTableData([editorData], data.config, geometryColumns);
+    sendMessage(window.parent, SEND_EVENTS.displayFormData, featuresToMap);
+  }, [editorData, data.config]);
+
+  useEffect(() => {
+    displayFeatures();
+
+    const postMessageListener = (evt: MessageEvent) => {
+      const message = receiveMessage(window.parent, evt);
+      if (!message || !evt) {
+        return;
+      }
+
+      const { type: evtType, payload } = evt.data;
+
+      switch (evtType) {
+        case RECEIVE_EVENTS.sendFeature: {
+          if (!editorInstanceRef.current) {
+            break;
+          }
+          // Merge the incoming geometry into the editor, then let the
+          // 'change' listener propagate the update into editorData.
+          const merged = {
+            ...editorInstanceRef.current.getValue(),
+            [payload.columnId]: payload.geom.geometry
+          };
+          editorInstanceRef.current.setValue(merged);
+          break;
+        }
+        case RECEIVE_EVENTS.drawingStopped:
+          displayFeatures();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('message', postMessageListener);
+    return () => {
+      window.removeEventListener('message', postMessageListener);
+    };
+  }, [displayFeatures]);
 
   const deleteItem = async (fId: string, iId: ItemId) => {
     try {
@@ -106,49 +202,16 @@ const ItemView: React.FC<ItemViewProps> = ({
     }
   };
 
-  const editable = data?.config?.editable;
-  const refreshLayerIds = data?.config?.refreshLayersIds;
-
-  useEffect(() => {
-    if (!data) {
-      return;
-    }
-    if (editor) {
-      if (editorData) {
-        editor?.setValue(editorData);
-      }
-      return;
-    }
-    const editorEl = editorRef.current;
-    const editorInst = new JSONEditor(editorEl, {
-      ...staticEditorConfig,
-      disable_array_add: !editable,
-      disable_array_delete: !editable,
-      form_name_root: formId,
-      schema: data.config,
-      // TODO check embedded mode
-      internalMap: internalMap
-    });
-    editorInst.on('ready', () => {
-      if (editorData) {
-        editorInst.setValue(editorData);
-      }
-      if (!editable) {
-        editorInst.disable();
-      }
-    });
-    setEditor(editorInst);
-  }, [data, editable, editor, editorRef, editorData, formId, internalMap]);
-
   const onUpdateItem = async (e: any) => {
     e.preventDefault();
 
-    if (itemId === undefined) {
+    if (itemId === undefined || !editorInstanceRef.current) {
       return;
     }
 
     sendMessage(window.parent, SEND_EVENTS.stopDrawing);
-    const value = editor.getValue();
+
+    const value = editorInstanceRef.current.getValue();
     try {
       const response = await api.updateItem(formId, itemId, value, keycloak);
       const responseData = await response.json();
@@ -179,8 +242,12 @@ const ItemView: React.FC<ItemViewProps> = ({
   const onCreateItem = async (e: any) => {
     e.preventDefault();
 
+    if (!editorInstanceRef.current) {
+      return;
+    }
+
     sendMessage(window.parent, SEND_EVENTS.stopDrawing);
-    const value = editor.getValue();
+    const value = editorInstanceRef.current.getValue();
     try {
       const response = await api.createItem(formId, value, keycloak);
       const responseData = await response.json();
@@ -209,7 +276,7 @@ const ItemView: React.FC<ItemViewProps> = ({
       window.location.assign(itemViewUrl);
     } catch (err) {
       showToast(TOAST_MESSAGE.createError);
-      Logger.error('failed to update item', err);
+      Logger.error('failed to create item', err);
     }
   };
 
@@ -240,55 +307,6 @@ const ItemView: React.FC<ItemViewProps> = ({
     }
   };
 
-  useEffect(() => {
-    const displayFeatures = () => {
-      // Find columns having type geometry
-      const geometryColumns = getGeometryColumns(data.config);
-      if (!geometryColumns || !geometryColumns.length) {
-        return;
-      }
-
-      const featuresToMap = getFeaturesFromTableData([editorData], data.config, geometryColumns);
-      sendMessage(window.parent, SEND_EVENTS.displayFormData, featuresToMap);
-    };
-
-    displayFeatures();
-
-    const postMessageListener = (evt: MessageEvent) => {
-      const message = receiveMessage(window.parent, evt);
-      if (!message || !evt) {
-        return;
-      }
-
-      const {
-        type: evtType,
-        payload
-      } = evt.data;
-
-      switch (evtType) {
-        case RECEIVE_EVENTS.sendFeature:
-          setEditorData(() => {
-            return {
-              ...editor.getValue(),
-              [payload.columnId]: payload.geom.geometry
-            };
-          });
-          break;
-        case RECEIVE_EVENTS.drawingStopped:
-          displayFeatures();
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('message', postMessageListener);
-
-    return () => {
-      window.removeEventListener('message', postMessageListener);
-    };
-  }, [editorData, data.config, editor]);
-
   return (
     <div>
       <ConfirmDelete
@@ -311,10 +329,10 @@ const ItemView: React.FC<ItemViewProps> = ({
             )
           }
         </div>
-        <div className="formbackend-editor" ref={editorRef}></div>
+        <div className="formbackend-editor" ref={editorDomRef}></div>
         <div className="form-actions">
           {
-            itemId && editor && editable && (
+            itemId && editorReady && editable && (
               <button
                 className="btn btn-primary"
                 type="submit"
@@ -327,7 +345,7 @@ const ItemView: React.FC<ItemViewProps> = ({
             )
           }
           {
-            !itemId && editor && editable && (
+            !itemId && editorReady && editable && (
               <button
                 className="btn btn-primary"
                 type="submit"

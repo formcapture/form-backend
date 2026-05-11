@@ -20,6 +20,34 @@ vi.mock('keycloak-js', () => ({
   default: vi.fn(() => mockKeycloak),
 }));
 
+const mockData: FormConfiguration = {
+  config: {
+    properties: {
+      key: {},
+      name: {},
+      value: {},
+      city: {
+        enumSource: [{source: [{value: 'BN', title: 'Bonn'}]}],
+      },
+    },
+    views: {
+      table: true,
+      item: true,
+      pageSize: 10
+    },
+    idColumn: 'id',
+    editable: true,
+    order: 'asc',
+    orderBy: 'name'
+  },
+  data: {
+    count: 1,
+    data: [
+      {key: 'Item 1', id: 2, name: 'Test-Object 1', value: 20, city: 'BN'},
+    ]
+  },
+};
+
 describe('App', () => {
   function createFetchResponse(data: any, status: number) {
     return new Response(JSON.stringify(data), {
@@ -27,34 +55,6 @@ describe('App', () => {
       headers: {'Content-Type': 'application/json'},
     });
   }
-
-  const mockData: FormConfiguration = {
-    config: {
-      properties: {
-        key: {},
-        name: {},
-        value: {},
-        city: {
-          enumSource: [{source: [{value: 'BN', title: 'Bonn'}]}],
-        },
-      },
-      views: {
-        table: true,
-        item: true,
-        pageSize: 10
-      },
-      idColumn: 'id',
-      editable: true,
-      order: 'asc',
-      orderBy: 'name'
-    },
-    data: {
-      count: 1,
-      data: [
-        {key: 'Item 1', id: 2, name: 'Test-Object 1', value: 20, city: 'BN'},
-      ]
-    },
-  };
 
   const mockKeycloakConfig: KeycloakConfig = {
     url: 'http://keycloak-server/auth',
@@ -69,7 +69,12 @@ describe('App', () => {
     return {
       JSONEditor: vi.fn().mockImplementation(() => ({
         setValue: vi.fn(),
-        on: vi.fn(),
+        on: vi.fn().mockImplementation((event, callback) => {
+          if (event === 'ready') {
+            // Fire synchronously so editorReady becomes true
+            callback();
+          }
+        }),
         getValue: vi.fn(() => mockData.config)
       })),
     };

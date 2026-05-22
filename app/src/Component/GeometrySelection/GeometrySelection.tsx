@@ -70,7 +70,7 @@ export class GeometrySelection extends AbstractEditor {
     this.input.readOnly = this.schema.readOnly;
     this.input.disabled = this.schema.readOnly;
 
-    if (!this.schema.readOnly) {
+    if (!this.schema.readOnly && this.options?.parent?.schema?.editable) {
       this.formButtons = this.createButtons();
     }
 
@@ -139,8 +139,8 @@ export class GeometrySelection extends AbstractEditor {
   }
 
   onStartSelectClick() {
-    const endSelectButton = this.formButtons.querySelector(`#end-select-${this.key}`);
-    const startSelectButton = this.formButtons.querySelector(`#start-select-${this.key}`);
+    const endSelectButton = this.formButtons?.querySelector(`#end-select-${this.key}`);
+    const startSelectButton = this.formButtons?.querySelector(`#start-select-${this.key}`);
 
     if (endSelectButton) {
       endSelectButton.style.display = 'inline';
@@ -167,8 +167,8 @@ export class GeometrySelection extends AbstractEditor {
   }
 
   endSelecting() {
-    const endSelectButton = this.formButtons.querySelector(`#end-select-${this.key}`);
-    const startSelectButton = this.formButtons.querySelector(`#start-select-${this.key}`);
+    const endSelectButton = this.formButtons?.querySelector(`#end-select-${this.key}`);
+    const startSelectButton = this.formButtons?.querySelector(`#start-select-${this.key}`);
 
     if (endSelectButton) {
       endSelectButton.style.display = 'none';
@@ -191,7 +191,7 @@ export class GeometrySelection extends AbstractEditor {
 
   updateGeometryIndicator() {
     const geom = this.value;
-    const iconEl = this.geometryIndicator.querySelector('i');
+    const iconEl = this.geometryIndicator?.querySelector('i');
     if (geom) {
       iconEl.classList.add('fb-geom-indicator-valid');
     } else {
@@ -209,7 +209,7 @@ export class GeometrySelection extends AbstractEditor {
   }
 
   updateZoomToFeatureButton(show: boolean) {
-    const zoomToFeatureButton = this.formButtons.querySelector(`#zoom-to-feature-${this.key}`);
+    const zoomToFeatureButton = this.formButtons?.querySelector(`#zoom-to-feature-${this.key}`);
     if (zoomToFeatureButton) {
       zoomToFeatureButton.style.display = show ? 'inline' : 'none';
     }

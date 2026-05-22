@@ -88,7 +88,7 @@ const ItemView: React.FC<ItemViewProps> = ({
       disable_array_add: !editable,
       disable_array_delete: !editable,
       form_name_root: formId,
-      schema: data.config,
+      schema: { ...data.config, editable},
       // TODO check embedded mode
       internalMap: internalMap
     });

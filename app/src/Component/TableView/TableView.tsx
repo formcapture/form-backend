@@ -144,7 +144,7 @@ const TableView: React.FC<TableViewProps> = ({
 
   const deleteTooltip = useMemo(() => (
     <Tooltip id="tooltip">
-      {t('ItemView.deleteTooltip')}
+      {t('TableView.deleteTooltip')}
     </Tooltip>
   ), [t]);
 

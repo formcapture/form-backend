@@ -42,7 +42,7 @@
     "@ag-grid-community/react": "^32.3.9",
     "@ag-grid-community/styles": "^32.3.9",
     "@json-editor/json-editor": "^2.15.2",
-    "@terrestris/base-util": "^3.0.0",
+    "@terrestris/base-util": "^4.0.2",
     "@types/geojson": "^7946.0.14",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.11.3",

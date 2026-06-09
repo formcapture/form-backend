@@ -1,3 +1,11 @@
+## [3.1.2](https://github.com/formcapture/form-backend/compare/v3.1.1...v3.1.2) (2026-06-09)
+
+
+### Bug Fixes
+
+* render draw buttons only when editable ([549bb44](https://github.com/formcapture/form-backend/commit/549bb443e597c54fd3d58804f6d8a34b6e2fc1b1))
+* tooltip tableview ([e3c79d6](https://github.com/formcapture/form-backend/commit/e3c79d681bdc47f8953cdfe68f94535b6a4e6f98))
+
 ## [3.1.1](https://github.com/formcapture/form-backend/compare/v3.1.0...v3.1.1) (2026-05-11)
 
 

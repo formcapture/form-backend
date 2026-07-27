@@ -12,13 +12,41 @@ import { authenticatedFetch } from './util/authenticatedFetch';
 
 let mockKeycloak: any;
 
+const { keycloakConstructorMock } = vi.hoisted(() => {
+  return {
+    keycloakConstructorMock: vi.fn(function keycloakConstructor() {
+      return mockKeycloak;
+    })
+  };
+});
+
 vi.mock('./util/authenticatedFetch', () => ({
   authenticatedFetch: vi.fn()
 }));
 
 vi.mock('keycloak-js', () => ({
-  default: vi.fn(() => mockKeycloak),
+  default: keycloakConstructorMock,
 }));
+
+// Keep this mock at module top-level. vi.mock is hoisted anyway and this avoids
+// confusion about execution order.
+vi.mock('@json-editor/json-editor', () => {
+  function JSONEditorMock() {
+    return {
+      setValue: vi.fn(),
+      on: vi.fn().mockImplementation((event, callback) => {
+        if (event === 'ready') {
+          callback();
+        }
+      }),
+      getValue: vi.fn(() => mockData.config)
+    };
+  }
+
+  return {
+    JSONEditor: JSONEditorMock,
+  };
+});
 
 const mockData: FormConfiguration = {
   config: {
@@ -64,22 +92,6 @@ describe('App', () => {
 
   const mockFetch = vi.fn(() => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200})));
 
-  // TODO mock also JSONEditor.defaults (editors and resolvers)
-  vi.mock('@json-editor/json-editor', () => {
-    return {
-      JSONEditor: vi.fn().mockImplementation(() => ({
-        setValue: vi.fn(),
-        on: vi.fn().mockImplementation((event, callback) => {
-          if (event === 'ready') {
-            // Fire synchronously so editorReady becomes true
-            callback();
-          }
-        }),
-        getValue: vi.fn(() => mockData.config)
-      })),
-    };
-  });
-
   beforeEach(() => {
     (global.window as any).location = {
       href: 'http://localhost?formId=abc&itemId=123',
@@ -96,8 +108,6 @@ describe('App', () => {
       token: 'mock-token' as string | null,
       authenticated: true,
     };
-
-    (Keycloak as any).mockImplementation(() => mockKeycloak);
 
     global.fetch = mockFetch;
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 200));

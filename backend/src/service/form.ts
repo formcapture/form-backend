@@ -16,6 +16,10 @@ import { FormProcessor } from '../processor/form';
 import { FormConfigRequest } from '../types/formConfigRequest';
 import { Opts } from '../types/opts';
 
+const getSingleParam = (param: string | string[] | undefined) => {
+  return typeof param === 'string' ? param : undefined;
+};
+
 class FormService {
   #opts: Opts;
   #logger: Logger;
@@ -27,11 +31,16 @@ class FormService {
 
   async getForm(req: FormConfigRequest, res: Response, next: NextFunction) {
     try {
-      const formId = req.params.formId;
+      const formId = getSingleParam(req.params.formId);
       const {
         formConfig,
         userRoles
       } = req;
+
+      if (!formId) {
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
+        return;
+      }
 
       const {
         filterKey,
@@ -129,14 +138,17 @@ class FormService {
 
   async getEmptyForm(req: FormConfigRequest, res: Response, next: NextFunction) {
     try {
-      const {
-        formId
-      } = req.params;
+      const formId = getSingleParam(req.params.formId);
 
       const {
         formConfig,
         userRoles
       } = req;
+
+      if (!formId) {
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
+        return;
+      }
 
       const postgrestToken = await getPostgrestJwt(this.#opts);
       if (!postgrestToken) {
@@ -166,10 +178,8 @@ class FormService {
 
   async getFormItem(req: FormConfigRequest, res: Response, next: NextFunction) {
     try {
-      const {
-        formId,
-        itemId
-      } = req.params;
+      const formId = getSingleParam(req.params.formId);
+      const itemId = getSingleParam(req.params.itemId);
       const {
         formConfig,
         userRoles
@@ -212,11 +222,16 @@ class FormService {
 
   async createFormItem(req: FormConfigRequest, res: Response, next: NextFunction) {
     try {
-      const formId = req.params.formId;
+      const formId = getSingleParam(req.params.formId);
       const {
         formConfig,
         userRoles
       } = req;
+
+      if (!formId) {
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
+        return;
+      }
 
       this.#logger.debug(`Creating form item ${JSON.stringify(req.body)} for formId ${formId}`);
 
@@ -244,14 +259,17 @@ class FormService {
 
   async updateFormItem(req: FormConfigRequest, res: Response, next: NextFunction) {
     try {
-      const {
-        formId,
-        itemId
-      } = req.params;
+      const formId = getSingleParam(req.params.formId);
+      const itemId = getSingleParam(req.params.itemId);
       const {
         formConfig,
         userRoles
       } = req;
+
+      if (!formId) {
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
+        return;
+      }
 
       if (!itemId) {
         next(new GenericRequestError('No itemId provided', 400, {errorCode: FormBackendErrorCode.ITEM_ID_MISSING}));
@@ -289,14 +307,17 @@ class FormService {
 
   async deleteFormItem(req: FormConfigRequest, res: Response, next: NextFunction) {
     try {
-      const {
-        formId,
-        itemId
-      } = req.params;
+      const formId = getSingleParam(req.params.formId);
+      const itemId = getSingleParam(req.params.itemId);
       const {
         formConfig,
         userRoles
       } = req;
+
+      if (!formId) {
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
+        return;
+      }
 
       if (!itemId) {
         next(new GenericRequestError('No itemId provided', 400, {errorCode: FormBackendErrorCode.ITEM_ID_MISSING}));
@@ -331,10 +352,20 @@ class FormService {
 
   async getFile(req: FormConfigRequest, res: Response, next: NextFunction) {
     try {
-      const {
-        formId,
-      } = req.params;
-      const fileIdentifier = req.params[0];
+      const formId = getSingleParam(req.params.formId);
+      const fileIdentifier = getSingleParam(req.params[0]);
+
+      if (!formId) {
+        next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
+        return;
+      }
+      if (!fileIdentifier) {
+        next(new GenericRequestError('Invalid file(s).', 500, {
+          errorCode: FormBackendErrorCode.INVALID_FILE,
+          detailedMessage: 'One or more files are invalid or missing.'
+        }));
+        return;
+      }
 
       const fileProcessor = new FileProcessor({ opts: this.#opts, formId });
       // Making sure that file exists in the expected directory

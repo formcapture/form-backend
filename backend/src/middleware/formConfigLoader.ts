@@ -21,7 +21,8 @@ export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => 
    */
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const formId = req.params.formId;
+      const rawFormId = req.params.formId;
+      const formId = typeof rawFormId === 'string' ? rawFormId : undefined;
       if (!formId) {
         next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));
         return;

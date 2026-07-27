@@ -63,7 +63,7 @@ describe('<ItemView />', () => {
   const previousView = '/previous';
 
   beforeAll(() => {
-    Object.defineProperty(global.window, 'location', {
+    Object.defineProperty(globalThis.window, 'location', {
       value: {
         href: '',
         origin: '',
@@ -75,7 +75,7 @@ describe('<ItemView />', () => {
       writable: true
     });
 
-    Object.defineProperty(global.window, 'history', {
+    Object.defineProperty(globalThis.window, 'history', {
       value: {
         pushState: vi.fn(),
         replaceState: vi.fn(),
@@ -132,15 +132,15 @@ describe('<ItemView />', () => {
       };
     }
 
-    global.fetch = vi.fn().mockResolvedValue(createFetchResponse({success: true}));
+    globalThis.fetch = vi.fn().mockResolvedValue(createFetchResponse({success: true}));
 
     const saveButton = await screen.findByText('ItemView.saveTxt');
     expect(saveButton).not.toBeNull();
     fireEvent.click(saveButton);
-    await new Promise(process.nextTick);
+    await Promise.resolve();
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(`../form/${formId}/item/${itemId}`, expect.objectContaining({
+      expect(globalThis.fetch).toHaveBeenCalledWith(`../form/${formId}/item/${itemId}`, expect.objectContaining({
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

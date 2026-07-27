@@ -93,7 +93,7 @@ describe('App', () => {
   const mockFetch = vi.fn(() => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200})));
 
   beforeEach(() => {
-    (global.window as any).location = {
+    (globalThis.window as any).location = {
       href: 'http://localhost?formId=abc&itemId=123',
       origin: 'http://localhost?formId=abc&itemId=123',
       search: '?formId=123&itemId=456&prev=view',
@@ -109,7 +109,7 @@ describe('App', () => {
       authenticated: true,
     };
 
-    global.fetch = mockFetch;
+    globalThis.fetch = mockFetch;
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 200));
 
     setKeycloakInst(undefined as unknown as Keycloak);
@@ -130,8 +130,8 @@ describe('App', () => {
   });
 
   it('renders error message when formId is missing', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?itemId=123');
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?itemId=123');
 
     render(
       <I18nextProvider i18n={i18n}>
@@ -145,8 +145,8 @@ describe('App', () => {
   });
 
   it('initializes Keycloack and renders TableView when formId is present but itemId is missing', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?view=table&formId=abc',);
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?view=table&formId=abc',);
 
     render(<App />);
 
@@ -160,8 +160,8 @@ describe('App', () => {
   });
 
   it('handles Keycloak initialization errors', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
 
     const loggerMock = vi.spyOn(Logger, 'error').mockImplementation(() => undefined);
     (mockKeycloak.init as Mock).mockRejectedValueOnce(new Error('Initialization failed'));
@@ -169,7 +169,7 @@ describe('App', () => {
     const localMockFetch = vi.fn(
       () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
-    global.fetch = localMockFetch;
+    globalThis.fetch = localMockFetch;
 
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 200));
 
@@ -199,8 +199,8 @@ describe('App', () => {
   });
 
   it('throws error when data can not be fetched', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
     const loggerMock = vi.spyOn(Logger, 'error').mockImplementation(() => undefined);
 
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 500));
@@ -220,11 +220,11 @@ describe('App', () => {
   });
 
   it('throws error when keycloak config can not be fetched', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
     const loggerError = vi.spyOn(Logger, 'error').mockImplementation(() => undefined);
 
-    global.fetch = vi.fn(
+    globalThis.fetch = vi.fn(
       () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 500}))
     );
 
@@ -243,10 +243,10 @@ describe('App', () => {
   });
 
   it('redirects to login page without token', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?view=item&formId=abc&itemId=123');
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?view=item&formId=abc&itemId=123');
     mockKeycloak.token = null;
-    global.fetch = vi.fn(
+    globalThis.fetch = vi.fn(
       () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 401));
@@ -270,9 +270,9 @@ describe('App', () => {
   });
 
   it('shows error if unauthorized with token', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
-    global.fetch = vi.fn(
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?formId=abc&itemId=123');
+    globalThis.fetch = vi.fn(
       () => Promise.resolve(new Response(JSON.stringify(mockKeycloakConfig), {status: 200}))
     );
     (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 401));
@@ -286,8 +286,8 @@ describe('App', () => {
   });
 
   it('renderes content if authorized with token', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?view=item&formId=abc&itemId=123');
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?view=item&formId=abc&itemId=123');
 
     render(<App />);
 
@@ -299,8 +299,8 @@ describe('App', () => {
   });
 
   it('takes the order URL parameter into account', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?view=table&formId=abc&order=asc&page=1');
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?view=table&formId=abc&order=asc&page=1');
 
     render(<App />);
 
@@ -314,8 +314,8 @@ describe('App', () => {
   });
 
   it('takes the orderBy URL parameter into account', async () => {
-    delete (global as any).window.location;
-    (global as any).window.location = new URL('http://localhost?view=table&formId=abc&orderBy=foo&page=1');
+    delete (globalThis as any).window.location;
+    (globalThis as any).window.location = new URL('http://localhost?view=table&formId=abc&orderBy=foo&page=1');
 
     render(<App />);
 

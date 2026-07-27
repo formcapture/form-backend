@@ -154,8 +154,9 @@ describe('App', () => {
       const loadingText = screen.queryByText('Seite wird geladen…');
       expect(mockFetch).toHaveBeenCalledOnce();
       expect(loadingText).toBeNull();
-      expect(screen.findByText('Test-Object 1')).not.toBeNull();
     }, {timeout: 1000});
+
+    expect(await screen.findByText('Test-Object 1')).not.toBeNull();
   });
 
   it('handles Keycloak initialization errors', async () => {

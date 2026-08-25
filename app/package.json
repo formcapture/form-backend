@@ -47,7 +47,7 @@
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.11.3",
     "dotenv": "^17.4.2",
-    "i18next": "^26.0.8",
+    "i18next": "^26.4.0",
     "i18next-browser-languagedetector": "^8.2.1",
     "keycloak-js": "^26.2.0",
     "lodash": "^4.17.21",

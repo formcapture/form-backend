@@ -48,6 +48,7 @@
     "winston": "^3.14.2"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@casualbot/jest-sonar-reporter": "^2.3.1",
     "@terrestris/eslint-config-typescript": "^10.0.0",
     "@types/express": "^5.0.3",
@@ -71,7 +72,7 @@
     "typescript-eslint": "^8.41.0"
   },
   "engines": {
-    "node": ">=24.18",
+    "node": ">=24",
     "npm": ">=10"
   },
   "@casualbot/jest-sonar-reporter": {

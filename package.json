@@ -34,7 +34,7 @@
     "semantic-release": "^25.0.9"
   },
   "engines": {
-    "node": ">=24.18",
+    "node": ">=24",
     "npm": ">=10"
   }
 }

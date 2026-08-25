@@ -29,12 +29,12 @@
     "@commitlint/config-conventional": "^21.0.2",
     "@commitlint/cli": "^21.2.1",
     "@semantic-release/changelog": "^7.0.0",
-    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/git": "^11.0.1",
     "@semantic-release/gitlab": "^13.3.2",
     "semantic-release": "^25.0.3"
   },
   "engines": {
-    "node": ">=20",
-    "npm": ">=9"
+    "node": ">=24.18",
+    "npm": ">=10"
   }
 }

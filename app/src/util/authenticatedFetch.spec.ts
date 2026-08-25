@@ -5,7 +5,7 @@ import Logger from '@terrestris/base-util/dist/Logger';
 
 import { authenticatedFetch } from './authenticatedFetch';
 
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn();
 
 describe('authenticatedFetch', () => {
   let mockKeycloak: Mocked<Keycloak>;

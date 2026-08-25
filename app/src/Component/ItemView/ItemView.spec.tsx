@@ -18,6 +18,21 @@ import { FormConfiguration } from '../../App';
 
 import ItemView from './ItemView';
 
+vi.mock('@json-editor/json-editor', () => ({
+  JSONEditor: function JSONEditorMock() {
+    return {
+      on: vi.fn().mockImplementation((event, callback) => {
+        if (event === 'ready') {
+          // Fire synchronously so editorReady becomes true
+          callback();
+        }
+      }),
+      setValue: vi.fn(),
+      getValue: () => ({name: 'Test-Object 1', value: 1}),
+    };
+  },
+}));
+
 describe('<ItemView />', () => {
   const mockData: FormConfiguration = {
     config: {
@@ -47,21 +62,8 @@ describe('<ItemView />', () => {
   const itemId = '1';
   const previousView = '/previous';
 
-  vi.mock('@json-editor/json-editor', () => ({
-    JSONEditor: vi.fn().mockImplementation(() => ({
-      on: vi.fn().mockImplementation((event, callback) => {
-        if (event === 'ready') {
-          // Fire synchronously so editorReady becomes true
-          callback();
-        }
-      }),
-      setValue: vi.fn(),
-      getValue: () => ({name: 'Test-Object 1', value: 1}),
-    })),
-  }));
-
   beforeAll(() => {
-    Object.defineProperty(global.window, 'location', {
+    Object.defineProperty(globalThis.window, 'location', {
       value: {
         href: '',
         origin: '',
@@ -73,7 +75,7 @@ describe('<ItemView />', () => {
       writable: true
     });
 
-    Object.defineProperty(global.window, 'history', {
+    Object.defineProperty(globalThis.window, 'history', {
       value: {
         pushState: vi.fn(),
         replaceState: vi.fn(),
@@ -130,15 +132,15 @@ describe('<ItemView />', () => {
       };
     }
 
-    global.fetch = vi.fn().mockResolvedValue(createFetchResponse({success: true}));
+    globalThis.fetch = vi.fn().mockResolvedValue(createFetchResponse({success: true}));
 
     const saveButton = await screen.findByText('ItemView.saveTxt');
     expect(saveButton).not.toBeNull();
     fireEvent.click(saveButton);
-    await new Promise(process.nextTick);
+    await Promise.resolve();
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(`../form/${formId}/item/${itemId}`, expect.objectContaining({
+      expect(globalThis.fetch).toHaveBeenCalledWith(`../form/${formId}/item/${itemId}`, expect.objectContaining({
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

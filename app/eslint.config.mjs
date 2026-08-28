@@ -56,6 +56,8 @@ export default tsEslint.config({
     'import/no-named-as-default': 'off',
     'import/no-unresolved': 'off',
     'import/named': 'off',
+    'react/jsx-tag-spacing': 'off',
+    'react/no-unknown-property': 'off',
     'import/order': ['warn', {
       groups: [
         'builtin',

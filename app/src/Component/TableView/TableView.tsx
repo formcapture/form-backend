@@ -1,23 +1,21 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import {
   CellClickedEvent,
   CellMouseOverEvent,
   ColDef,
-  FilterChangedEvent,
   GridReadyEvent,
   ICellRendererParams,
+  IDatasource,
   ISimpleFilterModel,
   ModuleRegistry,
-  PaginationChangedEvent,
   SortChangedEvent
 } from '@ag-grid-community/core';
+import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { AG_GRID_LOCALE_DE, AG_GRID_LOCALE_EN } from '@ag-grid-community/locale';
 import { AgGridReact, CustomCellEditorProps } from '@ag-grid-community/react';
 
 import Keycloak from 'keycloak-js';
-import _cloneDeep from 'lodash/cloneDeep';
 import _isNil from 'lodash/isNil';
 
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -45,7 +43,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './TableView.css';
 
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+ModuleRegistry.registerModules([InfiniteRowModelModule]);
 
 export interface FilterType {
   filterOp: 'equals' | 'notEqual' | 'like' | 'greaterThan' | 'lessThan';
@@ -57,7 +55,6 @@ interface TableViewProps {
   data: FormConfiguration;
   filter?: FilterType;
   formId: string;
-  page: number;
   keycloak?: Keycloak;
   order?: 'asc' | 'desc' | null;
   orderBy?: string | null;
@@ -78,6 +75,8 @@ const filterParams: any = {
   }
 };
 
+const CACHE_BLOCK_SIZE = 100;
+
 const TableView: React.FC<TableViewProps> = ({
   data,
   filter,
@@ -85,7 +84,6 @@ const TableView: React.FC<TableViewProps> = ({
   keycloak,
   order,
   orderBy,
-  page,
   showToast = () => undefined
 }) => {
 
@@ -113,6 +111,81 @@ const TableView: React.FC<TableViewProps> = ({
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [idToDelete, setIdToDelete] = useState<ItemId>();
+  const [isLoading, setLoading] = useState<boolean>();
+
+  const showFeaturesInMap = useCallback((rows?: any[], isReset = false) => {
+    if (!containsGeometryColumns || !data || !data.config) {
+      return;
+    }
+
+    const geometryColumns = getGeometryColumns(data.config);
+
+    if (!geometryColumns || !geometryColumns.length) {
+      return;
+    }
+
+    const rowData = rows ?? data.data?.data;
+    if (!rowData) {
+      return;
+    }
+
+    const featuresToMap = getFeaturesFromTableData(rowData, data.config, geometryColumns);
+
+    if (isReset) {
+      sendMessage(window.parent, SEND_EVENTS.clearFormData);
+    }
+    sendMessage(window.parent, SEND_EVENTS.displayFormData, featuresToMap);
+  }, [containsGeometryColumns, data]);
+
+  const dataSource: IDatasource = useMemo(() => ({
+    rowCount: undefined,
+    getRows: async ({
+      endRow,
+      failCallback,
+      filterModel,
+      sortModel,
+      startRow,
+      successCallback
+    }) => {
+      setLoading(true);
+      try {
+        const effectiveFilterModel = filterModel && Object.keys(filterModel).length > 0
+          ? filterModel
+          : filter?.filterKey && filter.filterOp && filter.filterValue !== null && filter.filterValue !== undefined
+            ? {
+              [filter.filterKey]: {
+                filter: filter.filterValue,
+                type: filter.filterOp
+              }
+            }
+            : filterModel;
+        const fetchedResponse = await api.fetchTableData(formId, {
+          startRow,
+          endRow,
+          sortModel,
+          filterModel: effectiveFilterModel
+        }, keycloak);
+
+        if ('error' in fetchedResponse && fetchedResponse.error === 401) {
+          failCallback();
+          await keycloak?.login();
+          return;
+        }
+
+        const { data: fetchedData } = fetchedResponse;
+        if (!_isNil(fetchedData)) {
+          successCallback(fetchedData.data, fetchedData.count);
+          showFeaturesInMap(fetchedData.data, startRow === 0);
+        }
+      } catch (error) {
+        failCallback();
+        successCallback([], 0);
+        Logger.warn('Error while fetching rows for table', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  }), [filter, formId, keycloak, showFeaturesInMap]);
 
   const agGridLocale = useMemo(() => {
     const lang = i18n.language ||
@@ -159,7 +232,6 @@ const TableView: React.FC<TableViewProps> = ({
       const queryParams: TableViewQueryParams = {
         formId: formId,
         message: TOAST_MESSAGE.deleteSuccess,
-        page: page + 1,
         order: order ?? undefined,
         orderBy: order ?? undefined,
         filterValue: filter?.filterValue,
@@ -229,7 +301,6 @@ const TableView: React.FC<TableViewProps> = ({
 
     const tableViewQueryParams: TableViewQueryParams = {
       formId: formId,
-      page: page + 1,
       order: order ?? undefined,
       orderBy: order ?? undefined,
       filterValue: filter?.filterValue,
@@ -324,23 +395,12 @@ const TableView: React.FC<TableViewProps> = ({
     );
   }, [
     allowItemView, containsGeometryColumns, data, deleteTooltip, editTooltip, editable,
-    filter, formId, order, page, viewTooltip, zoomToFeature, zoomToTooltip, t
+    filter, formId, order, viewTooltip, zoomToFeature, zoomToTooltip, t
   ]);
 
   const renderColumnTitle = useCallback((colName: any) => {
     return data.config.properties[colName].title ?? colName;
   }, [data]);
-
-  const applyFilter = (setFilterModel: any, filterToApply: FilterType) => {
-    const filterModel = {
-      [filterToApply.filterKey]: {
-        type: filterToApply.filterOp,
-        filter: filterToApply.filterValue,
-        filterType: 'text'
-      }
-    };
-    setFilterModel(filterModel);
-  };
 
   const isGeometryColumn = (format?: string) => {
     return (format && isGeometryType(format)) || format === 'geometrySelection' || format === 'location';
@@ -432,7 +492,6 @@ const TableView: React.FC<TableViewProps> = ({
     const newSort = col?.getSort();
     const queryParams: TableViewQueryParams = {
       formId: formId,
-      page: page + 1,
       order: newSort ?? undefined,
       orderBy: colId ?? undefined,
       filterValue: filter?.filterValue,
@@ -443,58 +502,8 @@ const TableView: React.FC<TableViewProps> = ({
     window.location.assign(newUrl);
   };
 
-  const onPaginationChanged = (event: PaginationChangedEvent) => {
-    if (!event.newPage) {
-      return;
-    }
-    // URL query param `page` will be 1-indexed, but ag-grid is 0-indexed
-    const nextPage = event.api.paginationGetCurrentPage() + 1;
-    const queryParams: TableViewQueryParams = {
-      formId: formId,
-      page: nextPage,
-      order: order ?? undefined,
-      orderBy: orderBy ?? undefined,
-      filterValue: filter?.filterValue,
-      filterOp: filter?.filterOp as ISimpleFilterModel['type'],
-      filterKey: filter?.filterKey
-    };
-    const newUrl = createTableViewUrl(window.location.href, queryParams);
-    window.location.assign(newUrl);
-  };
-
   const onGridReady = (event: GridReadyEvent) => {
-    if (filter && filter.filterKey && filter.filterOp && filter.filterValue) {
-      applyFilter(event.api.setFilterModel, filter);
-    }
-    // Set onFilterChanged callback after filter has initially been set.
-    event.api.addEventListener('filterChanged', onFilterChanged);
-    event.api.paginationGoToPage(page);
-    event.api.addEventListener('paginationChanged', onPaginationChanged);
-  };
-
-  const onFilterChanged = ({api: gridApi}: FilterChangedEvent) => {
-    const filterModel = gridApi.getFilterModel();
-
-    // We only allow one filter per table
-    if (filter && Object.keys(filterModel).includes(filter?.filterKey)) {
-      // delete filter that is currently active
-      delete filterModel[filter.filterKey];
-    }
-
-    const queryParams = {
-      formId,
-      page,
-      order: order ?? undefined,
-      orderBy: orderBy ?? undefined,
-      ...(Object.keys(filterModel).length > 0 && {
-        filterKey: Object.keys(filterModel)[0],
-        filterOp: Object.values(filterModel)[0].type,
-        filterValue: Object.values(filterModel)[0].filter
-      })
-    };
-
-    const newUrl = createTableViewUrl(window.location.href, queryParams);
-    window.location.assign(newUrl);
+    event.api.setGridOption('datasource', dataSource);
   };
 
   const enableItemSelection = useCallback(() => {
@@ -514,7 +523,6 @@ const TableView: React.FC<TableViewProps> = ({
     }
     const tableViewQueryParams: TableViewQueryParams = {
       formId: formId,
-      page: page + 1,
       order: order ?? undefined,
       orderBy: order ?? undefined,
       filterValue: filter?.filterValue,
@@ -530,24 +538,12 @@ const TableView: React.FC<TableViewProps> = ({
     const itemViewUrl = createItemViewUrl(window.location.href, itemViewQueryParams);
 
     window.location.assign(itemViewUrl);
-  }, [data, filter, formId, order, page]);
+  }, [data, filter, formId, order]);
 
   useEffect(() => {
     if (!containsGeometryColumns || !data || !data.config) {
       return;
     }
-    const showFeaturesInMap = () => {
-      // Find columns of type geometry
-      const geometryColumns = getGeometryColumns(data.config);
-
-      if (!geometryColumns || !geometryColumns.length) {
-        return;
-      }
-
-      const featuresToMap = getFeaturesFromTableData(data.data.data, data.config, geometryColumns);
-
-      sendMessage(window.parent, SEND_EVENTS.displayFormData, featuresToMap);
-    };
 
     showFeaturesInMap();
     enableItemSelection();
@@ -580,7 +576,7 @@ const TableView: React.FC<TableViewProps> = ({
       window.removeEventListener('message', postMessageListener);
     };
 
-  }, [containsGeometryColumns, data, enableItemSelection, onEditRecord]);
+  }, [containsGeometryColumns, data, enableItemSelection, onEditRecord, showFeaturesInMap]);
 
   const onCellClicked = (event: CellClickedEvent) => {
     if (!event.colDef.field) {
@@ -613,7 +609,6 @@ const TableView: React.FC<TableViewProps> = ({
   const onCreateBtnClick = () => {
     const tableViewQueryParams: TableViewQueryParams = {
       formId,
-      page: page + 1,
       order: order ?? undefined,
       orderBy: orderBy ?? undefined,
       filterValue: filter?.filterValue,
@@ -630,23 +625,6 @@ const TableView: React.FC<TableViewProps> = ({
     disableItemSelection();
     window.location.assign(itemViewUrl);
   };
-
-  const rowData = useMemo(() => {
-    if (!data.data || !data.data.data || !data.config.views.pageSize) {
-      return [];
-    }
-    if (data.data.data.length === 0) {
-      return [];
-    }
-
-    // If filter is set, we need to pad the data with objects matching the filter
-    // => re-use the first object in the data array
-    const fillContent = _isNil(filter) ? undefined : _cloneDeep(data.data.data[0]);
-
-    const leftPaddedData = Array(page * data.config.views.pageSize).fill(fillContent);
-    const rightPaddedData = Array(data.data.count - leftPaddedData.length - data.data.data.length).fill(fillContent);
-    return [...leftPaddedData, ...data.data.data, ...rightPaddedData];
-  }, [data, filter, page]);
 
   return (
     <div>
@@ -675,24 +653,21 @@ const TableView: React.FC<TableViewProps> = ({
           <i className="bi bi-plus-lg"></i>
           <span className="d-none d-sm-inline">&ensp;{t('TableView.createEntryText')}</span>
         </Button>
-        <div className="ag-theme-quartz" style={{height: '100%', width: '100%'}}>
+        <div className="ag-theme-quartz" style={{ height: '80vh', width: '100%' }}>
           <AgGridReact
+            cacheBlockSize={CACHE_BLOCK_SIZE}
             columnDefs={columnDefs}
-            // Automatically set the height of the table depending on the data.
-            // Might become slow with a lot of data (1000+ rows).
-            domLayout='autoHeight'
             defaultColDef={defaultColumnDefs}
+            loading={isLoading}
             localeText={agGridLocale}
             onCellClicked={onCellClicked}
             onCellMouseOut={onCellMouseOut}
             onCellMouseOver={onCellMouseOver}
             onGridReady={onGridReady}
             onSortChanged={onSortChanged}
-            pagination
-            paginationPageSize={data.config.views.pageSize}
-            paginationPageSizeSelector={false}
-            rowData={rowData}
+            rowModelType='infinite'
             suppressMultiSort
+            className='ag-theme-quartz gridTable'
           />
         </div>
       </div>

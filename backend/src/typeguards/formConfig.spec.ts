@@ -22,8 +22,7 @@ describe('FormConfigTypeGuards', () => {
         },
         views: {
           table: true,
-          item: true,
-          pageSize: 10
+          item: true
         },
         includedProperties: ['id'],
         includedPropertiesTable: ['id'],

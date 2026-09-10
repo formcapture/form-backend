@@ -113,7 +113,7 @@ const TableView: React.FC<TableViewProps> = ({
   const [idToDelete, setIdToDelete] = useState<ItemId>();
   const [isLoading, setLoading] = useState<boolean>();
 
-  const showFeaturesInMap = useCallback((rows?: any[], isReset: boolean = false) => {
+  const showFeaturesInMap = useCallback((rows?: any[], isReset = false) => {
     if (!containsGeometryColumns || !data || !data.config) {
       return;
     }

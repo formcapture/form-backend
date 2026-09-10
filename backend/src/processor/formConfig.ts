@@ -201,8 +201,7 @@ class FormConfigProcessor {
     if (isFormConfig(formConfig)) {
       config.views = {
         item: formConfig.views.item ?? false,
-        table: formConfig.views.table ?? false,
-        pageSize: formConfig.views.pageSize ?? 10
+        table: formConfig.views.table ?? false
       };
     }
 

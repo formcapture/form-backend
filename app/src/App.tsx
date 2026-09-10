@@ -22,7 +22,7 @@ import i18n, {
 import { getKeycloakInst, setKeycloakInst } from './singletons/keycloak';
 import api from './util/api';
 import { DE, isGeometryType } from './util/jsonEditor';
-import { getFilterFromUrl, getOrderFromUrl, getPageFromUrl } from './util/url';
+import { getFilterFromUrl, getOrderFromUrl } from './util/url';
 
 import './App.css';
 
@@ -73,7 +73,6 @@ export interface FormConfiguration {
     views: {
       table: boolean;
       item: boolean;
-      pageSize: number;
     };
     order: 'asc' | 'desc';
     orderBy: string;
@@ -121,9 +120,9 @@ const App: React.FC = () => {
   const formId = new URLSearchParams(window.location.search).get('formId');
   const itemId: ItemId | undefined = new URLSearchParams(window.location.search).get('itemId') ?? undefined;
   const previousView = new URLSearchParams(window.location.search).get('prev');
+  const initialPage = 1;
   const order = getOrderFromUrl(window.location.href);
   const orderBy = new URLSearchParams(window.location.search).get('orderBy');
-  const page = getPageFromUrl(window.location.href);
   const {
     filterKey,
     filterOp,
@@ -178,7 +177,7 @@ const App: React.FC = () => {
       let response;
 
       if (view === 'table') {
-        response = await api.getForm(formId, page, filterKey, filterOp, filterValue, order, orderBy, kc);
+        response = await api.getForm(formId, initialPage, filterKey, filterOp, filterValue, order, orderBy, kc);
       } else if (view === 'item' && itemId !== undefined) {
         response = await api.getFormItem(formId, itemId, kc);
       } else {
@@ -335,7 +334,6 @@ const App: React.FC = () => {
             keycloak={getKeycloakInst()}
             order={order}
             orderBy={orderBy}
-            page={page}
             showToast={onShowToast}
           />
         )

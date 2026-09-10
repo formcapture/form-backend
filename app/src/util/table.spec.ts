@@ -20,8 +20,7 @@ describe('Table', () => {
       editable: true,
       views: {
         table: true,
-        item: true,
-        pageSize: 10
+        item: true
       },
       order: 'desc',
       orderBy: 'name'
@@ -45,8 +44,7 @@ describe('Table', () => {
       editable: true,
       views: {
         table: true,
-        item: true,
-        pageSize: 10
+        item: true
       },
       order: 'desc',
       orderBy: 'name',

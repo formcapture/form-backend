@@ -75,6 +75,8 @@ const filterParams: any = {
   }
 };
 
+const CACHE_BLOCK_SIZE = 100;
+
 const TableView: React.FC<TableViewProps> = ({
   data,
   filter,
@@ -111,6 +113,30 @@ const TableView: React.FC<TableViewProps> = ({
   const [idToDelete, setIdToDelete] = useState<ItemId>();
   const [isLoading, setLoading] = useState<boolean>();
 
+  const showFeaturesInMap = useCallback((rows?: any[], isReset: boolean = false) => {
+    if (!containsGeometryColumns || !data || !data.config) {
+      return;
+    }
+
+    const geometryColumns = getGeometryColumns(data.config);
+
+    if (!geometryColumns || !geometryColumns.length) {
+      return;
+    }
+
+    const rowData = rows ?? data.data?.data;
+    if (!rowData) {
+      return;
+    }
+
+    const featuresToMap = getFeaturesFromTableData(rowData, data.config, geometryColumns);
+
+    if (isReset) {
+      sendMessage(window.parent, SEND_EVENTS.clearFormData);
+    }
+    sendMessage(window.parent, SEND_EVENTS.displayFormData, featuresToMap);
+  }, [containsGeometryColumns, data]);
+
   const dataSource: IDatasource = useMemo(() => ({
     rowCount: undefined,
     getRows: async ({
@@ -132,6 +158,7 @@ const TableView: React.FC<TableViewProps> = ({
 
         if (!_isNil(fetchedData)) {
           successCallback(fetchedData.data, fetchedData.count);
+          showFeaturesInMap(fetchedData.data, startRow === 0);
         }
       } catch (error) {
         failCallback();
@@ -141,7 +168,7 @@ const TableView: React.FC<TableViewProps> = ({
         setLoading(false);
       }
     }
-  }), [formId, keycloak]);
+  }), [formId, keycloak, showFeaturesInMap]);
 
   const agGridLocale = useMemo(() => {
     const lang = i18n.language ||
@@ -500,18 +527,6 @@ const TableView: React.FC<TableViewProps> = ({
     if (!containsGeometryColumns || !data || !data.config) {
       return;
     }
-    const showFeaturesInMap = () => {
-      // Find columns of type geometry
-      const geometryColumns = getGeometryColumns(data.config);
-
-      if (!geometryColumns || !geometryColumns.length) {
-        return;
-      }
-
-      const featuresToMap = getFeaturesFromTableData(data.data.data, data.config, geometryColumns);
-
-      sendMessage(window.parent, SEND_EVENTS.displayFormData, featuresToMap);
-    };
 
     showFeaturesInMap();
     enableItemSelection();
@@ -544,7 +559,7 @@ const TableView: React.FC<TableViewProps> = ({
       window.removeEventListener('message', postMessageListener);
     };
 
-  }, [containsGeometryColumns, data, enableItemSelection, onEditRecord]);
+  }, [containsGeometryColumns, data, enableItemSelection, onEditRecord, showFeaturesInMap]);
 
   const onCellClicked = (event: CellClickedEvent) => {
     if (!event.colDef.field) {
@@ -621,9 +636,9 @@ const TableView: React.FC<TableViewProps> = ({
           <i className="bi bi-plus-lg"></i>
           <span className="d-none d-sm-inline">&ensp;{t('TableView.createEntryText')}</span>
         </Button>
-        <div className="ag-theme-quartz" style={{height: '500px', width: '100%'}}>
+        <div className="ag-theme-quartz" style={{ height: '80vh', width: '100%' }}>
           <AgGridReact
-            cacheBlockSize={data.config.views.pageSize}
+            cacheBlockSize={CACHE_BLOCK_SIZE}
             columnDefs={columnDefs}
             defaultColDef={defaultColumnDefs}
             loading={isLoading}
@@ -635,6 +650,7 @@ const TableView: React.FC<TableViewProps> = ({
             onSortChanged={onSortChanged}
             rowModelType='infinite'
             suppressMultiSort
+            className='ag-theme-quartz gridTable'
           />
         </div>
       </div>

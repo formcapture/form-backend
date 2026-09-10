@@ -1,7 +1,5 @@
 import { ISimpleFilterModel } from '@ag-grid-community/core';
 
-import Logger from '@terrestris/base-util/dist/Logger';
-
 import { ItemId } from '../App';
 import { isFilterType } from '../typeguards';
 
@@ -27,24 +25,6 @@ export const getFilterFromUrl: any = (url: string) => {
     filterOp: filterOpTyped,
     filterValue
   };
-};
-
-export const getPageFromUrl = (url: string) => {
-  const urlInst = new URL(url);
-  const page = new URLSearchParams(urlInst.search).get('page');
-  if (!page) {
-    return 0;
-  }
-  try {
-    const parsedPage = parseInt(page, 10);
-    if (Number.isNaN(parsedPage) || parsedPage < 1) {
-      return 0;
-    }
-    return parsedPage - 1;
-  } catch (e) {
-    Logger.warn('Could not parse page from URL', e);
-    return 0;
-  }
 };
 
 export interface ItemViewQueryParams {
@@ -77,7 +57,6 @@ export const createItemViewUrl = (
 export interface TableViewQueryParams {
   formId: string;
   message?: string;
-  page?: number;
   order?: string;
   orderBy?: string;
   filterKey?: string;
@@ -90,7 +69,6 @@ export const createTableViewUrl = (
   {
     formId,
     message,
-    page,
     order,
     orderBy,
     filterValue,
@@ -104,9 +82,6 @@ export const createTableViewUrl = (
   url.searchParams.set('formId', formId);
   if (message) {
     url.searchParams.set('msg', message);
-  }
-  if (page) {
-    url.searchParams.set('page', page.toString());
   }
   if (order) {
     url.searchParams.set('order', order);

@@ -56,8 +56,6 @@ class DataProcessor {
 
     const selectStatement = this.#createFormSelectStatement(formConfig);
 
-    // const rangeLower = page * formConfig.views.pageSize;
-    // const rangeUpper = rangeLower + formConfig.views.pageSize - 1;
     // TODO think about how to work with ranges and join tables, many-to-many etc
 
     const query = this.#pgClient

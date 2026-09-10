@@ -10,9 +10,4 @@ export interface Views {
    * should not be accessible for this form. False, otherwise.
    */
   item: boolean;
-  /**
-   * The number of items per page in the table view.
-   * Defaults to 10.
-   */
-  pageSize?: number;
 }

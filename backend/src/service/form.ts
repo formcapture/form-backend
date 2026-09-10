@@ -101,9 +101,10 @@ class FormService {
       }
       const parsedStartRow = Number(startRow);
       const parsedEndRow = Number(endRow);
-      if (!Number.isFinite(parsedStartRow) || !Number.isFinite(parsedEndRow)) {
+      if (!Number.isFinite(parsedStartRow) || !Number.isFinite(parsedEndRow) ||
+        parsedStartRow < 0 || parsedEndRow <= parsedStartRow) {
         next(new FormRequestError(
-          'Invalid value for arguments "startRow" and "endRow". Must be numbers.', 400, {
+          'Invalid value for arguments "startRow" and "endRow". Must be a valid row range.', 400, {
             errorCode: FormBackendErrorCode.INVALID_PAGE
           }));
         return;

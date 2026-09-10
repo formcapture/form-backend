@@ -149,13 +149,30 @@ const TableView: React.FC<TableViewProps> = ({
     }) => {
       setLoading(true);
       try {
-        const { data: fetchedData } = await api.fetchTableData(formId, {
+        const effectiveFilterModel = filterModel && Object.keys(filterModel).length > 0
+          ? filterModel
+          : filter?.filterKey && filter.filterOp && filter.filterValue !== null && filter.filterValue !== undefined
+            ? {
+              [filter.filterKey]: {
+                filter: filter.filterValue,
+                type: filter.filterOp
+              }
+            }
+            : filterModel;
+        const fetchedResponse = await api.fetchTableData(formId, {
           startRow,
           endRow,
           sortModel,
-          filterModel
+          filterModel: effectiveFilterModel
         }, keycloak);
 
+        if ('error' in fetchedResponse && fetchedResponse.error === 401) {
+          failCallback();
+          await keycloak?.login();
+          return;
+        }
+
+        const { data: fetchedData } = fetchedResponse;
         if (!_isNil(fetchedData)) {
           successCallback(fetchedData.data, fetchedData.count);
           showFeaturesInMap(fetchedData.data, startRow === 0);
@@ -168,7 +185,7 @@ const TableView: React.FC<TableViewProps> = ({
         setLoading(false);
       }
     }
-  }), [formId, keycloak, showFeaturesInMap]);
+  }), [filter, formId, keycloak, showFeaturesInMap]);
 
   const agGridLocale = useMemo(() => {
     const lang = i18n.language ||

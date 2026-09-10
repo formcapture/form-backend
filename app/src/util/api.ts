@@ -73,7 +73,6 @@ const fetchTableData = async (formId: string, getRowsParams: Partial<IGetRowsPar
 
 const getForm = async (
   formId: string,
-  page: number,
   filterKey?: string | null,
   filterOp?: ISimpleFilterModel['type'] | null,
   filterValue?: string | null,
@@ -83,9 +82,7 @@ const getForm = async (
 ) => {
   let url = `../form/${formId}`;
 
-  const params = new URLSearchParams({
-    page: page.toString()
-  });
+  const params = new URLSearchParams();
   if (order) {
     params.append('order', order);
   }

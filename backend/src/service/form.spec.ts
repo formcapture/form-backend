@@ -201,6 +201,27 @@ describe('FormService', () => {
         filterValue: 'my_value'
       });
     });
+
+    it.each([
+      {startRow: '-1', endRow: '10'},
+      {startRow: '10', endRow: '10'},
+      {startRow: '20', endRow: '10'}
+    ])('rejects invalid row range $startRow-$endRow', async ({startRow, endRow}) => {
+      const req: FormConfigRequest = {
+        params: {formId: 'foo'},
+        query: {startRow, endRow},
+        formConfig: {},
+        userRoles: []
+      } as unknown as FormConfigRequest;
+      const res = createResponseMock();
+      const next = jest.fn();
+      const formService = new FormService({FORM_CONFIGS_DIR: 'foo'} as Opts);
+
+      await formService.getForm(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({status: 400}));
+      expect(getPostgrestJwtMock).not.toHaveBeenCalled();
+    });
   });
 
   describe('getEmptyForm', () => {

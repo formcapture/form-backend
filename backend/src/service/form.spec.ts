@@ -45,7 +45,7 @@ const getFilePathMock = jest.fn();
 jest.mock('../processor/file', () => {
   return {
     FileProcessor: jest.fn(() => ({
-      fileExists: () => fileExistsMock(),
+      fileExists: (fileIdentifier: string) => fileExistsMock(fileIdentifier),
       getFilePath: (...args: any[]) => getFilePathMock.apply(args)
     }))
   };
@@ -195,11 +195,32 @@ describe('FormService', () => {
 
       await formService.getForm(req, res, next);
 
-      expect(getTableFormMock).toHaveBeenCalledWith(undefined, {
+      expect(getTableFormMock).toHaveBeenCalledWith(0, 10, {
         filterKey: 'my_col',
         filterOp: 'contains',
         filterValue: 'my_value'
       });
+    });
+
+    it.each([
+      {startRow: '-1', endRow: '10'},
+      {startRow: '10', endRow: '10'},
+      {startRow: '20', endRow: '10'}
+    ])('rejects invalid row range $startRow-$endRow', async ({startRow, endRow}) => {
+      const req: FormConfigRequest = {
+        params: {formId: 'foo'},
+        query: {startRow, endRow},
+        formConfig: {},
+        userRoles: []
+      } as unknown as FormConfigRequest;
+      const res = createResponseMock();
+      const next = jest.fn();
+      const formService = new FormService({FORM_CONFIGS_DIR: 'foo'} as Opts);
+
+      await formService.getForm(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({status: 400}));
+      expect(getPostgrestJwtMock).not.toHaveBeenCalled();
     });
   });
 
@@ -517,18 +538,19 @@ describe('FormService', () => {
       const req: FormConfigRequest = {
         params: {
           formId: 'foo',
-          0: 'file_1.png'
+          fileIdentifier: ['directory', 'file_1.png']
         }
       } as unknown as FormConfigRequest;
 
       fileExistsMock.mockResolvedValue(true);
-      getFilePathMock.mockReturnValue('foo/file_1.png');
+      getFilePathMock.mockReturnValue('foo/directory/file_1.png');
 
       const res = createResponseMock();
       const formService = new FormService(opts);
       await formService.getFile(req, res, jest.fn());
 
-      expect(sendFileMock).toHaveBeenCalledWith('foo/file_1.png', { root: 'uploads' });
+      expect(fileExistsMock).toHaveBeenCalledWith('directory/file_1.png');
+      expect(sendFileMock).toHaveBeenCalledWith('foo/directory/file_1.png', { root: 'uploads' });
     });
     it('fails if the file does not exist', async () => {
       const opts: Opts = {
@@ -539,7 +561,7 @@ describe('FormService', () => {
       const req: FormConfigRequest = {
         params: {
           formId: 'foo',
-          0: 'file_1.png'
+          fileIdentifier: ['directory', 'file_1.png']
         }
       } as unknown as FormConfigRequest;
 

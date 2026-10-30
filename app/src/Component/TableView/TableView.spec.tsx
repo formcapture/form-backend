@@ -4,14 +4,23 @@ import {
   waitFor
 } from '@testing-library/react';
 import {
+  afterEach,
+  beforeEach,
   describe,
   expect,
-  it
+  it,
+  Mock,
+  vi
 } from 'vitest';
 
 import { FormConfiguration } from '../../App';
+import { authenticatedFetch } from '../../util/authenticatedFetch';
 
 import TableView from './TableView';
+
+vi.mock('../../util/authenticatedFetch', () => ({
+  authenticatedFetch: vi.fn()
+}));
 
 describe('<TableView />', () => {
   const mockData: FormConfiguration = {
@@ -32,8 +41,7 @@ describe('<TableView />', () => {
       editable: true,
       views: {
         table: true,
-        item: true,
-        pageSize: 10
+        item: true
       },
       order: 'desc',
       orderBy: 'name',
@@ -49,6 +57,16 @@ describe('<TableView />', () => {
 
   const mockFormId = '123';
 
+  beforeEach(() => {
+    (authenticatedFetch as Mock).mockImplementation(() => Promise.resolve(
+      new Response(JSON.stringify(mockData), {status: 200})
+    ));
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('is defined', () => {
     expect(TableView).not.toBeNull();
   });
@@ -58,7 +76,6 @@ describe('<TableView />', () => {
       <TableView
         data={mockData}
         formId={mockFormId}
-        page={0}
       />
     );
 
@@ -87,7 +104,6 @@ describe('<TableView />', () => {
       <TableView
         data={mockData}
         formId={mockFormId}
-        page={0}
       />
     );
   });
@@ -97,7 +113,6 @@ describe('<TableView />', () => {
       <TableView
         data={mockData}
         formId={mockFormId}
-        page={0}
       />
     );
     await waitFor(() => {

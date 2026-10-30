@@ -90,8 +90,8 @@ import { Views } from './views';
  * }
  * ```
  *
- * @example Pagination
- * Configuration with pagination showing 5 items per page:
+ * @example Infinite row model
+ * Configuration for a table that loads rows on demand:
  *
  * ```json
  * {
@@ -105,8 +105,7 @@ import { Views } from './views';
  *  },
  *  "views": {
  *    "item": true,
- *    "table": true,
- *    "pageSize": 5
+ *    "table": true
  *  }
  * }
  * ```

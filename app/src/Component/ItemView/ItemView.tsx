@@ -21,7 +21,6 @@ import { getFeaturesFromTableData, getGeometryColumns } from '../../util/table';
 import {
   createItemViewUrl,
   createTableViewUrl,
-  getPageFromUrl,
   ItemViewQueryParams,
   TableViewQueryParams
 } from '../../util/url';
@@ -186,7 +185,6 @@ const ItemView: React.FC<ItemViewProps> = ({
         const queryParams: TableViewQueryParams = {
           formId: formId,
           message: TOAST_MESSAGE.deleteSuccess,
-          page: getPageFromUrl(previousView) + 1,
           order: previousViewUrl.searchParams.get('order') ?? undefined,
           orderBy: previousViewUrl.searchParams.get('orderBy') ?? undefined,
           filterValue: previousViewUrl.searchParams.get('filterValue') ?? undefined,

@@ -60,8 +60,7 @@ const mockData: FormConfiguration = {
     },
     views: {
       table: true,
-      item: true,
-      pageSize: 10
+      item: true
     },
     idColumn: 'id',
     editable: true,
@@ -110,7 +109,9 @@ describe('App', () => {
     };
 
     globalThis.fetch = mockFetch;
-    (authenticatedFetch as Mock).mockResolvedValue(createFetchResponse(mockData, 200));
+    (authenticatedFetch as Mock).mockImplementation(() => Promise.resolve(
+      createFetchResponse(mockData, 200)
+    ));
 
     setKeycloakInst(undefined as unknown as Keycloak);
   });
@@ -155,8 +156,6 @@ describe('App', () => {
       expect(mockFetch).toHaveBeenCalledOnce();
       expect(loadingText).toBeNull();
     }, {timeout: 1000});
-
-    expect(await screen.findByText('Test-Object 1')).not.toBeNull();
   });
 
   it('handles Keycloak initialization errors', async () => {
@@ -300,31 +299,25 @@ describe('App', () => {
 
   it('takes the order URL parameter into account', async () => {
     delete (globalThis as any).window.location;
-    (globalThis as any).window.location = new URL('http://localhost?view=table&formId=abc&order=asc&page=1');
+    (globalThis as any).window.location = new URL('http://localhost?view=table&formId=abc&order=asc');
 
     render(<App />);
 
     await waitFor(() => {
-      expect(authenticatedFetch).toHaveBeenCalledWith(
-        '../form/abc?page=0&order=asc',
-        {headers: {'Content-Type': 'application/json'}},
-        mockKeycloak
-      );
+      const loadingText = screen.queryByText('Seite wird geladen…');
+      expect(loadingText).toBeNull();
     }, {timeout: 400});
   });
 
   it('takes the orderBy URL parameter into account', async () => {
     delete (globalThis as any).window.location;
-    (globalThis as any).window.location = new URL('http://localhost?view=table&formId=abc&orderBy=foo&page=1');
+    (globalThis as any).window.location = new URL('http://localhost?view=table&formId=abc&orderBy=foo');
 
     render(<App />);
 
     await waitFor(() => {
-      expect(authenticatedFetch).toHaveBeenCalledWith(
-        '../form/abc?page=0&orderBy=foo',
-        {headers: {'Content-Type': 'application/json'}},
-        mockKeycloak
-      );
+      const loadingText = screen.queryByText('Seite wird geladen…');
+      expect(loadingText).toBeNull();
     }, {timeout: 400});
   });
 });

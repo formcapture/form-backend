@@ -44,8 +44,7 @@ describe('<ItemView />', () => {
       idColumn: '1',
       views: {
         table: true,
-        item: true,
-        pageSize: 10
+        item: true
       },
       order: 'desc',
       orderBy: 'foo'

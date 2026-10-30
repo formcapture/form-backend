@@ -3,8 +3,7 @@ import { describe, it, expect } from 'vitest';
 import {
   createItemViewUrl,
   createTableViewUrl,
-  getOrderFromUrl,
-  getPageFromUrl
+  getOrderFromUrl
 } from './url';
 
 describe('url', () => {
@@ -20,24 +19,6 @@ describe('url', () => {
     it('should return undefined if order is not "asc" or "desc"', () => {
       const url = 'https://example.com?order=invalid';
       expect(getOrderFromUrl(url)).toBeUndefined();
-    });
-  });
-  describe('getPageFromUrl', () => {
-    it('should return 0 if page is not set', () => {
-      const url = 'https://example.com';
-      expect(getPageFromUrl(url)).toBe(0);
-    });
-    it('should return 0 if page is not a number', () => {
-      const url = 'https://example.com?page=invalid';
-      expect(getPageFromUrl(url)).toBe(0);
-    });
-    it('should return 0 if page is less than 1', () => {
-      const url = 'https://example.com?page=0';
-      expect(getPageFromUrl(url)).toBe(0);
-    });
-    it('should return the 0-based page number', () => {
-      const url = 'https://example.com?page=1';
-      expect(getPageFromUrl(url)).toBe(0);
     });
   });
   describe('createItemViewUrl', () => {
@@ -56,11 +37,10 @@ describe('url', () => {
       const baseUrl = 'https://example.com';
       const formId = '123';
       const message = 'message';
-      const page = 1;
       const order = 'asc';
       const orderBy = 'name';
-      expect(createTableViewUrl(baseUrl, {formId, message, page, order, orderBy})).toBe(
-        'https://example.com/?view=table&formId=123&msg=message&page=1&order=asc&orderBy=name'
+      expect(createTableViewUrl(baseUrl, {formId, message, order, orderBy})).toBe(
+        'https://example.com/?view=table&formId=123&msg=message&order=asc&orderBy=name'
       );
     });
   });

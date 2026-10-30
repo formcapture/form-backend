@@ -1,3 +1,29 @@
+# [4.0.0](https://github.com/formcapture/form-backend/compare/v3.1.2...v4.0.0) (2026-09-10)
+
+
+### Bug Fixes
+
+* add legacy-peer-deps=true to app and backend .npmrc to resolve peer dep conflicts with eslint 10 and typescript 7 ([ecc7513](https://github.com/formcapture/form-backend/commit/ecc751368f448b5784237ec76b76e70aaccceb75))
+* align react-dom version with react (19.2.8) ([adb1989](https://github.com/formcapture/form-backend/commit/adb19897b2d4201909e870d99803e6970386945c))
+* disable eslint-plugin-react rules incompatible with ESLint 10 ([ee39171](https://github.com/formcapture/form-backend/commit/ee3917174cf7f0fda6e7b3997f1b8d23ad5b6fe6))
+* revert typescript from 7.0.2 to 5.9.2 to fix peer dependency conflict ([f5a9c15](https://github.com/formcapture/form-backend/commit/f5a9c1541af5cec159fd887196120249f035a43f))
+* test app global object ([8d6b9dd](https://github.com/formcapture/form-backend/commit/8d6b9ddb79c3f33b97b4bbdfd0c2609e2c75046c))
+* test findbyText ([84a1f64](https://github.com/formcapture/form-backend/commit/84a1f643480c9b336db657d6ef396e236f326152))
+* tests keyloak init ([dd316a6](https://github.com/formcapture/form-backend/commit/dd316a635fc943b1aea3f7b4f94b44eda19f5778))
+* typechek backend ([a4e7c3b](https://github.com/formcapture/form-backend/commit/a4e7c3bc8496de8e754ca3adcf9b7f848923eb6e))
+* update package-lock.json to reflect react-dom 19.2.8 ([936e42e](https://github.com/formcapture/form-backend/commit/936e42e46da10a25b6b72eea690277927c10ba5a))
+
+
+### Features
+
+* introduce first version of infinite row model ([#58](https://github.com/formcapture/form-backend/issues/58)) ([8e7f746](https://github.com/formcapture/form-backend/commit/8e7f7464c7ed4a3ef429bc6e390be9a42062d4b2))
+
+
+### BREAKING CHANGES
+
+* page is not supported anymore. Replaced by startRow and
+endRow
+
 ## [3.1.2](https://github.com/formcapture/form-backend/compare/v3.1.1...v3.1.2) (2026-06-09)
 
 

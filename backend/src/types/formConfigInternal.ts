@@ -17,7 +17,7 @@ export type FormConfigInternal = Omit<Required<FormConfig>, 'format'> & {
   format?: string;
   // TODO check which properties have to be resolved further (e.g. because some nested properties are still optional)
   dataSource: WithRequiredProperty<FormConfig['dataSource'], 'order' | 'orderBy'>;
-  views: WithRequiredProperty<FormConfig['views'], 'item' | 'table' | 'pageSize'>;
+  views: WithRequiredProperty<FormConfig['views'], 'item' | 'table'>;
   includedProperties: string[];
   includedPropertiesTable: string[];
 };

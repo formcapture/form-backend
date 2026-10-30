@@ -45,7 +45,7 @@ const getFilePathMock = jest.fn();
 jest.mock('../processor/file', () => {
   return {
     FileProcessor: jest.fn(() => ({
-      fileExists: () => fileExistsMock(),
+      fileExists: (fileIdentifier: string) => fileExistsMock(fileIdentifier),
       getFilePath: (...args: any[]) => getFilePathMock.apply(args)
     }))
   };
@@ -538,18 +538,19 @@ describe('FormService', () => {
       const req: FormConfigRequest = {
         params: {
           formId: 'foo',
-          0: 'file_1.png'
+          fileIdentifier: ['directory', 'file_1.png']
         }
       } as unknown as FormConfigRequest;
 
       fileExistsMock.mockResolvedValue(true);
-      getFilePathMock.mockReturnValue('foo/file_1.png');
+      getFilePathMock.mockReturnValue('foo/directory/file_1.png');
 
       const res = createResponseMock();
       const formService = new FormService(opts);
       await formService.getFile(req, res, jest.fn());
 
-      expect(sendFileMock).toHaveBeenCalledWith('foo/file_1.png', { root: 'uploads' });
+      expect(fileExistsMock).toHaveBeenCalledWith('directory/file_1.png');
+      expect(sendFileMock).toHaveBeenCalledWith('foo/directory/file_1.png', { root: 'uploads' });
     });
     it('fails if the file does not exist', async () => {
       const opts: Opts = {
@@ -560,7 +561,7 @@ describe('FormService', () => {
       const req: FormConfigRequest = {
         params: {
           formId: 'foo',
-          0: 'file_1.png'
+          fileIdentifier: ['directory', 'file_1.png']
         }
       } as unknown as FormConfigRequest;
 

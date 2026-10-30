@@ -60,7 +60,7 @@ describe('FormApi', () => {
       it('provides an endpoint for getting a file of a form entry', () => {
         const router = createFormRouter(opts);
         const route = router.stack.find(
-          (s) => s.route?.path === '/files/:formId/*' && s.route?.stack[0].method === 'get'
+          (s) => s.route?.path === '/files/:formId/*fileIdentifier' && s.route?.stack[0].method === 'get'
         );
         expect(route).toBeDefined();
       });

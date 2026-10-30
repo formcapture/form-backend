@@ -78,7 +78,7 @@ export const createFormRouter = (opts: Opts) => {
     (req, res, next) => service.deleteFormItem(req as FormConfigRequest, res, next)
   );
   /** Get a single file for an item */
-  router.get('/files/:formId/*',
+  router.get('/files/:formId/*fileIdentifier',
     configLoader,
     (req, res, next) => userRolesLoader(req as FormConfigRequest, res, next),
     (req, res, next) => {

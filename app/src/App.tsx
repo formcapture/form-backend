@@ -130,7 +130,7 @@ const App: React.FC = () => {
   const message = new URLSearchParams(window.location.search).get('msg');
 
   const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(formId !== null);
   const [unauthorizedWithToken, setUnauthorizedWithToken] = useState(false);
   const [isRedirectingToLogin, setIsRedirectingToLogin] = useState(false);
   const [toastVisible, setToastVisible] = useState(!!message);
@@ -239,7 +239,6 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!formId) {
-      setIsLoading(false);
       return;
     }
     const initialize = async () => {

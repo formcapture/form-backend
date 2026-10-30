@@ -189,7 +189,7 @@ const TableView: React.FC<TableViewProps> = ({
 
   const agGridLocale = useMemo(() => {
     const lang = i18n.language ||
-      (typeof window !== 'undefined' && window.localStorage.i18nextLng) ||
+      (typeof window !== 'undefined' && window.localStorage?.i18nextLng) ||
       'de-DE';
     if (lang === 'de-DE') {
       return AG_GRID_LOCALE_DE;

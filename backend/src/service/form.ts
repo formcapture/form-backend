@@ -354,7 +354,8 @@ class FormService {
   async getFile(req: FormConfigRequest, res: Response, next: NextFunction) {
     try {
       const formId = getSingleParam(req.params.formId);
-      const fileIdentifier = getSingleParam(req.params[0]);
+      const fileParam = req.params.fileIdentifier ?? req.params[0];
+      const fileIdentifier = Array.isArray(fileParam) ? fileParam.join('/') : getSingleParam(fileParam);
 
       if (!formId) {
         next(new GenericRequestError('No formId provided', 400, {errorCode: FormBackendErrorCode.FORM_ID_MISSING}));

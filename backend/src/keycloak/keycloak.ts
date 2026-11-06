@@ -3,8 +3,21 @@ import jwt, { JwtPayload, VerifyOptions } from 'jsonwebtoken';
 import { setupLogger } from '../logger';
 import { Opts } from '../types/opts';
 
+const getRealmUrl = (baseUrl: string, realm: string) => {
+  return `${baseUrl}${baseUrl.endsWith('/') ? '' : '/'}realms/${realm}`;
+};
+
+/** Realm URL for requests from the backend to Keycloak (may be an internal URL). */
 const getKeycloakRealmUrl = (opts: Opts) => {
-  return `${opts.KC_AUTH_SERVER_URL}${opts.KC_AUTH_SERVER_URL.endsWith('/') ? '' : '/'}realms/${opts.KC_REALM}`;
+  return getRealmUrl(opts.KC_AUTH_SERVER_URL, opts.KC_REALM);
+};
+
+/**
+ * Realm URL as seen by the browser. Keycloak uses it as issuer (`iss`)
+ * of the tokens that users obtain when logging in.
+ */
+export const getPublicKeycloakRealmUrl = (opts: Opts) => {
+  return getRealmUrl(opts.KC_PUBLIC_URL, opts.KC_REALM);
 };
 
 export const harmonizePublicKey = (pk: string|undefined) => {
@@ -26,7 +39,8 @@ export const decodeToken = (token: string|undefined, opts: Opts) => {
     return;
   }
 
-  const issuerUrl = getKeycloakRealmUrl(opts);
+  // user tokens are issued to the browser, so their issuer is the public URL
+  const issuerUrl = getPublicKeycloakRealmUrl(opts);
   const publicKey = opts.KC_PUBLIC_KEY;
   const verifyOpts: VerifyOptions = {
     issuer: issuerUrl,

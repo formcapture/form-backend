@@ -10,6 +10,11 @@ jobs:
     steps:
       - name: Checkout sources 🔰
         uses: actions/checkout@v7
+        with:
+          # Do not store the workflow's GITHUB_TOKEN in the git config. Otherwise semantic-release
+          # pushes the release commit as github-actions[bot], which cannot bypass the ruleset on main,
+          # instead of using SEMANTIC_RELEASE_TOKEN.
+          persist-credentials: false
 
       - name: Setup Node.js 👷🏻
         uses: actions/setup-node@v7

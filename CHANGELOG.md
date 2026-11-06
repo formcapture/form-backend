@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/formcapture/form-backend/compare/v4.0.0...v4.0.1) (2026-11-06)
+
+
+### Bug Fixes
+
+* verify the issuer of user tokens against KC_PUBLIC_URL ([#385](https://github.com/formcapture/form-backend/issues/385)) ([cff161c](https://github.com/formcapture/form-backend/commit/cff161c31729a55afcd4c3842dc322af750ab11b))
+
 # [4.0.0](https://github.com/formcapture/form-backend/compare/v3.1.2...v4.0.0) (2026-09-10)
 
 

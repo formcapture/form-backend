@@ -42,7 +42,7 @@
     "@ag-grid-community/locale": "^36.1.0",
     "@ag-grid-community/react": "^32.3.9",
     "@ag-grid-community/styles": "^32.3.9",
-    "@json-editor/json-editor": "^2.16.0",
+    "@json-editor/json-editor": "^2.17.4",
     "@terrestris/base-util": "^4.0.2",
     "@testing-library/dom": "^10.4.1",
     "@types/geojson": "^7946.0.14",

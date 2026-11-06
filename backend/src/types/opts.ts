@@ -28,7 +28,7 @@ export interface Opts {
   KC_REALM: string;
   /** Keycloak auth url (internal backend use) */
   KC_AUTH_SERVER_URL: string;
-  /** Keycloak public url */
+  /** Keycloak public url (used by the browser; also the expected issuer of user tokens) */
   KC_PUBLIC_URL: string;
   /**
    * The public key of the keycloak realm.

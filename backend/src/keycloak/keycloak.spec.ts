@@ -1,3 +1,5 @@
+import { generateKeyPairSync } from 'crypto';
+
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 import { Opts } from '../types/opts';
@@ -7,6 +9,7 @@ import {
   getTokenFromHeader,
   getRolesFromToken,
   getPostgrestJwt,
+  getPublicKeycloakRealmUrl,
   harmonizePublicKey
 } from './keycloak';
 
@@ -19,6 +22,7 @@ describe('Keycloak', () => {
 
   const opts: Opts = {
     KC_AUTH_SERVER_URL: 'http://foo/auth',
+    KC_PUBLIC_URL: 'https://public.foo/auth',
     KC_REALM: 'foo',
     KC_PUBLIC_KEY: 'foo',
     KC_CLIENT_APP_ID: 'foo',
@@ -68,6 +72,52 @@ describe('Keycloak', () => {
       jwt.verify = verifyMock;
       const decodedToken = decodeToken(token, opts);
       expect(decodedToken).toBeUndefined();
+    });
+    it('verifies the issuer against the public keycloak url, not the internal one', () => {
+      const verifyMock = jest.fn();
+      jwt.verify = verifyMock;
+      decodeToken('foo', opts);
+      expect(verifyMock).toHaveBeenCalledWith('foo', opts.KC_PUBLIC_KEY, {
+        issuer: 'https://public.foo/auth/realms/foo'
+      });
+    });
+
+    describe('with real tokens', () => {
+      const { privateKey, publicKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
+      const realOpts: Opts = {
+        ...opts,
+        KC_PUBLIC_KEY: publicKey.export({ type: 'spki', format: 'pem' }).toString()
+      };
+      const { sign, verify } = jest.requireActual('jsonwebtoken');
+      const signToken = (iss: string) => sign(
+        // eslint-disable-next-line camelcase
+        { resource_access: { foo: { roles: ['editor'] } } },
+        privateKey,
+        { algorithm: 'RS256', issuer: iss }
+      );
+
+      beforeEach(() => {
+        jwt.verify = verify;
+      });
+
+      it('accepts a token issued by the public keycloak url', () => {
+        const decodedToken = decodeToken(signToken('https://public.foo/auth/realms/foo'), realOpts);
+        expect(getRolesFromToken(decodedToken, realOpts)).toEqual(['editor']);
+      });
+      it('rejects a token issued by the internal keycloak url', () => {
+        const decodedToken = decodeToken(signToken('http://foo/auth/realms/foo'), realOpts);
+        expect(decodedToken).toBeUndefined();
+      });
+    });
+  });
+
+  describe('getPublicKeycloakRealmUrl', () => {
+    it('builds the realm url from KC_PUBLIC_URL', () => {
+      expect(getPublicKeycloakRealmUrl(opts)).toBe('https://public.foo/auth/realms/foo');
+    });
+    it('handles a trailing slash in KC_PUBLIC_URL', () => {
+      const realmUrl = getPublicKeycloakRealmUrl({ ...opts, KC_PUBLIC_URL: 'https://public.foo/auth/' });
+      expect(realmUrl).toBe('https://public.foo/auth/realms/foo');
     });
   });
   describe('getTokenFromHeader', () => {

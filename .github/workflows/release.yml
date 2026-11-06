@@ -30,9 +30,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
 
-      - name: Checkout sources 🔰 again # Needed to ensure the latest commit is checked out after semantic-release has run
+      - name: Checkout sources 🔰 again # Check out the release commit created by semantic-release
         if: steps.semantic.outputs.new_release_published == 'true'
         uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.semantic.outputs.new_release_git_tag }}
 
       - name: Log in to the Container registry
         if: steps.semantic.outputs.new_release_published == 'true'
@@ -54,5 +56,8 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true'
         uses: docker/build-push-action@v7
         with:
+          # build from the checked out release commit; without a context the action builds the
+          # git ref that triggered the workflow, i.e. the commit before the release commit
+          context: .
           push: true
           tags: ghcr.io/formcapture/form-backend:latest,ghcr.io/formcapture/form-backend:${{ steps.semantic.outputs.new_release_version }}

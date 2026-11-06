@@ -4,8 +4,9 @@ RUN mkdir -p /form-backend/app /form-backend/backend
 
 WORKDIR /form-backend
 
-COPY backend/package.json backend/package-lock.json backend/
-COPY app/package.json app/package-lock.json app/
+# .npmrc is needed for npm ci (legacy-peer-deps)
+COPY backend/package.json backend/package-lock.json backend/.npmrc backend/
+COPY app/package.json app/package-lock.json app/.npmrc app/
 RUN cd backend && npm ci
 RUN cd app && npm ci
 
@@ -33,10 +34,10 @@ RUN chown -R node:node /form-backend
 USER node
 
 COPY --from=builder --chown=node:node /form-backend/backend/public public/
-COPY --from=builder --chown=node:node /form-backend/backend/package.json /form-backend/backend/package-lock.json .
+COPY --from=builder --chown=node:node /form-backend/backend/package.json /form-backend/backend/package-lock.json /form-backend/backend/.npmrc ./
 COPY --from=builder --chown=node:node /form-backend/backend/dist dist/
 
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 ENV NODE_ENV=production
 

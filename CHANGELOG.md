@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/formcapture/form-backend/compare/v4.0.1...v4.0.2) (2026-11-06)
+
+
+### Bug Fixes
+
+* **docker:** copy .npmrc into the image build ([#388](https://github.com/formcapture/form-backend/issues/388)) ([6020aa7](https://github.com/formcapture/form-backend/commit/6020aa7d82e7ee78349ea1ad0c69607438e95346)), closes [#387](https://github.com/formcapture/form-backend/issues/387) [#387](https://github.com/formcapture/form-backend/issues/387)
+
 ## [4.0.1](https://github.com/formcapture/form-backend/compare/v4.0.0...v4.0.1) (2026-11-06)
 
 

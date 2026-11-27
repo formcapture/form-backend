@@ -434,7 +434,7 @@ class DataProcessor {
 
     const configKey = configKeys.at(-1);
     if (!configKey) {
-      throw new DatabaseError('Cannot handle oneToMany table. ConfigKeys is empty', {
+      throw new DatabaseError('Cannot handle to-one table. ConfigKeys is empty', {
         errorCode: FormBackendErrorCode.CONFIG_KEY_IS_EMPTY
       });
     }
@@ -787,7 +787,7 @@ class DataProcessor {
         const lookupTables = formConfig.dataSource.lookupTables;
         if (!lookupTables) {
           throw new GenericRequestError('Cannot reconstruct data. Missing lookupTables.', 500, {
-            errorCode: FormBackendErrorCode.MISSING_LOOKUP_COLUMNS
+            errorCode: FormBackendErrorCode.MISSING_LOOKUP_TABLES
           });
         }
         const refCol = lookupTables[c].includedProperties?.[0];

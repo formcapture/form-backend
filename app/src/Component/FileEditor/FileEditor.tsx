@@ -186,7 +186,7 @@ export class FileEditor extends Base64Editor {
   }
 
   async previewUploadedFile(fileNameEl: HTMLElement, previewContainer: HTMLElement) {
-    fileNameEl.innerHTML = this.value;
+    fileNameEl.textContent = this.value;
     const mime = mimeTypes.getType(this.value);
     if (!mime || !mime.startsWith('image/')) {
       return;
@@ -223,9 +223,13 @@ export class FileEditor extends Base64Editor {
     const bytes = Math.floor((this.value.length - this.value.split(',')[0].length - 1) / 1.33333);
     const formattedSize = this.formatBytes(bytes);
     if (fileName) {
-      fileNameEl.innerHTML = fileName;
+      fileNameEl.textContent = fileName;
     }
-    metadataContainer.innerHTML = `<strong>Typ:</strong> ${mime} <strong>Größe:</strong> ~${formattedSize}`;
+    // mime comes from the (untrusted) value, so it must not be parsed as HTML
+    metadataContainer.innerHTML = '<strong>Typ:</strong> <span></span> <strong>Größe:</strong> ~<span></span>';
+    const [mimeEl, sizeEl] = metadataContainer.querySelectorAll('span');
+    mimeEl.textContent = mime ?? '';
+    sizeEl.textContent = formattedSize;
     if (mime?.startsWith('image')) {
       const img = document.createElement('img');
       img.style.maxWidth = '100%';

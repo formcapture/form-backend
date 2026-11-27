@@ -125,6 +125,19 @@ describe('<FileEditor />', () => {
     expect(fileEditor.preview.querySelector('img')).toBeNull();
   });
 
+  it('does not render HTML from the mime type of a data url', async () => {
+    const fileEditor = await createEditor({}, 'data:<img src=x onerror=alert(1)>;base64,AAAA');
+    expect(fileEditor.preview.querySelector('img[onerror]')).toBeNull();
+    expect(fileEditor.preview.textContent).toContain('<img src=x onerror=alert(1)>');
+  });
+
+  it('does not render HTML from the name of an uploaded file', async () => {
+    vi.mocked(api.fetchFile).mockResolvedValue(new Response(null, { status: 404 }));
+    const fileEditor = await createEditor({}, 'root/file_<img src=x onerror=alert(1)>.png');
+    await vi.waitFor(() => expect(fileEditor.preview.textContent).toContain('<img src=x onerror=alert(1)>'));
+    expect(fileEditor.preview.querySelector('img[onerror]')).toBeNull();
+  });
+
   it('recognizes file identifiers', async () => {
     const fileEditor = await createEditor();
     fileEditor.value = 'root/file_abc.png';

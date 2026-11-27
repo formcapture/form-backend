@@ -72,13 +72,29 @@ export const getRolesFromToken = (decodedToken: JwtPayload|undefined, opts: Opts
   return decodedToken?.resource_access?.[opts.KC_CLIENT_APP_ID]?.roles ?? [];
 };
 
+// refresh the token this long before it expires, so it does not expire while a request is running
+const POSTGREST_JWT_EXPIRY_MARGIN_MS = 30_000;
+// shortcut: parallel requests on a cold cache each fetch a token; share an in-flight promise if Keycloak load matters
+const postgrestJwtCache = new Map<string, { token: string; expiresAt: number }>();
+
+/** Clears the cached postgrest tokens. */
+export const clearPostgrestJwtCache = () => postgrestJwtCache.clear();
+
 /**
  * Get the token used for authenticating with postgrest.
+ * The token is cached until shortly before it expires.
  * @param opts The opts.
  * @returns The token or undefined if authentication failed.
  */
 export const getPostgrestJwt = async (opts: Opts) => {
   const logger = setupLogger({ label: 'keycloak' });
+  const url = `${getKeycloakRealmUrl(opts)}/protocol/openid-connect/token`;
+  const cacheKey = `${url}|${opts.POSTGREST_JWT_CLIENT_ID}`;
+  const cached = postgrestJwtCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.token;
+  }
+
   const payload = {
     // eslint-disable-next-line camelcase
     client_id: opts.POSTGREST_JWT_CLIENT_ID,
@@ -87,7 +103,6 @@ export const getPostgrestJwt = async (opts: Opts) => {
     // eslint-disable-next-line camelcase
     grant_type: 'client_credentials'
   };
-  const url = `${getKeycloakRealmUrl(opts)}/protocol/openid-connect/token`;
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -105,6 +120,13 @@ export const getPostgrestJwt = async (opts: Opts) => {
     logger.verbose('Got postgrest jwt');
     const jwtPayload = decodeToken(data.access_token, opts);
     logger.verbose(`Granted resources: ${JSON.stringify(jwtPayload?.resource_access ?? {})}`);
+  }
+
+  if (data.access_token && typeof data.expires_in === 'number') {
+    postgrestJwtCache.set(cacheKey, {
+      token: data.access_token,
+      expiresAt: Date.now() + data.expires_in * 1000 - POSTGREST_JWT_EXPIRY_MARGIN_MS
+    });
   }
 
   return data.access_token;

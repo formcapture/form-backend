@@ -5,6 +5,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Opts } from '../types/opts';
 
 import {
+  clearPostgrestJwtCache,
   decodeToken,
   getTokenFromHeader,
   getRolesFromToken,
@@ -156,6 +157,60 @@ describe('Keycloak', () => {
     });
   });
   describe('getPostgrestJwt', () => {
+    const tokenResponse = (token: string, expiresIn?: number) => ({
+      ok: true,
+      // eslint-disable-next-line camelcase
+      json: async () => ({ access_token: token, expires_in: expiresIn })
+    });
+
+    beforeEach(() => {
+      clearPostgrestJwtCache();
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('caches the token until shortly before it expires', async () => {
+      const now = 1_000_000;
+      const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(now);
+      fetchMock.mockResolvedValueOnce(tokenResponse('first', 60)).mockResolvedValueOnce(tokenResponse('second', 60));
+
+      expect(await getPostgrestJwt(opts)).toBe('first');
+      nowSpy.mockReturnValue(now + 29_000);
+      expect(await getPostgrestJwt(opts)).toBe('first');
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      // 60s lifetime minus 30s margin
+      nowSpy.mockReturnValue(now + 30_000);
+      expect(await getPostgrestJwt(opts)).toBe('second');
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not cache tokens without expiry', async () => {
+      fetchMock.mockResolvedValue(tokenResponse('foo'));
+
+      await getPostgrestJwt(opts);
+      await getPostgrestJwt(opts);
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not cache failed token requests', async () => {
+      fetchMock.mockResolvedValueOnce({ ok: false, status: 401 }).mockResolvedValueOnce(tokenResponse('foo', 60));
+
+      expect(await getPostgrestJwt(opts)).toBeUndefined();
+      expect(await getPostgrestJwt(opts)).toBe('foo');
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('caches tokens per client', async () => {
+      fetchMock.mockResolvedValueOnce(tokenResponse('a', 60)).mockResolvedValueOnce(tokenResponse('b', 60));
+
+      expect(await getPostgrestJwt({ ...opts, POSTGREST_JWT_CLIENT_ID: 'a' })).toBe('a');
+      expect(await getPostgrestJwt({ ...opts, POSTGREST_JWT_CLIENT_ID: 'b' })).toBe('b');
+    });
+
     it('returns the token used for authenticating with postgrest', async () => {
       const mockData = {
         // eslint-disable-next-line camelcase

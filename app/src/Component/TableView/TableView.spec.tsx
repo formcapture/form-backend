@@ -166,6 +166,27 @@ describe('<TableView />', () => {
       expect(postMessageSpy).toHaveBeenCalledWith({type: SEND_EVENTS.refreshLayer, payload: 'l1'}, window.origin);
     });
 
+    it('keeps the sort order after deleting an item', async () => {
+      render(<TableView data={mockData} formId={mockFormId} order="asc" orderBy="Value" />);
+      await confirmDeleteOfFirstItem(() => Promise.resolve(new Response(null, {status: 200})));
+
+      await waitFor(() => expect(assignMock).toHaveBeenCalled());
+      const nextUrl = new URL(assignMock.mock.calls[0][0]);
+      expect(nextUrl.searchParams.get('order')).toBe('asc');
+      expect(nextUrl.searchParams.get('orderBy')).toBe('Value');
+    });
+
+    it('passes the sort order to the item view as previous url', async () => {
+      render(<TableView data={mockData} formId={mockFormId} order="asc" orderBy="Value" />);
+      window.dispatchEvent(new MessageEvent('message', {
+        data: {type: RECEIVE_EVENTS.editRecord, payload: {itemId: 2}},
+        origin: window.origin
+      }));
+      const prevUrl = new URL(new URL(assignMock.mock.calls[0][0]).searchParams.get('prev')!);
+      expect(prevUrl.searchParams.get('order')).toBe('asc');
+      expect(prevUrl.searchParams.get('orderBy')).toBe('Value');
+    });
+
     it('shows an error toast if deleting fails', async () => {
       const showToast = vi.fn();
       render(<TableView data={mockData} formId={mockFormId} showToast={showToast} />);

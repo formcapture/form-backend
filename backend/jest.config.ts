@@ -10,10 +10,10 @@ const jestConfig: JestConfigWithTsJest = {
   coverageReporters: ['json-summary', 'lcov', 'text'],
   coverageThreshold: {
     global: {
-      lines: 85,
-      statements: 85,
-      functions: 85,
-      branches: 70
+      lines: 92,
+      statements: 92,
+      functions: 95,
+      branches: 82
     }
   },
   moduleNameMapper: {

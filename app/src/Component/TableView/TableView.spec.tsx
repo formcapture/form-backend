@@ -103,7 +103,8 @@ describe('<TableView />', () => {
           });
 
       });
-    });
+      // ag-grid renders asynchronously and can take longer than the default 1s under parallel test load
+    }, { timeout: 5000 });
 
   });
 

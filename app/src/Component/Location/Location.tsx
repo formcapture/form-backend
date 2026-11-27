@@ -278,7 +278,7 @@ export class Location extends AbstractEditor {
   }
 
   updateZoomToFeatureButton(show: boolean) {
-    const zoomToFeatureButton = this.formButtons.querySelector(`#zoom-to-feature-${this.key}`);
+    const zoomToFeatureButton = this.formButtons?.querySelector(`#zoom-to-feature-${this.key}`);
     if (zoomToFeatureButton) {
       zoomToFeatureButton.style.display = show ? 'inline' : 'none';
     }

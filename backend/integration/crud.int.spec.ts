@@ -116,6 +116,7 @@ describe('creating, updating and deleting items with joins and files', () => {
     await call(`/form/fountains_editor/item/${id}`, 'PATCH', { ...item, fountains_pictures: [] });
 
     const picture = (await postgrest(`/fountains_pictures?id=eq.${pictureId}`)).body;
+    // eslint-disable-next-line camelcase
     expect(picture).toEqual([expect.objectContaining({ id: pictureId, fountain_id: null })]);
     await postgrest(`/fountains_pictures?id=eq.${pictureId}`, 'DELETE');
   });

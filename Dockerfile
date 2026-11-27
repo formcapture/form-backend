@@ -34,6 +34,11 @@ RUN chown -R node:node /form-backend
 USER node
 
 COPY --from=builder --chown=node:node /form-backend/backend/public public/
+
+# release version for the app, served as /app/version.json (set by the release workflow)
+ARG APP_VERSION=development
+RUN printf '{"version":"%s"}\n' "$APP_VERSION" > public/app/version.json
+
 COPY --from=builder --chown=node:node /form-backend/backend/package.json /form-backend/backend/package-lock.json /form-backend/backend/.npmrc ./
 COPY --from=builder --chown=node:node /form-backend/backend/dist dist/
 

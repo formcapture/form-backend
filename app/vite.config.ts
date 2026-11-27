@@ -20,8 +20,15 @@ export default defineConfig({
       'default'
     ],
     coverage: {
-      exclude: ['src/main.tsx'],
-      reporter: ['lcov', 'json', 'text']
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/main.tsx', 'src/**/*.spec.{ts,tsx}', 'src/**/*.d.ts', 'src/i18n/i18nTest.ts'],
+      reporter: ['lcov', 'json', 'text'],
+      thresholds: {
+        lines: 70,
+        statements: 70,
+        functions: 70,
+        branches: 60
+      }
     },
   },
 });

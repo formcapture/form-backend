@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { isGeometryType } from './jsonEditor';
+import { getItemId, isGeometryType } from './jsonEditor';
 
 describe('jsonEditor', () => {
 
@@ -19,6 +19,22 @@ describe('jsonEditor', () => {
     });
     it('returns false for non-geometry types', () => {
       expect(isGeometryType('string')).toBe(false);
+    });
+  });
+
+  describe('isGeometryType with empty values', () => {
+    it('returns false', () => {
+      expect(isGeometryType('')).toBe(false);
+      expect(isGeometryType(undefined as unknown as string)).toBe(false);
+    });
+  });
+
+  describe('getItemId', () => {
+    it('returns the id of the root editor', () => {
+      // eslint-disable-next-line camelcase
+      const root = { original_schema: { idColumn: 'id' }, value: { id: 5 } };
+      expect(getItemId({ parent: { parent: root } })).toBe(5);
+      expect(getItemId(root)).toBe(5);
     });
   });
 });

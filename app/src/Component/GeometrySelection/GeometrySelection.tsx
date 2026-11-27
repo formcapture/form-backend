@@ -13,6 +13,8 @@ export class GeometrySelection extends AbstractEditor {
     this.currentDepth = depth;
 
     this.internalMap = this.options.jsoneditor?.options?.internalMap;
+    // bind once, so removeEventListener gets the same function reference
+    this.postMessageListener = this.postMessageListener.bind(this);
   }
 
   postMessageListener(evt: MessageEvent) {
@@ -35,11 +37,11 @@ export class GeometrySelection extends AbstractEditor {
   }
 
   registerListener() {
-    window.addEventListener('message', this.postMessageListener.bind(this));
+    window.addEventListener('message', this.postMessageListener);
   }
 
   unregisterListener() {
-    window.removeEventListener('message', this.postMessageListener.bind(this));
+    window.removeEventListener('message', this.postMessageListener);
   }
 
   setValue(value: any) {
@@ -60,7 +62,7 @@ export class GeometrySelection extends AbstractEditor {
     this.label = this.theme.getFormInputLabel(this.getTitle(), this.isRequired());
 
     const descriptionText = this.schema.description ??
-    this.schema.readOnly ? '' : 'Bitte geben Sie eine GeoJSON Geometrie ein.';
+    (this.schema.readOnly ? '' : 'Bitte geben Sie eine GeoJSON Geometrie ein.');
     this.description = this.theme.getFormInputDescription(descriptionText);
 
     // eslint-disable-next-line camelcase

@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import {
   createItemViewUrl,
   createTableViewUrl,
+  getFilterFromUrl,
   getOrderFromUrl
 } from './url';
 
@@ -42,6 +43,33 @@ describe('url', () => {
       expect(createTableViewUrl(baseUrl, {formId, message, order, orderBy})).toBe(
         'https://example.com/?view=table&formId=123&msg=message&order=asc&orderBy=name'
       );
+    });
+    it('should add the filter params', () => {
+      expect(createTableViewUrl('https://example.com?foo=bar', {
+        formId: '123',
+        filterKey: 'name',
+        filterOp: 'contains',
+        filterValue: 'abc'
+      })).toBe('https://example.com/?view=table&formId=123&filterKey=name&filterOp=contains&filterValue=abc');
+    });
+  });
+  describe('createItemViewUrl with message', () => {
+    it('should add the message', () => {
+      expect(createItemViewUrl('https://example.com', {formId: '123', message: 'saved'})).toBe(
+        'https://example.com/?view=item&formId=123&msg=saved'
+      );
+    });
+  });
+  describe('getFilterFromUrl', () => {
+    it('should return the filter params', () => {
+      expect(getFilterFromUrl('https://example.com?filterKey=name&filterOp=contains&filterValue=abc')).toEqual({
+        filterKey: 'name',
+        filterOp: 'contains',
+        filterValue: 'abc'
+      });
+    });
+    it('should drop invalid filter operators', () => {
+      expect(getFilterFromUrl('https://example.com?filterOp=foo').filterOp).toBeUndefined();
     });
   });
 });

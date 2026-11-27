@@ -27,7 +27,7 @@ export function errorMiddleware(
     logger.debug(`Generic request error: ${err.message}`);
     statusCode = err.status || statusCode;
   } else {
-    logger.error(`Cannot create formItem: ${err.message}`);
+    logger.error(`Unhandled error: ${err.message}`);
   }
 
   const responseObject: any = {

@@ -16,6 +16,8 @@ export class GeometryEditor extends AbstractEditor {
     this.internalMap = this.options.jsoneditor?.options?.internalMap;
 
     this.listenerRegistered = false;
+    // bind once, so removeEventListener gets the same function reference
+    this.postMessageListener = this.postMessageListener.bind(this);
   }
 
   postMessageListener(evt: MessageEvent) {
@@ -42,13 +44,13 @@ export class GeometryEditor extends AbstractEditor {
 
   registerListener() {
     if (!this.listenerRegistered) {
-      window.addEventListener('message', this.postMessageListener.bind(this));
+      window.addEventListener('message', this.postMessageListener);
       this.listenerRegistered = true;
     }
   }
 
   unregisterListener() {
-    window.removeEventListener('message', this.postMessageListener.bind(this));
+    window.removeEventListener('message', this.postMessageListener);
     this.listenerRegistered = false;
   }
 
@@ -103,7 +105,7 @@ export class GeometryEditor extends AbstractEditor {
     this.label = this.theme.getFormInputLabel(this.getTitle(), this.isRequired());
 
     const descriptionText = this.schema.description ??
-    this.schema.readOnly ? '' : 'Bitte geben Sie eine GeoJSON Geometrie ein.';
+    (this.schema.readOnly ? '' : 'Bitte geben Sie eine GeoJSON Geometrie ein.');
     this.description = this.theme.getFormInputDescription(descriptionText);
 
     // eslint-disable-next-line camelcase

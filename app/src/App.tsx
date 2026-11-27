@@ -1,18 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { JSONEditor } from '@json-editor/json-editor';
-
 import Keycloak, { KeycloakConfig } from 'keycloak-js';
 
 import Logger from '@terrestris/base-util/dist/Logger';
 
 import ErrorPage from './Component/ErrorPage/ErrorPage';
-import FileEditor from './Component/FileEditor/FileEditor';
-import GeometryEditor from './Component/GeometryEditor/GeometryEditor';
-import GeometrySelection from './Component/GeometrySelection/GeometrySelection';
 import ItemView from './Component/ItemView/ItemView';
 import LoadingPage from './Component/LoadingPage/LoadingPage';
-import Location from './Component/Location/Location';
 import TableView from './Component/TableView/TableView';
 import ToastAlert from './Component/ToastAlert/ToastAlert';
 import { TOAST_MESSAGE } from './constants/toastMessage';
@@ -21,7 +15,7 @@ import i18n, {
 } from './i18n/i18n';
 import { getKeycloakInst, setKeycloakInst } from './singletons/keycloak';
 import api from './util/api';
-import { DE, isGeometryType } from './util/jsonEditor';
+import { registerCustomEditors } from './util/registerEditors';
 import { getFilterFromUrl, getOrderFromUrl } from './util/url';
 
 import './App.css';
@@ -86,31 +80,7 @@ export interface FormConfiguration {
 
 export type ItemId = number | string;
 
-// TODO improve this. Cf. App.spec.tsx
-if (JSONEditor && JSONEditor.defaults && JSONEditor.defaults.editors && JSONEditor.defaults.resolvers) {
-  JSONEditor.defaults.languages.de = DE;
-  JSONEditor.defaults.language = 'de';
-  JSONEditor.defaults.editors.geometry = GeometryEditor;
-  JSONEditor.defaults.editors.geometrySelection = GeometrySelection;
-  JSONEditor.defaults.editors.location = Location;
-  JSONEditor.defaults.editors.file = FileEditor;
-
-  JSONEditor.defaults.resolvers.unshift((schema: any) => {
-    const isGeometry = isGeometryType(schema.format);
-    if (schema.type === 'string' && schema.format === 'geometrySelection') {
-      return 'geometrySelection';
-    }
-    if (schema.type === 'string' && schema.format === 'location') {
-      return 'location';
-    }
-    if (schema.type === 'string' && isGeometry) {
-      return 'geometry';
-    }
-  });
-  JSONEditor.defaults.resolvers.unshift((schema: any) => {
-    return schema.type === 'string' && schema.media && schema.media.binaryEncoding === 'base64' && 'file';
-  });
-}
+registerCustomEditors();
 
 const checkLoginIframe = import.meta.env.MODE !== 'development';
 

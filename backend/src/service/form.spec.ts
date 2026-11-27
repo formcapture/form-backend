@@ -1,5 +1,7 @@
 import { Response } from 'express';
 
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
+import { GenericRequestError } from '../errors/GenericRequestError';
 import { FormConfig } from '../types/formConfig';
 import { FormConfigRequest } from '../types/formConfigRequest';
 import { Opts } from '../types/opts';
@@ -46,7 +48,7 @@ jest.mock('../processor/file', () => {
   return {
     FileProcessor: jest.fn(() => ({
       fileExists: (fileIdentifier: string) => fileExistsMock(fileIdentifier),
-      getFilePath: (...args: any[]) => getFilePathMock.apply(args)
+      getFilePath: (...args: any[]) => getFilePathMock(...args)
     }))
   };
 });
@@ -550,6 +552,7 @@ describe('FormService', () => {
       await formService.getFile(req, res, jest.fn());
 
       expect(fileExistsMock).toHaveBeenCalledWith('directory/file_1.png');
+      expect(getFilePathMock).toHaveBeenCalledWith('directory/file_1.png');
       expect(sendFileMock).toHaveBeenCalledWith('foo/directory/file_1.png', { root: 'uploads' });
     });
     it('fails if the file does not exist', async () => {
@@ -572,6 +575,99 @@ describe('FormService', () => {
       await formService.getFile(req, {} as Response, next);
 
       expect(next).toHaveBeenCalled();
+    });
+  });
+  describe('validation and error handling', () => {
+    const opts = { FORM_CONFIGS_DIR: 'foo' } as Opts;
+    const handlers = [
+      'getForm', 'getEmptyForm', 'getFormItem', 'createFormItem', 'updateFormItem', 'deleteFormItem'
+    ] as const;
+
+    it.each([
+      [{ order: 'foo' }, FormBackendErrorCode.INVALID_ORDER],
+      [{ orderBy: ['a', 'b'] }, FormBackendErrorCode.INVALID_ORDER_BY],
+      [{ startRow: ['0'] }, FormBackendErrorCode.INVALID_PAGE],
+      [{ endRow: ['10'] }, FormBackendErrorCode.INVALID_PAGE],
+      [{ filterKey: 'foo' }, FormBackendErrorCode.INVALID_FILTER]
+    ])('getForm rejects query %p', async (query, errorCode) => {
+      const req = { params: { formId: 'foo' }, query } as unknown as FormConfigRequest;
+      const next = jest.fn();
+
+      await new FormService(opts).getForm(req, createResponseMock(), next);
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 400, extra: { errorCode } }));
+      expect(getPostgrestJwtMock).not.toHaveBeenCalled();
+    });
+
+    it.each([...handlers, 'getFile' as const])('%s rejects a missing formId', async (handler) => {
+      const req = { params: {}, query: {} } as unknown as FormConfigRequest;
+      const next = jest.fn();
+
+      await new FormService(opts)[handler](req, createResponseMock(), next);
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({
+        status: 400,
+        extra: { errorCode: FormBackendErrorCode.FORM_ID_MISSING }
+      }));
+    });
+
+    it.each(['getEmptyForm', 'createFormItem'] as const)('%s checks the postgrest token', async (handler) => {
+      const req = { params: { formId: 'foo' }, query: {} } as unknown as FormConfigRequest;
+      const next = jest.fn();
+      getPostgrestJwtMock.mockResolvedValue(undefined);
+
+      await new FormService(opts)[handler](req, createResponseMock(), next);
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({ name: 'AuthenticationError' }));
+    });
+
+    it.each(
+      handlers.flatMap((handler) => [
+        [handler, new GenericRequestError('foo', 400, {})],
+        [handler, new Error('foo')]
+      ])
+    )('%s passes %p to next', async (handler, err) => {
+      const req = { params: { formId: 'foo', itemId: '1' }, query: {} } as unknown as FormConfigRequest;
+      const next = jest.fn();
+      getPostgrestJwtMock.mockRejectedValue(err);
+
+      await new FormService(opts)[handler as typeof handlers[number]](req, createResponseMock(), next);
+
+      expect(next).toHaveBeenCalledWith(err);
+    });
+
+    it('getFile rejects a missing file identifier', async () => {
+      const req = { params: { formId: 'foo' } } as unknown as FormConfigRequest;
+      const next = jest.fn();
+
+      await new FormService(opts).getFile(req, createResponseMock(), next);
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({
+        extra: expect.objectContaining({ errorCode: FormBackendErrorCode.INVALID_FILE })
+      }));
+      expect(fileExistsMock).not.toHaveBeenCalled();
+    });
+
+    it('getFile falls back to the unnamed wildcard param', async () => {
+      const req = { params: { formId: 'foo', 0: 'directory/file_1.png' } } as unknown as FormConfigRequest;
+      fileExistsMock.mockResolvedValue(true);
+
+      await new FormService(opts).getFile(req, createResponseMock(), jest.fn());
+
+      expect(fileExistsMock).toHaveBeenCalledWith('directory/file_1.png');
+    });
+
+    it.each([
+      new GenericRequestError('foo', 400, {}),
+      new Error('foo')
+    ])('getFile passes %p to next', async (err) => {
+      const req = { params: { formId: 'foo', fileIdentifier: 'file_1.png' } } as unknown as FormConfigRequest;
+      const next = jest.fn();
+      fileExistsMock.mockRejectedValue(err);
+
+      await new FormService(opts).getFile(req, createResponseMock(), next);
+
+      expect(next).toHaveBeenCalledWith(err);
     });
   });
 });

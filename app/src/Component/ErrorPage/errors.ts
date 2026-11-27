@@ -16,10 +16,10 @@ export const errorCodeToMessage = (errorCodeObject: any, t: TFunction, formId?: 
   }
 
   if (!_isNil(dbErrorCode)) {
-    return t(`ErrorCodes.DATABASE.${dbErrorCode}`) || t('ErrorCodes.unknownDatabaseError');
+    return t(`ErrorCodes.DATABASE.${dbErrorCode}`, { defaultValue: t('ErrorCodes.unknownDatabaseError') });
   }
 
-  const message = t(`ErrorCodes.${errorCode}`);
+  const message = t(`ErrorCodes.${errorCode}`, { defaultValue: t('ErrorCodes.unknownError') });
   if (message.indexOf('{{') !== -1 && message.indexOf('}}') !== -1) {
     return t(`ErrorCodes.${errorCode}`, { formId }); // TODO: make this more generic
   }

@@ -60,7 +60,7 @@ const prepare = async () => {
   return opts;
 };
 
-const checkConnection = async (opts: Opts): Promise<boolean> => {
+export const checkConnection = async (opts: Opts): Promise<boolean> => {
   const logger = setupLogger({ label: 'app:checkConnection' });
   const postgrestToken = await getPostgrestJwt(opts);
   if (!postgrestToken) {
@@ -100,23 +100,31 @@ const checkConnection = async (opts: Opts): Promise<boolean> => {
   return false;
 };
 
-const run = (opts: Opts) => {
-  const logger = setupLogger({ label: 'app:run' });
-  logger.debug('Running app');
+/**
+ * Creates the express app without starting it.
+ * @param opts The opts.
+ * @returns The express app.
+ */
+export const createApp = (opts: Opts) => {
   const app = express();
-  const port = 3000;
 
   app.use(helmet({
     contentSecurityPolicy: false
   }));
 
-  const apiRouter = createApiRouter(opts);
-
   app.use('/app', express.static(path.join(__dirname, '..', 'public', 'app')));
   app.use('/docs', express.static(path.join(__dirname, '..', 'public', 'docs')));
-  app.use('/', apiRouter);
+  app.use('/', createApiRouter(opts));
 
-  app.listen(port, () => {
+  return app;
+};
+
+const run = (opts: Opts) => {
+  const logger = setupLogger({ label: 'app:run' });
+  logger.debug('Running app');
+  const port = 3000;
+
+  createApp(opts).listen(port, () => {
     logger.info('----------------------------------------');
     logger.info(`🚀 form-backend listening at localhost:${port}`);
     logger.info('📦 Environment variables loaded:');

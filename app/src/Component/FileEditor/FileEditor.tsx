@@ -80,6 +80,11 @@ export class FileEditor extends Base64Editor {
     this.control = this.theme.getFormControl(this.label, this.uploader || this.input, this.preview, this.infoButton);
     this.container.appendChild(this.control);
 
+    // readonly: there is no uploader to click or initialize
+    if (!this.uploader) {
+      return;
+    }
+
     const uploadButton = this.getButton('button_upload', 'upload', 'button_upload');
 
     uploadButton.addEventListener('click', () => {

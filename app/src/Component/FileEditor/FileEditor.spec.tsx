@@ -58,11 +58,14 @@ describe('<FileEditor />', () => {
     expect(fileEditor.uploader.getAttribute('accept')).toBe('image/png,image/jpeg');
   });
 
-  it('renders no uploader and hides the remove button if readOnly', async () => {
-    // build() calls theme.afterInputReady(undefined) in readOnly mode, which throws in the frame callback
-    vi.spyOn(JSONEditor.defaults.themes.bootstrap5.prototype, 'afterInputReady').mockImplementation(() => undefined);
+  it('renders no uploader, no upload button and hides the remove button if readOnly', async () => {
+    const afterInputReadySpy = vi.spyOn(JSONEditor.defaults.themes.bootstrap5.prototype, 'afterInputReady');
     const fileEditor = await createEditor({ readOnly: true }, pngDataUrl);
+    await new Promise(resolve => window.requestAnimationFrame(resolve));
+
     expect(fileEditor.uploader).toBeUndefined();
+    expect(fileEditor.control.querySelector('.json-editor-btn-upload')).toBeNull();
+    expect(afterInputReadySpy).not.toHaveBeenCalledWith(undefined);
     const removeButton = fileEditor.preview.querySelector('button');
     expect(removeButton.style.display).toBe('none');
   });

@@ -1517,6 +1517,66 @@ describe('DataProcessor', () => {
     });
   });
 
+  describe('join table errors', () => {
+    const formConfig = {
+      dataSource: {
+        tableName: 'test',
+        idColumn: 'id',
+        joinTables: {
+          bar: {
+            relationship: Relationship.MANY_TO_MANY,
+            dataSource: { tableName: 'bar', idColumn: 'id' },
+            on: { self: 'testId', other: 'barId' },
+            via: { tableName: 'test_bar' },
+            includedProperties: ['id', 'value'],
+            properties: { id: { type: 'string' }, value: { type: 'string' } }
+          }
+        }
+      },
+      includedProperties: ['name', 'bar'],
+      properties: { name: { type: 'string' }, bar: { resolveTable: true } }
+    } as unknown as FormConfigInternal;
+
+    const createDataProcessor = (from: any) => {
+      const pgClient = { schemaName: 'public', schema: () => ({ from: () => from }) } as unknown as PostgrestClient<any, any, any>;
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+      jest.spyOn(dataProcessor, 'createItemData').mockResolvedValue({ success: true, id: '1' });
+      return dataProcessor;
+    };
+
+    it('reports the join table name if adding relations fails', async () => {
+      const dataProcessor = createDataProcessor({
+        insert: () => Promise.resolve({ status: 409, error: { message: 'duplicate key' } })
+      });
+      jest.spyOn(dataProcessor, 'getItemData').mockResolvedValue({ data: [{ bar: [] }] });
+
+      await expect(dataProcessor.handleData({ name: 'foo', id: '1', bar: [{ value: 'baz' }] }, formConfig, DbAction.CREATE))
+        .rejects.toMatchObject({
+          extra: {
+            errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_CREATION_FAILED,
+            detailedMessage: 'duplicate key',
+            tableName: 'test_bar'
+          }
+        });
+    });
+
+    it('reports the join table name if removing relations fails', async () => {
+      const dataProcessor = createDataProcessor({
+        delete: () => ({ eq: () => ({ in: () => Promise.resolve({ status: 500, error: { message: 'boom' } }) }) })
+      });
+      jest.spyOn(dataProcessor, 'getItemData').mockResolvedValue({ data: [{ bar: [{ id: 'a', value: 'baz' }] }] });
+
+      await expect(dataProcessor.handleData({ name: 'foo', id: '1', bar: [] }, formConfig, DbAction.CREATE))
+        .rejects.toMatchObject({
+          extra: {
+            errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_DELETION_FAILED,
+            detailedMessage: 'boom',
+            tableName: 'test_bar'
+          }
+        });
+    });
+  });
+
   describe('handleData one-to-many removal', () => {
     const formConfig = {
       dataSource: {

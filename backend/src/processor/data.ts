@@ -526,7 +526,7 @@ class DataProcessor {
           ${formConfig.via.tableName}. ${updateJoinTableResponse?.error?.message}`, {
           errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_CREATION_FAILED,
           detailedMessage: updateJoinTableResponse?.error?.message,
-          tableName: updateJoinTableResponse?.error?.message
+          tableName: formConfig.via.tableName
         });
       }
     }
@@ -548,7 +548,7 @@ class DataProcessor {
           ${formConfig.via.tableName}. ${deleteFromJoinTableResponse?.error?.message}`, {
         errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_DELETION_FAILED,
         detailedMessage: deleteFromJoinTableResponse?.error?.message,
-        tableName: deleteFromJoinTableResponse?.error?.message
+        tableName: formConfig.via.tableName
       });
     }
   }

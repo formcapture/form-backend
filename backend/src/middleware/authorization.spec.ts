@@ -1,7 +1,11 @@
 import { FormConfigRequest } from '../types/formConfigRequest';
 import { Opts } from '../types/opts';
 
-import { authorization as authorizationCreator, userRolesLoader as userRolesLoaderCreator } from './authorization';
+import {
+  authorization as authorizationCreator,
+  Permission,
+  userRolesLoader as userRolesLoaderCreator
+} from './authorization';
 
 const getTokenFromHeaderMock = jest.fn();
 const decodeTokenMock = jest.fn();
@@ -199,6 +203,32 @@ describe('Authorization Middleware', () => {
 
       expect(nextMock).toHaveBeenCalled();
       expect(nextMock).toHaveBeenCalledWith(expect.any(Error));
+    });
+    it('fails for unknown permissions', () => {
+      const authorization = authorizationCreator({
+        opts: {} as Opts,
+        requiredPermissions: ['unknown' as Permission]
+      });
+      const req = { userRoles: ['foo'], formConfig: {}, params: { formId: 'bar' } } as unknown as FormConfigRequest;
+      const nextMock = jest.fn();
+      authorization(req, {} as any, nextMock);
+
+      expect(nextMock).toHaveBeenCalledWith(expect.objectContaining({ name: 'AuthenticationError' }));
+    });
+  });
+  describe('userRolesLoader errors', () => {
+    it('passes an AuthenticationError to next if loading the roles fails', () => {
+      const userRolesLoader = userRolesLoaderCreator({ opts: {} as Opts });
+      getTokenFromHeaderMock.mockImplementationOnce(() => {
+        throw new Error('foo');
+      });
+      const nextMock = jest.fn();
+      userRolesLoader({ headers: {} } as FormConfigRequest, {} as any, nextMock);
+
+      expect(nextMock).toHaveBeenCalledWith(expect.objectContaining({
+        name: 'AuthenticationError',
+        message: 'Failed loading user roles'
+      }));
     });
   });
 });

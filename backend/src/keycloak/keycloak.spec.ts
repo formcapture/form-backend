@@ -171,5 +171,24 @@ describe('Keycloak', () => {
       const postgrestJwt = await getPostgrestJwt(opts);
       expect(postgrestJwt).toBe(mockData.access_token);
     });
+    it('returns undefined if the token request fails', async () => {
+      fetchMock.mockReturnValue({ ok: false, status: 401 });
+
+      expect(await getPostgrestJwt(opts)).toBeUndefined();
+    });
+    it('decodes the token for logging if log level is verbose', async () => {
+      const verifyMock = jest.fn().mockReturnValue({});
+      jwt.verify = verifyMock;
+      fetchMock.mockReturnValue({
+        ok: true,
+        // eslint-disable-next-line camelcase
+        json: async () => ({ access_token: 'foo' })
+      });
+
+      const postgrestJwt = await getPostgrestJwt({ ...opts, LOG_LEVEL: 'verbose' } as Opts);
+
+      expect(verifyMock).toHaveBeenCalledWith('foo', expect.anything(), expect.anything());
+      expect(postgrestJwt).toBe('foo');
+    });
   });
 });

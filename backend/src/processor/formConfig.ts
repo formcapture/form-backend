@@ -347,8 +347,8 @@ class FormConfigProcessor {
     includedProperties: FormConfigInternal['includedProperties'] | FormConfigInternal['includedPropertiesTable'] = []
   ) {
     const properties = formConfig.properties;
-    return Object.keys(properties)
-      .filter(key => includedProperties.includes(key))
+    return includedProperties
+      .filter(key => Object.hasOwn(properties, key))
       .reduce((obj, key) => {
         const filteredProperty: FormConfigInternal['properties'] = {
           ...obj,

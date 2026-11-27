@@ -579,7 +579,10 @@ describe('FormService', () => {
       const formService = new FormService(opts);
       await formService.getFile(req, {} as Response, next);
 
-      expect(next).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({
+        status: 404,
+        extra: expect.objectContaining({ errorCode: FormBackendErrorCode.INVALID_FILE })
+      }));
     });
   });
   describe('validation and error handling', () => {
@@ -650,6 +653,7 @@ describe('FormService', () => {
       await new FormService(opts).getFile(req, createResponseMock(), next);
 
       expect(next).toHaveBeenCalledWith(expect.objectContaining({
+        status: 404,
         extra: expect.objectContaining({ errorCode: FormBackendErrorCode.INVALID_FILE })
       }));
       expect(fileExistsMock).not.toHaveBeenCalled();

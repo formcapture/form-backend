@@ -367,7 +367,7 @@ class FormService {
         return;
       }
       if (!fileIdentifier) {
-        next(new GenericRequestError('Invalid file(s).', 500, {
+        next(new GenericRequestError('Invalid file(s).', 404, {
           errorCode: FormBackendErrorCode.INVALID_FILE,
           detailedMessage: 'One or more files are invalid or missing.'
         }));
@@ -379,7 +379,7 @@ class FormService {
       // to prevent disclosing files from other directories/forms
       const fileExists = await fileProcessor.fileExists(fileIdentifier);
       if (!fileExists) {
-        next(new GenericRequestError('Invalid file(s).', 500, {
+        next(new GenericRequestError('Invalid file(s).', 404, {
           errorCode: FormBackendErrorCode.INVALID_FILE,
           detailedMessage: 'One or more files are invalid or missing.'
         }));

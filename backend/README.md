@@ -41,6 +41,6 @@ variable here.
 | `KC_REALM`                                | Keycloak realm                                                                                                                                            |
 | `KC_AUTH_SERVER_URL`                      | Keycloak auth URL used by the backend to request tokens for PostgREST. May be an internal URL, e.g. `http://keycloak:8080/auth`                           |
 | `KC_PUBLIC_URL`                           | Keycloak auth URL as reached by the browser, e.g. `https://auth.example.org/auth`. Must match the issuer of user tokens (`<KC_PUBLIC_URL>/realms/<KC_REALM>`) |
-| `KC_PUBLIC_KEY`                           | The public key of the Keycloak realm. Works with both PEM and JWK format                                                                                  |
+| `KC_PUBLIC_KEY`                           | The public key of the Keycloak realm. Works with both PEM and JWK format. User tokens must be signed with RS256 (the Keycloak default)                    |
 | `KC_CLIENT_APP_ID`                        | The ID of the Keycloak client used for the app. Only roles from this client will be considered                                                           |
 | `LOG_LEVEL`                               | The log level for the logger. Optional. Valid values: `'debug'`, `'verbose'`, `'info'`, `'warn'`, `'error'`                                              |

@@ -57,3 +57,7 @@ updates:
       day: "monday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    ignore:
+      # node majors (incl. odd non-LTS ones) are switched deliberately, minor/patch updates stay automatic
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]

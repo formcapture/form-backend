@@ -1538,7 +1538,10 @@ describe('DataProcessor', () => {
     } as unknown as FormConfigInternal;
 
     const createDataProcessor = (from: any) => {
-      const pgClient = { schemaName: 'public', schema: () => ({ from: () => from }) } as unknown as PostgrestClient<any, any, any>;
+      const pgClient = {
+        schemaName: 'public',
+        schema: () => ({ from: () => from })
+      } as unknown as PostgrestClient<any, any, any>;
       const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
       jest.spyOn(dataProcessor, 'createItemData').mockResolvedValue({ success: true, id: '1' });
       return dataProcessor;
@@ -1550,7 +1553,8 @@ describe('DataProcessor', () => {
       });
       jest.spyOn(dataProcessor, 'getItemData').mockResolvedValue({ data: [{ bar: [] }] });
 
-      await expect(dataProcessor.handleData({ name: 'foo', id: '1', bar: [{ value: 'baz' }] }, formConfig, DbAction.CREATE))
+      const item = { name: 'foo', id: '1', bar: [{ value: 'baz' }] };
+      await expect(dataProcessor.handleData(item, formConfig, DbAction.CREATE))
         .rejects.toMatchObject({
           extra: {
             errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_CREATION_FAILED,

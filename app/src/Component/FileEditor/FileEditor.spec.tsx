@@ -72,6 +72,7 @@ describe('<FileEditor />', () => {
 
   it('formats bytes', async () => {
     const fileEditor = await createEditor();
+    expect(fileEditor.formatBytes(0)).toBe('0 Bytes');
     expect(fileEditor.formatBytes(500)).toBe('500 Bytes');
     expect(fileEditor.formatBytes(1536)).toBe('1.5 KB');
     expect(fileEditor.formatBytes(5 * 1024 ** 2)).toBe('5 MB');

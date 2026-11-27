@@ -154,6 +154,10 @@ export class FileEditor extends Base64Editor {
 
   formatBytes(bytes: number) {
     // taken from upload editor
+    if (bytes <= 0) {
+      // log(0) is -Infinity, which would yield "NaN undefined"
+      return '0 Bytes';
+    }
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     const units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const unit = units[i];

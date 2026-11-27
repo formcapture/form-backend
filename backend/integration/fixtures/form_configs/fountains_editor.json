@@ -1,0 +1,88 @@
+{
+  "dataSource": {
+    "tableName": "fountains",
+    "idColumn": "id",
+    "lookupTables": {
+      "type": {
+        "dataSource": {
+          "tableName": "fountain_types",
+          "idColumn": "id"
+        },
+        "includedProperties": ["id"],
+        "properties": {
+          "id": {
+            "resolveAsEnum": true,
+            "resolveToColumn": "type"
+          }
+        }
+      }
+    },
+    "joinTables": {
+      "contacts": {
+        "relationship": "manyToMany",
+        "via": {
+          "tableName": "fountains_contacts"
+        },
+        "on": {
+          "self": "fountain_id",
+          "other": "contact_id"
+        },
+        "dataSource": {
+          "tableName": "contacts",
+          "idColumn": "id"
+        },
+        "includedProperties": ["id", "name"],
+        "properties": {
+          "id": {
+            "resolveAsEnum": true,
+            "resolveToColumn": "name"
+          }
+        }
+      },
+      "fountains_pictures": {
+        "relationship": "oneToMany",
+        "dataSource": {
+          "tableName": "fountains_pictures",
+          "idColumn": "id"
+        },
+        "on": {
+          "self": "fountain_id"
+        },
+        "includedProperties": ["id", "img_path"],
+        "properties": {
+          "img_path": {
+            "media": {
+              "binaryEncoding": "base64"
+            },
+            "options": {
+              "mime_type": ["image/png", "text/plain"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "views": {
+    "table": true,
+    "item": true
+  },
+  "access": {
+    "read": ["fountains_editor"],
+    "write": ["fountains_editor"]
+  },
+  "includedProperties": ["id", "name", "type", "contacts", "fountains_pictures"],
+  "properties": {
+    "id": {
+      "readOnly": true
+    },
+    "type": {
+      "resolveLookup": true
+    },
+    "contacts": {
+      "resolveTable": true
+    },
+    "fountains_pictures": {
+      "resolveTable": true
+    }
+  }
+}

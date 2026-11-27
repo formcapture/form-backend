@@ -16,6 +16,8 @@ const jestConfig: JestConfigWithTsJest = {
       branches: 82
     }
   },
+  // integration tests run separately: npm run test:integration
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/integration/'],
   moduleNameMapper: {
     '^node:fs/promises$': 'fs/promises'
   }

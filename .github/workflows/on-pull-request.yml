@@ -65,3 +65,22 @@ jobs:
       - name: Build artifacts 🏗️
         working-directory: ./backend
         run: npm run build
+  integration_test_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources 🔰
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js 🧮
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+
+      - name: Install dependencies ⏬
+        working-directory: ./backend
+        run: npm ci
+
+      # starts postgis and postgrest via docker compose, see backend/integration
+      - name: Run integration tests 🔗
+        working-directory: ./backend
+        run: npm run test:integration

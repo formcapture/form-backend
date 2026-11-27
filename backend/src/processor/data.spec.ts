@@ -11,6 +11,11 @@ import FileProcessor, { FileProcessorOpts } from './file';
 
 jest.mock('@supabase/postgrest-js');
 
+const mockLogger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+jest.mock('../logger', () => ({
+  setupLogger: () => mockLogger
+}));
+
 const validateFileFieldsMock = jest.fn();
 const createFilesMock = jest.fn();
 const deleteFilesMock = jest.fn();
@@ -1479,6 +1484,36 @@ describe('DataProcessor', () => {
       } as unknown as FormConfigInternal;
 
       expect(await dataProcessor.createItemData({ name: 'foo' }, formConfig)).toEqual({ success: false });
+    });
+  });
+
+  describe('createItemData with a failing file update', () => {
+    it('logs the error of the update response', async () => {
+      const insert = jest.fn(() => ({ select: () => Promise.resolve({ status: 201, data: [{ id: '1' }] }) }));
+      const update = jest.fn(() => ({
+        eq: () => Promise.resolve({ status: 400, error: { message: 'update failed' } })
+      }));
+      const pgClient = {
+        schemaName: 'public',
+        schema: () => ({ from: () => ({ insert, update }) })
+      } as unknown as PostgrestClient<any, any, any>;
+      const dataProcessor = new DataProcessor(
+        { pgClient, formId: '', opts: {} as Opts },
+        createFileProcessorMock() as unknown as FileProcessor
+      );
+      const formConfig = {
+        dataSource: { tableName: 'test', idColumn: 'id' },
+        includedProperties: ['file'],
+        properties: { file: { type: 'string', media: { binaryEncoding: 'base64' } } }
+      } as unknown as FormConfigInternal;
+      getFilesFromItemMock.mockReturnValue({ file: 'data:image/png;base64,xxx' });
+      getItemWithoutFilesMock.mockReturnValue({});
+      createFilesMock.mockResolvedValue({ id: '1', file: 'test/file_1.png' });
+
+      const result = await dataProcessor.createItemData({ file: 'data:image/png;base64,xxx' }, formConfig);
+
+      expect(result).toEqual({ success: false });
+      expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('update failed'));
     });
   });
 

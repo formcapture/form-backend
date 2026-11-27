@@ -168,7 +168,7 @@ class DataProcessor {
 
       if (updateResponse.status !== 204) {
         this.#logger.error(
-          `Could not update data for item ${JSON.stringify(item)} of table ${tableName}. ${response?.error?.message}`
+          `Could not update data for item ${JSON.stringify(item)} of table ${tableName}. ${updateResponse?.error?.message}`
         );
         return { success: isSuccess };
       }

@@ -254,6 +254,11 @@ class FormService {
 
       return res.json(createResponse);
     } catch (err) {
+      if (err instanceof GenericRequestError) {
+        this.#logger.debug(`Cannot create formItem: ${err.message}`);
+      } else if (err instanceof Error) {
+        this.#logger.error(`Cannot create formItem: ${err.message}`);
+      }
       next(err);
     }
   }

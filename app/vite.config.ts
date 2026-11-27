@@ -24,10 +24,10 @@ export default defineConfig({
       exclude: ['src/main.tsx', 'src/**/*.spec.{ts,tsx}', 'src/**/*.d.ts', 'src/i18n/i18nTest.ts'],
       reporter: ['lcov', 'json', 'text'],
       thresholds: {
-        lines: 70,
-        statements: 70,
-        functions: 70,
-        branches: 60
+        lines: 86,
+        statements: 86,
+        functions: 89,
+        branches: 75
       }
     },
   },

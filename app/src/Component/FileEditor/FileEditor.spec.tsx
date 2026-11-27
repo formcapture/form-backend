@@ -58,17 +58,21 @@ describe('<FileEditor />', () => {
     expect(fileEditor.uploader.getAttribute('accept')).toBe('image/png,image/jpeg');
   });
 
-  it('renders no uploader and hides the remove button if readOnly', async () => {
-    // build() calls theme.afterInputReady(undefined) in readOnly mode, which throws in the frame callback
-    vi.spyOn(JSONEditor.defaults.themes.bootstrap5.prototype, 'afterInputReady').mockImplementation(() => undefined);
+  it('renders no uploader, no upload button and hides the remove button if readOnly', async () => {
+    const afterInputReadySpy = vi.spyOn(JSONEditor.defaults.themes.bootstrap5.prototype, 'afterInputReady');
     const fileEditor = await createEditor({ readOnly: true }, pngDataUrl);
+    await new Promise(resolve => window.requestAnimationFrame(resolve));
+
     expect(fileEditor.uploader).toBeUndefined();
+    expect(fileEditor.control.querySelector('.json-editor-btn-upload')).toBeNull();
+    expect(afterInputReadySpy).not.toHaveBeenCalledWith(undefined);
     const removeButton = fileEditor.preview.querySelector('button');
     expect(removeButton.style.display).toBe('none');
   });
 
   it('formats bytes', async () => {
     const fileEditor = await createEditor();
+    expect(fileEditor.formatBytes(0)).toBe('0 Bytes');
     expect(fileEditor.formatBytes(500)).toBe('500 Bytes');
     expect(fileEditor.formatBytes(1536)).toBe('1.5 KB');
     expect(fileEditor.formatBytes(5 * 1024 ** 2)).toBe('5 MB');
@@ -123,6 +127,19 @@ describe('<FileEditor />', () => {
   it('does not render an image preview for values that are no data urls', async () => {
     const fileEditor = await createEditor({}, 'just-text');
     expect(fileEditor.preview.querySelector('img')).toBeNull();
+  });
+
+  it('does not render HTML from the mime type of a data url', async () => {
+    const fileEditor = await createEditor({}, 'data:<img src=x onerror=alert(1)>;base64,AAAA');
+    expect(fileEditor.preview.querySelector('img[onerror]')).toBeNull();
+    expect(fileEditor.preview.textContent).toContain('<img src=x onerror=alert(1)>');
+  });
+
+  it('does not render HTML from the name of an uploaded file', async () => {
+    vi.mocked(api.fetchFile).mockResolvedValue(new Response(null, { status: 404 }));
+    const fileEditor = await createEditor({}, 'root/file_<img src=x onerror=alert(1)>.png');
+    await vi.waitFor(() => expect(fileEditor.preview.textContent).toContain('<img src=x onerror=alert(1)>'));
+    expect(fileEditor.preview.querySelector('img[onerror]')).toBeNull();
   });
 
   it('recognizes file identifiers', async () => {

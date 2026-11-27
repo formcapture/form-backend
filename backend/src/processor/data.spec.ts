@@ -11,6 +11,11 @@ import FileProcessor, { FileProcessorOpts } from './file';
 
 jest.mock('@supabase/postgrest-js');
 
+const mockLogger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+jest.mock('../logger', () => ({
+  setupLogger: () => mockLogger
+}));
+
 const validateFileFieldsMock = jest.fn();
 const createFilesMock = jest.fn();
 const deleteFilesMock = jest.fn();
@@ -1479,6 +1484,100 @@ describe('DataProcessor', () => {
       } as unknown as FormConfigInternal;
 
       expect(await dataProcessor.createItemData({ name: 'foo' }, formConfig)).toEqual({ success: false });
+    });
+  });
+
+  describe('createItemData with a failing file update', () => {
+    it('logs the error of the update response', async () => {
+      const insert = jest.fn(() => ({ select: () => Promise.resolve({ status: 201, data: [{ id: '1' }] }) }));
+      const update = jest.fn(() => ({
+        eq: () => Promise.resolve({ status: 400, error: { message: 'update failed' } })
+      }));
+      const pgClient = {
+        schemaName: 'public',
+        schema: () => ({ from: () => ({ insert, update }) })
+      } as unknown as PostgrestClient<any, any, any>;
+      const dataProcessor = new DataProcessor(
+        { pgClient, formId: '', opts: {} as Opts },
+        createFileProcessorMock() as unknown as FileProcessor
+      );
+      const formConfig = {
+        dataSource: { tableName: 'test', idColumn: 'id' },
+        includedProperties: ['file'],
+        properties: { file: { type: 'string', media: { binaryEncoding: 'base64' } } }
+      } as unknown as FormConfigInternal;
+      getFilesFromItemMock.mockReturnValue({ file: 'data:image/png;base64,xxx' });
+      getItemWithoutFilesMock.mockReturnValue({});
+      createFilesMock.mockResolvedValue({ id: '1', file: 'test/file_1.png' });
+
+      const result = await dataProcessor.createItemData({ file: 'data:image/png;base64,xxx' }, formConfig);
+
+      expect(result).toEqual({ success: false });
+      expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('update failed'));
+    });
+  });
+
+  describe('join table errors', () => {
+    const formConfig = {
+      dataSource: {
+        tableName: 'test',
+        idColumn: 'id',
+        joinTables: {
+          bar: {
+            relationship: Relationship.MANY_TO_MANY,
+            dataSource: { tableName: 'bar', idColumn: 'id' },
+            on: { self: 'testId', other: 'barId' },
+            via: { tableName: 'test_bar' },
+            includedProperties: ['id', 'value'],
+            properties: { id: { type: 'string' }, value: { type: 'string' } }
+          }
+        }
+      },
+      includedProperties: ['name', 'bar'],
+      properties: { name: { type: 'string' }, bar: { resolveTable: true } }
+    } as unknown as FormConfigInternal;
+
+    const createDataProcessor = (from: any) => {
+      const pgClient = {
+        schemaName: 'public',
+        schema: () => ({ from: () => from })
+      } as unknown as PostgrestClient<any, any, any>;
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+      jest.spyOn(dataProcessor, 'createItemData').mockResolvedValue({ success: true, id: '1' });
+      return dataProcessor;
+    };
+
+    it('reports the join table name if adding relations fails', async () => {
+      const dataProcessor = createDataProcessor({
+        insert: () => Promise.resolve({ status: 409, error: { message: 'duplicate key' } })
+      });
+      jest.spyOn(dataProcessor, 'getItemData').mockResolvedValue({ data: [{ bar: [] }] });
+
+      const item = { name: 'foo', id: '1', bar: [{ value: 'baz' }] };
+      await expect(dataProcessor.handleData(item, formConfig, DbAction.CREATE))
+        .rejects.toMatchObject({
+          extra: {
+            errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_CREATION_FAILED,
+            detailedMessage: 'duplicate key',
+            tableName: 'test_bar'
+          }
+        });
+    });
+
+    it('reports the join table name if removing relations fails', async () => {
+      const dataProcessor = createDataProcessor({
+        delete: () => ({ eq: () => ({ in: () => Promise.resolve({ status: 500, error: { message: 'boom' } }) }) })
+      });
+      jest.spyOn(dataProcessor, 'getItemData').mockResolvedValue({ data: [{ bar: [{ id: 'a', value: 'baz' }] }] });
+
+      await expect(dataProcessor.handleData({ name: 'foo', id: '1', bar: [] }, formConfig, DbAction.CREATE))
+        .rejects.toMatchObject({
+          extra: {
+            errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_DELETION_FAILED,
+            detailedMessage: 'boom',
+            tableName: 'test_bar'
+          }
+        });
     });
   });
 

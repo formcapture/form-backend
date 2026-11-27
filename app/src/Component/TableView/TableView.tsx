@@ -233,7 +233,7 @@ const TableView: React.FC<TableViewProps> = ({
         formId: formId,
         message: TOAST_MESSAGE.deleteSuccess,
         order: order ?? undefined,
-        orderBy: order ?? undefined,
+        orderBy: orderBy ?? undefined,
         filterValue: filter?.filterValue,
         filterOp: filter?.filterOp as ISimpleFilterModel['type'],
         filterKey: filter?.filterKey
@@ -302,7 +302,7 @@ const TableView: React.FC<TableViewProps> = ({
     const tableViewQueryParams: TableViewQueryParams = {
       formId: formId,
       order: order ?? undefined,
-      orderBy: order ?? undefined,
+      orderBy: orderBy ?? undefined,
       filterValue: filter?.filterValue,
       filterOp: filter?.filterOp as ISimpleFilterModel['type'],
       filterKey: filter?.filterKey
@@ -395,7 +395,7 @@ const TableView: React.FC<TableViewProps> = ({
     );
   }, [
     allowItemView, containsGeometryColumns, data, deleteTooltip, editTooltip, editable,
-    filter, formId, order, viewTooltip, zoomToFeature, zoomToTooltip, t
+    filter, formId, order, orderBy, viewTooltip, zoomToFeature, zoomToTooltip, t
   ]);
 
   const renderColumnTitle = useCallback((colName: any) => {
@@ -524,7 +524,7 @@ const TableView: React.FC<TableViewProps> = ({
     const tableViewQueryParams: TableViewQueryParams = {
       formId: formId,
       order: order ?? undefined,
-      orderBy: order ?? undefined,
+      orderBy: orderBy ?? undefined,
       filterValue: filter?.filterValue,
       filterOp: filter?.filterOp as ISimpleFilterModel['type'],
       filterKey: filter?.filterKey
@@ -538,7 +538,7 @@ const TableView: React.FC<TableViewProps> = ({
     const itemViewUrl = createItemViewUrl(window.location.href, itemViewQueryParams);
 
     window.location.assign(itemViewUrl);
-  }, [data, filter, formId, order]);
+  }, [data, filter, formId, order, orderBy]);
 
   useEffect(() => {
     if (!containsGeometryColumns || !data || !data.config) {

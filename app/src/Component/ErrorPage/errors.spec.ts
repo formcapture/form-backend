@@ -17,6 +17,15 @@ describe('errorCodeToMessage', () => {
       .toBe('Geometrie-Fehler: Invalide / Leere Geometrie kann nicht gespeichert werden.');
   });
 
+  it('returns the unknown database error for an unknown database error code', () => {
+    expect(errorCodeToMessage({ errorCode: 'X', dbErrorCode: 'NOPE1' }, t))
+      .toBe('Unbekannter Fehler bei der Datenbankabfrage.');
+  });
+
+  it('returns the unknown error for an unknown error code', () => {
+    expect(errorCodeToMessage({ errorCode: 'NOT_A_CODE' }, t)).toBe('Unbekannter Fehler.');
+  });
+
   it('returns the message for an error code', () => {
     expect(errorCodeToMessage({ errorCode: 'CONFIG_KEY_IS_EMPTY' }, t)).toBe('Konfigurationsschlüssel ist leer.');
   });

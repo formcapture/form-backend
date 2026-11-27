@@ -168,7 +168,8 @@ class DataProcessor {
 
       if (updateResponse.status !== 204) {
         this.#logger.error(
-          `Could not update data for item ${JSON.stringify(item)} of table ${tableName}. ${response?.error?.message}`
+          `Could not update data for item ${JSON.stringify(item)} of table ${tableName}. ` +
+          `${updateResponse?.error?.message}`
         );
         return { success: isSuccess };
       }
@@ -434,7 +435,7 @@ class DataProcessor {
 
     const configKey = configKeys.at(-1);
     if (!configKey) {
-      throw new DatabaseError('Cannot handle oneToMany table. ConfigKeys is empty', {
+      throw new DatabaseError('Cannot handle to-one table. ConfigKeys is empty', {
         errorCode: FormBackendErrorCode.CONFIG_KEY_IS_EMPTY
       });
     }
@@ -526,7 +527,7 @@ class DataProcessor {
           ${formConfig.via.tableName}. ${updateJoinTableResponse?.error?.message}`, {
           errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_CREATION_FAILED,
           detailedMessage: updateJoinTableResponse?.error?.message,
-          tableName: updateJoinTableResponse?.error?.message
+          tableName: formConfig.via.tableName
         });
       }
     }
@@ -548,7 +549,7 @@ class DataProcessor {
           ${formConfig.via.tableName}. ${deleteFromJoinTableResponse?.error?.message}`, {
         errorCode: FormBackendErrorCode.JOIN_TABLE_DATA_DELETION_FAILED,
         detailedMessage: deleteFromJoinTableResponse?.error?.message,
-        tableName: deleteFromJoinTableResponse?.error?.message
+        tableName: formConfig.via.tableName
       });
     }
   }
@@ -787,7 +788,7 @@ class DataProcessor {
         const lookupTables = formConfig.dataSource.lookupTables;
         if (!lookupTables) {
           throw new GenericRequestError('Cannot reconstruct data. Missing lookupTables.', 500, {
-            errorCode: FormBackendErrorCode.MISSING_LOOKUP_COLUMNS
+            errorCode: FormBackendErrorCode.MISSING_LOOKUP_TABLES
           });
         }
         const refCol = lookupTables[c].includedProperties?.[0];

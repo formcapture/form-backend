@@ -8,6 +8,11 @@ import { Opts } from '../types/opts';
 
 import FormService from './form';
 
+const mockLogger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+jest.mock('../logger', () => ({
+  setupLogger: () => mockLogger
+}));
+
 const getPostgrestJwtMock = jest.fn();
 jest.mock('../keycloak/keycloak', () => {
   return {
@@ -623,8 +628,8 @@ describe('FormService', () => {
 
     it.each(
       handlers.flatMap((handler) => [
-        [handler, new GenericRequestError('foo', 400, {})],
-        [handler, new Error('foo')]
+        [handler, new GenericRequestError('handler failed', 400, {})],
+        [handler, new Error('handler failed')]
       ])
     )('%s passes %p to next', async (handler, err) => {
       const req = { params: { formId: 'foo', itemId: '1' }, query: {} } as unknown as FormConfigRequest;
@@ -634,6 +639,8 @@ describe('FormService', () => {
       await new FormService(opts)[handler as typeof handlers[number]](req, createResponseMock(), next);
 
       expect(next).toHaveBeenCalledWith(err);
+      const expectedLogger = err instanceof GenericRequestError ? mockLogger.debug : mockLogger.error;
+      expect(expectedLogger).toHaveBeenCalledWith(expect.stringMatching(/^Cannot .+: handler failed$/));
     });
 
     it('getFile rejects a missing file identifier', async () => {

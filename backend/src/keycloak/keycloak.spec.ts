@@ -79,7 +79,8 @@ describe('Keycloak', () => {
       jwt.verify = verifyMock;
       decodeToken('foo', opts);
       expect(verifyMock).toHaveBeenCalledWith('foo', opts.KC_PUBLIC_KEY, {
-        issuer: 'https://public.foo/auth/realms/foo'
+        issuer: 'https://public.foo/auth/realms/foo',
+        algorithms: ['RS256']
       });
     });
 
@@ -90,11 +91,11 @@ describe('Keycloak', () => {
         KC_PUBLIC_KEY: publicKey.export({ type: 'spki', format: 'pem' }).toString()
       };
       const { sign, verify } = jest.requireActual('jsonwebtoken');
-      const signToken = (iss: string) => sign(
+      const signToken = (iss: string, algorithm = 'RS256', expiresIn: number | string = '5m') => sign(
         // eslint-disable-next-line camelcase
         { resource_access: { foo: { roles: ['editor'] } } },
         privateKey,
-        { algorithm: 'RS256', issuer: iss }
+        { algorithm, issuer: iss, expiresIn }
       );
 
       beforeEach(() => {
@@ -107,6 +108,14 @@ describe('Keycloak', () => {
       });
       it('rejects a token issued by the internal keycloak url', () => {
         const decodedToken = decodeToken(signToken('http://foo/auth/realms/foo'), realOpts);
+        expect(decodedToken).toBeUndefined();
+      });
+      it('rejects a token signed with another algorithm than RS256', () => {
+        const decodedToken = decodeToken(signToken('https://public.foo/auth/realms/foo', 'PS256'), realOpts);
+        expect(decodedToken).toBeUndefined();
+      });
+      it('rejects an expired token', () => {
+        const decodedToken = decodeToken(signToken('https://public.foo/auth/realms/foo', 'RS256', -10), realOpts);
         expect(decodedToken).toBeUndefined();
       });
     });

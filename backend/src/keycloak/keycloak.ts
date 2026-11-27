@@ -44,6 +44,8 @@ export const decodeToken = (token: string|undefined, opts: Opts) => {
   const publicKey = opts.KC_PUBLIC_KEY;
   const verifyOpts: VerifyOptions = {
     issuer: issuerUrl,
+    // only accept the algorithm keycloak signs with by default
+    algorithms: ['RS256']
   };
   try {
     const decodedToken = jwt.verify(token, publicKey, verifyOpts);

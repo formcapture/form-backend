@@ -51,6 +51,42 @@ describe('Authorization Middleware', () => {
       expect(req.userRoles).toEqual(['baz']);
     });
   });
+  describe('invalid or expired tokens', () => {
+    // agreed behaviour: such users are treated as anonymous instead of being rejected,
+    // so public forms stay readable and protected forms answer with 401
+    const loadRolesForInvalidToken = () => {
+      const req = { headers: { authorization: 'Bearer invalid' } } as FormConfigRequest;
+      getTokenFromHeaderMock.mockReturnValue('invalid');
+      decodeTokenMock.mockReturnValue(undefined);
+      getRolesFromTokenMock.mockReturnValue([]);
+      const next = jest.fn();
+      userRolesLoaderCreator({ opts: {} as Opts })(req, {} as any, next);
+      return { req, next };
+    };
+
+    it('are treated as anonymous', () => {
+      const { req, next } = loadRolesForInvalidToken();
+      expect(req.userRoles).toEqual([]);
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    it('can still read public forms', () => {
+      const { req } = loadRolesForInvalidToken();
+      req.formConfig = { access: { read: true } } as FormConfigRequest['formConfig'];
+      const next = jest.fn();
+      authorizationCreator({ opts: {} as Opts, requiredPermissions: ['readForm'] })(req, {} as any, next);
+      expect(next).toHaveBeenCalledWith();
+    });
+
+    it('cannot write protected forms', () => {
+      const { req } = loadRolesForInvalidToken();
+      req.formConfig = { access: { read: true, write: ['editor'] } } as FormConfigRequest['formConfig'];
+      const next = jest.fn();
+      authorizationCreator({ opts: {} as Opts, requiredPermissions: ['writeForm'] })(req, {} as any, next);
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 401 }));
+    });
+  });
+
   describe('authorization', () => {
     it('succeeds if the user has readForm permission', () => {
       const authorization = authorizationCreator({

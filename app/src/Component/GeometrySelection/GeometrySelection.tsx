@@ -13,6 +13,8 @@ export class GeometrySelection extends AbstractEditor {
     this.currentDepth = depth;
 
     this.internalMap = this.options.jsoneditor?.options?.internalMap;
+    // bind once, so removeEventListener gets the same function reference
+    this.postMessageListener = this.postMessageListener.bind(this);
   }
 
   postMessageListener(evt: MessageEvent) {
@@ -35,11 +37,11 @@ export class GeometrySelection extends AbstractEditor {
   }
 
   registerListener() {
-    window.addEventListener('message', this.postMessageListener.bind(this));
+    window.addEventListener('message', this.postMessageListener);
   }
 
   unregisterListener() {
-    window.removeEventListener('message', this.postMessageListener.bind(this));
+    window.removeEventListener('message', this.postMessageListener);
   }
 
   setValue(value: any) {

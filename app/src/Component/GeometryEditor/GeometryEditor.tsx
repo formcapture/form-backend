@@ -16,6 +16,8 @@ export class GeometryEditor extends AbstractEditor {
     this.internalMap = this.options.jsoneditor?.options?.internalMap;
 
     this.listenerRegistered = false;
+    // bind once, so removeEventListener gets the same function reference
+    this.postMessageListener = this.postMessageListener.bind(this);
   }
 
   postMessageListener(evt: MessageEvent) {
@@ -42,13 +44,13 @@ export class GeometryEditor extends AbstractEditor {
 
   registerListener() {
     if (!this.listenerRegistered) {
-      window.addEventListener('message', this.postMessageListener.bind(this));
+      window.addEventListener('message', this.postMessageListener);
       this.listenerRegistered = true;
     }
   }
 
   unregisterListener() {
-    window.removeEventListener('message', this.postMessageListener.bind(this));
+    window.removeEventListener('message', this.postMessageListener);
     this.listenerRegistered = false;
   }
 

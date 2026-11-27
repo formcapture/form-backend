@@ -18,6 +18,8 @@ export class Location extends AbstractEditor {
     super(options, defaults);
     this.currentDepth = depth;
     this.internalMap = options?.jsoneditor?.options?.internalMap;
+    // bind once, so removeEventListener gets the same function reference
+    this.postMessageListener = this.postMessageListener.bind(this);
   }
 
   /**
@@ -232,14 +234,14 @@ export class Location extends AbstractEditor {
    * Registers the postMessageListener to handle incoming window 'message' events.
    */
   registerListener(): void {
-    window.addEventListener('message', this.postMessageListener.bind(this));
+    window.addEventListener('message', this.postMessageListener);
   }
 
   /**
    * Unregisters the postMessageListener to stop handling window 'message' events.
    */
   unregisterListener(): void {
-    window.removeEventListener('message', this.postMessageListener.bind(this));
+    window.removeEventListener('message', this.postMessageListener);
   }
 
   createGeometryIndicator() {

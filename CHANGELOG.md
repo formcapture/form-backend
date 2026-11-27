@@ -3,8 +3,25 @@
 
 ### Bug Fixes
 
+* answer missing files with 404 instead of 500 ([#403](https://github.com/formcapture/form-backend/issues/403)) ([c589ee8](https://github.com/formcapture/form-backend/commit/c589ee8678359b0e47eb5b6c386dd0d5a2bc5448))
+* cache the postgrest token instead of fetching it on every request ([#403](https://github.com/formcapture/form-backend/issues/403)) ([c589ee8](https://github.com/formcapture/form-backend/commit/c589ee8678359b0e47eb5b6c386dd0d5a2bc5448))
 * delete one-to-many items and their files together with their parent ([0ac8a45](https://github.com/formcapture/form-backend/commit/0ac8a45014a880aa516c61dd64628a424e8ae751))
+* log errors when creating a form item fails ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
+* log the error of the failed file update when creating an item ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
 * name the missing form config in the 404 message ([1ba60f9](https://github.com/formcapture/form-backend/commit/1ba60f946cdf2ac1957d9c9629e39d0c0637ff5d))
+* only accept RS256 signed user tokens ([#403](https://github.com/formcapture/form-backend/issues/403)) ([c589ee8](https://github.com/formcapture/form-backend/commit/c589ee8678359b0e47eb5b6c386dd0d5a2bc5448))
+* report the join table name in join table errors ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
+* use a generic log message for unhandled errors in errorMiddleware ([#400](https://github.com/formcapture/form-backend/issues/400)) ([18717a7](https://github.com/formcapture/form-backend/commit/18717a7d4241c96824a2682526d439a47e5b853c))
+* use matching error code and message for lookup and to-one errors ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
+* **app:** do not crash file preview for non data URL values ([#400](https://github.com/formcapture/form-backend/issues/400)) ([18717a7](https://github.com/formcapture/form-backend/commit/18717a7d4241c96824a2682526d439a47e5b853c))
+* **app:** do not crash read-only location editor on setValue ([#400](https://github.com/formcapture/form-backend/issues/400)) ([18717a7](https://github.com/formcapture/form-backend/commit/18717a7d4241c96824a2682526d439a47e5b853c))
+* **app:** do not render upload button for read-only file editor ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
+* **app:** format zero bytes in file editor ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
+* **app:** keep the sort column when leaving the table view ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
+* **app:** prevent HTML injection in file editor preview ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
+* **app:** remove postMessage listeners of geometry editors correctly ([#400](https://github.com/formcapture/form-backend/issues/400)) ([18717a7](https://github.com/formcapture/form-backend/commit/18717a7d4241c96824a2682526d439a47e5b853c))
+* **app:** show configured description in geometry editors ([#400](https://github.com/formcapture/form-backend/issues/400)) ([18717a7](https://github.com/formcapture/form-backend/commit/18717a7d4241c96824a2682526d439a47e5b853c))
+* **app:** show unknown error message for unknown error codes ([#401](https://github.com/formcapture/form-backend/issues/401)) ([7e70ce0](https://github.com/formcapture/form-backend/commit/7e70ce0919130ee56d0ada62327441b641081e13))
 
 
 ### Features

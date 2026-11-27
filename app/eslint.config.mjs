@@ -1,7 +1,7 @@
 // @ts-check
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';
-import importPlugin from 'eslint-plugin-import';
+import importX from 'eslint-plugin-import-x';
 import eslintReact from 'eslint-plugin-react';
 import eslintTerrestris from '@terrestris/eslint-config-typescript';
 import eslintReactTerrestris from '@terrestris/eslint-config-typescript-react';
@@ -14,7 +14,7 @@ export default tsEslint.config({
     eslint.configs.recommended,
     ...tsEslint.configs.recommended,
     ...tsEslint.configs.stylistic,
-    importPlugin.flatConfigs.recommended
+    importX.flatConfigs.recommended
   ],
   files: [
     '**/*.{ts,tsx}',
@@ -53,12 +53,12 @@ export default tsEslint.config({
     'react-hooks/exhaustive-deps': ['warn'],
     '@typescript-eslint/no-empty-object-type': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
-    'import/no-named-as-default': 'off',
-    'import/no-unresolved': 'off',
-    'import/named': 'off',
+    'import-x/no-named-as-default': 'off',
+    'import-x/no-unresolved': 'off',
+    'import-x/named': 'off',
     'react/jsx-tag-spacing': 'off',
     'react/no-unknown-property': 'off',
-    'import/order': ['warn', {
+    'import-x/order': ['warn', {
       groups: [
         'builtin',
         'external',

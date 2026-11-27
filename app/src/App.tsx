@@ -112,7 +112,6 @@ if (JSONEditor && JSONEditor.defaults && JSONEditor.defaults.editors && JSONEdit
   });
 }
 
-// @ts-expect-error This should be injected by vite
 const checkLoginIframe = import.meta.env.MODE !== 'development';
 
 const App: React.FC = () => {

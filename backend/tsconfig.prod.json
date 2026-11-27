@@ -110,5 +110,7 @@
     "jest.config.watch.ts",
     "__mocks__",
     "src/**/*.spec.ts",
+    "integration",
+    "jest.integration.config.ts",
   ]
 }

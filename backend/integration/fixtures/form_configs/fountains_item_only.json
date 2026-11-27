@@ -1,0 +1,14 @@
+{
+  "dataSource": {
+    "tableName": "fountains",
+    "idColumn": "id"
+  },
+  "views": {
+    "table": false,
+    "item": true
+  },
+  "access": {
+    "read": true,
+    "write": false
+  }
+}

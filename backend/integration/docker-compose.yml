@@ -1,0 +1,30 @@
+# Throwaway database and PostgREST for the integration tests (npm run test:integration).
+# Keycloak is not needed: the tests sign their own tokens, see integration/helpers.
+services:
+  db:
+    image: postgis/postgis:17-3.7-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./fixtures/sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # tcp check: during init the server only listens on the unix socket
+      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "127.0.0.1"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  postgrest:
+    image: postgrest/postgrest:v16.6
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:authenticator@db:5432/postgres
+      PGRST_DB_SCHEMAS: sampledata
+      PGRST_DB_ANON_ROLE: web_anon
+      # test-only secret, must match POSTGREST_JWT_SECRET in integration/helpers/env.ts
+      PGRST_JWT_SECRET: integration-test-secret-not-for-production-use
+    ports:
+      # random host port, read via `docker compose port`
+      - "127.0.0.1::3000"

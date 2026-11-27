@@ -22,6 +22,22 @@ See `localhost:3000/docs` for the documentation.
 
 <!-- Todo: docker based dev setup -->
 
+## Tests
+
+```bash
+npm test                  # unit tests with coverage, no external services
+npm run test:integration  # integration tests, needs docker
+```
+
+The integration tests in `integration/` run the real backend against a real PostgREST and PostGIS.
+`integration/docker-compose.yml` starts both with the test data from `integration/fixtures/sql` and
+removes them afterwards. Keycloak is not started: the tests sign user tokens with their own RS256 key
+and a small stub hands out the PostgREST tokens (see `integration/helpers`).
+
+- Show the backend logs: `npm run test:integration -- --silent=false`
+- Keep the containers after the run for inspection: `INTEGRATION_KEEP_STACK=1 npm run test:integration`,
+  remove them with `docker compose -p fb-integration down -v`
+
 ## Configuration
 
 Create a `.env` file with all needed config parameters. Every key

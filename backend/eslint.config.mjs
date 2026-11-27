@@ -1,5 +1,5 @@
 import globals from 'globals';
-import importPlugin from 'eslint-plugin-import';
+import importX from 'eslint-plugin-import-x';
 import eslintTerrestris from '@terrestris/eslint-config-typescript';
 import eslint from '@eslint/js';
 import tsEslint from 'typescript-eslint';
@@ -10,7 +10,7 @@ export default tsEslint.config({
     eslint.configs.recommended,
     ...tsEslint.configs.recommended,
     ...tsEslint.configs.stylistic,
-    importPlugin.flatConfigs.recommended
+    importX.flatConfigs.recommended
   ],
   files: [
     '**/*.ts'
@@ -37,10 +37,10 @@ export default tsEslint.config({
     '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/ban-ts-comment': 'warn',
     'prefer-spread': 'warn',
-    'import/no-unresolved': 'off',
-    'import/named': 'off',
-    'import/no-named-as-default': 'off',
-    'import/order': ['warn', {
+    'import-x/no-unresolved': 'off',
+    'import-x/named': 'off',
+    'import-x/no-named-as-default': 'off',
+    'import-x/order': ['warn', {
       groups: [
         'builtin',
         'external',

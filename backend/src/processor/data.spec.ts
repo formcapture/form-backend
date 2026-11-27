@@ -1,5 +1,6 @@
 import { PostgrestClient, PostgrestQueryBuilder } from '@supabase/postgrest-js';
 
+import { FormBackendErrorCode } from '../errors/FormBackendErrorCode';
 import { DbAction } from '../types/dbAction';
 import { FormConfigInternal } from '../types/formConfigInternal';
 import { Opts } from '../types/opts';
@@ -28,6 +29,25 @@ const createFileProcessorMock = jest.fn(() => {
   };
 });
 
+const createQueryStub = (response: any) => {
+  const query: any = {
+    then: (resolve: any, reject: any) => Promise.resolve(response).then(resolve, reject)
+  };
+  ['order', 'range', 'eq', 'neq', 'gt', 'lt', 'ilike'].forEach((method) => {
+    query[method] = jest.fn(() => query);
+  });
+  return query;
+};
+
+const createPgClientStub = (query: any) => {
+  const select = jest.fn(() => query);
+  const update = jest.fn(() => query);
+  const from = jest.fn(() => ({ select, update }));
+  const schema = jest.fn(() => ({ from }));
+  const pgClient = { schemaName: 'public', schema } as unknown as PostgrestClient<any, any, any>;
+  return { pgClient, schema, from, select, update };
+};
+
 describe('DataProcessor', () => {
 
   beforeEach(() => {
@@ -44,9 +64,111 @@ describe('DataProcessor', () => {
   });
 
   describe('getFormData', () => {
-    it.todo('returns only the included columns');
-    it.todo('ignores columns that are not in the table');
-    it.todo('always includes the id column');
+    const createFormConfig = (dataSource: Record<string, any> = {}) => ({
+      dataSource: {
+        tableName: 'test',
+        idColumn: 'id',
+        order: 'desc',
+        orderBy: 'lookup',
+        lookupTables: {
+          lookup: { includedProperties: ['label'] }
+        },
+        ...dataSource
+      },
+      includedPropertiesTable: ['name', 'lookup', 'joined'],
+      properties: {
+        name: { type: 'string' },
+        lookup: { resolveAsEnum: true, resolveLookup: true, resolveToColumn: 'lookup_id' },
+        joined: { resolveTable: true }
+      }
+    } as unknown as FormConfigInternal);
+
+    it('returns undefined without a table name', async () => {
+      const pgClient = {} as PostgrestClient<any, any, any>;
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+      const formConfig = createFormConfig({ tableName: undefined });
+      const data = await dataProcessor.getFormData(formConfig, 0, 10, undefined as any);
+      expect(data).toBeUndefined();
+    });
+
+    it('selects, orders, pages and flattens lookup columns', async () => {
+      const query = createQueryStub({
+        status: 200,
+        count: 1,
+        data: [{ id: 1, name: 'foo', lookup: { label: 'bar' } }]
+      });
+      const { pgClient, schema, from, select } = createPgClientStub(query);
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+
+      const data = await dataProcessor.getFormData(createFormConfig(), 0, 10, undefined as any);
+
+      expect(schema).toHaveBeenCalledWith('public');
+      expect(from).toHaveBeenCalledWith('test');
+      expect(select).toHaveBeenCalledWith('id,name,lookup(label,lookup_id)', { count: 'exact' });
+      expect(query.order).toHaveBeenCalledWith('lookup(lookup_id)', { ascending: false });
+      expect(query.range).toHaveBeenCalledWith(0, 9);
+      expect(data).toEqual({ data: [{ id: 1, name: 'foo', lookup: 'bar' }], count: 1 });
+    });
+
+    it('orders by plain columns and uses the configured schema', async () => {
+      const query = createQueryStub({ status: 200, count: 0, data: [] });
+      const { pgClient, schema } = createPgClientStub(query);
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+
+      const formConfig = createFormConfig({ schema: 'foo', orderBy: 'name', order: 'asc' });
+      await dataProcessor.getFormData(formConfig, 0, 10, undefined as any);
+
+      expect(schema).toHaveBeenCalledWith('foo');
+      expect(query.order).toHaveBeenCalledWith('name', { ascending: true });
+    });
+
+    it.each([
+      ['equals', 'eq', 'baz'],
+      ['notEqual', 'neq', 'baz'],
+      ['greaterThan', 'gt', 'baz'],
+      ['lessThan', 'lt', 'baz'],
+      ['like', 'ilike', '%baz%'],
+      ['contains', 'ilike', '%baz%']
+    ])('applies filter operator %s', async (filterOp, method, value) => {
+      const query = createQueryStub({ status: 200, count: 0, data: [] });
+      const { pgClient } = createPgClientStub(query);
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+
+      await dataProcessor.getFormData(createFormConfig(), 0, 10, {
+        filterKey: 'name',
+        filterOp: filterOp as any,
+        filterValue: ' baz '
+      });
+
+      expect(query[method]).toHaveBeenCalledWith('name', value);
+    });
+
+    it.each([
+      { status: 500, data: null },
+      { status: 200, error: { message: 'foo' }, data: null }
+    ])('returns undefined for a failed request %p', async (response) => {
+      const { pgClient } = createPgClientStub(createQueryStub(response));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+
+      expect(await dataProcessor.getFormData(createFormConfig(), 0, 10, undefined as any)).toBeUndefined();
+    });
+
+    it('throws if lookup tables are missing', async () => {
+      const { pgClient } = createPgClientStub(createQueryStub({}));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+
+      await expect(dataProcessor.getFormData(createFormConfig({ lookupTables: undefined }), 0, 10, undefined as any))
+        .rejects.toMatchObject({ status: 500, extra: { errorCode: FormBackendErrorCode.MISSING_LOOKUP_TABLES } });
+    });
+
+    it('throws if the lookup table has no included properties', async () => {
+      const { pgClient } = createPgClientStub(createQueryStub({}));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+      const formConfig = createFormConfig({ lookupTables: { lookup: {} } });
+
+      await expect(dataProcessor.getFormData(formConfig, 0, 10, undefined as any))
+        .rejects.toMatchObject({ status: 500, extra: { errorCode: FormBackendErrorCode.MISSING_LOOKUP_COLUMNS } });
+    });
   });
 
   describe('createItemData', () => {
@@ -277,8 +399,75 @@ describe('DataProcessor', () => {
     });
   });
 
-  it.todo('gets the form data');
-  it.todo('gets the form item data');
+  describe('getItemData', () => {
+    const formConfig = {
+      dataSource: {
+        tableName: 'test',
+        idColumn: 'id',
+        joinTables: {
+          owner: {
+            relationship: Relationship.MANY_TO_ONE,
+            dataSource: { tableName: 'person', idColumn: 'pid' },
+            includedProperties: ['pname'],
+            properties: { pname: { type: 'string' } }
+          },
+          tags: {
+            relationship: Relationship.ONE_TO_MANY,
+            dataSource: { tableName: 'tag', idColumn: 'tid' },
+            includedProperties: ['tid', 'label'],
+            properties: { tid: { type: 'string' }, label: { type: 'string' } }
+          }
+        }
+      },
+      includedProperties: ['name', 'owner', 'tags'],
+      properties: {
+        name: { type: 'string' },
+        owner: { resolveTable: true },
+        tags: { resolveTable: true }
+      }
+    } as unknown as FormConfigInternal;
+
+    it('selects the item including its join tables', async () => {
+      const query = createQueryStub({ status: 200, data: [{ id: '1' }] });
+      const { pgClient, select } = createPgClientStub(query);
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+
+      const data = await dataProcessor.getItemData('1', formConfig);
+
+      expect(select).toHaveBeenCalledWith('id,name,owner:person(pid,pname),tags(tid,label)');
+      expect(query.eq).toHaveBeenCalledWith('id', '1');
+      expect(data).toEqual({ data: [{ id: '1' }] });
+    });
+
+    it('returns undefined for a failed request', async () => {
+      const { pgClient } = createPgClientStub(createQueryStub({ status: 404, data: null }));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+
+      expect(await dataProcessor.getItemData('1', formConfig)).toBeUndefined();
+    });
+
+    it.each([
+      ['no item id', undefined, formConfig],
+      ['no table name', '1', { ...formConfig, dataSource: { idColumn: 'id' } }],
+      ['no id column', '1', { ...formConfig, dataSource: { tableName: 'test' } }]
+    ])('returns undefined with %s', async (_, itemId, config) => {
+      const { pgClient, select } = createPgClientStub(createQueryStub({}));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+
+      expect(await dataProcessor.getItemData(itemId as any, config as FormConfigInternal)).toBeUndefined();
+      expect(select).not.toHaveBeenCalled();
+    });
+
+    it('throws if a join table config is missing', async () => {
+      const { pgClient } = createPgClientStub(createQueryStub({}));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+      const config = { ...formConfig, dataSource: { tableName: 'test', idColumn: 'id' } } as FormConfigInternal;
+
+      await expect(dataProcessor.getItemData('1', config))
+        .rejects.toMatchObject({ extra: { errorCode: FormBackendErrorCode.MISSING_LOOKUP_COLUMNS } });
+    });
+  });
+
   describe('handleData', () => {
     it('handles create actions', async () => {
       const item = { name: 'foo' };
@@ -1212,5 +1401,123 @@ describe('DataProcessor', () => {
       });
     });
   });
-  it.todo('updates the form item data');
+  describe('updateItemData', () => {
+    const joinTableConfig = {
+      relationship: Relationship.ONE_TO_MANY,
+      on: { self: 'testId' },
+      dataSource: {
+        tableName: 'test',
+        idColumn: 'id',
+        joinTables: {
+          tags: { relationship: Relationship.MANY_TO_MANY }
+        }
+      },
+      includedProperties: ['name', 'tags'],
+      properties: {
+        name: { type: 'string' },
+        tags: { resolveTable: true }
+      }
+    } as unknown as FormConfigInternal;
+
+    const setupFileProcessor = () => {
+      validateFileFieldsMock.mockReturnValue(true);
+      getFilesFromItemMock.mockReturnValue({});
+      createFilesMock.mockImplementation(async ({ item }) => item);
+      getEmptyFileFieldsMock.mockReturnValue([]);
+      deleteFilesMock.mockResolvedValue(undefined);
+      return createFileProcessorMock() as unknown as FileProcessor;
+    };
+
+    it('updates the sanitized item', async () => {
+      const query = createQueryStub({ status: 204 });
+      const { pgClient, update } = createPgClientStub(query);
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, setupFileProcessor());
+
+      const result = await dataProcessor.updateItemData(
+        { id: '1', name: 'foo', tags: [{ id: 'a' }], other: 'bar', testId: 5 }, '1', joinTableConfig, 'foo'
+      );
+
+      // keeps the one-to-many foreign key, drops the id, join table props and not included props
+      expect(update).toHaveBeenCalledWith({ name: 'foo', testId: 5 });
+      expect(query.eq).toHaveBeenCalledWith('id', '1');
+      expect(deleteFilesMock).toHaveBeenCalledWith('1', joinTableConfig, [], 'foo');
+      expect(result).toEqual({ id: '1', success: true });
+    });
+
+    it('returns success=false if the update failed', async () => {
+      const { pgClient } = createPgClientStub(createQueryStub({ status: 400, error: { message: 'foo' } }));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, setupFileProcessor());
+
+      const result = await dataProcessor.updateItemData({ name: 'foo' }, '1', joinTableConfig);
+
+      expect(result).toEqual({ id: '1', success: false });
+    });
+
+    it('returns success=false without a table name', async () => {
+      const { pgClient, update } = createPgClientStub(createQueryStub({ status: 204 }));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, setupFileProcessor());
+      const config = { ...joinTableConfig, dataSource: { idColumn: 'id' } } as FormConfigInternal;
+
+      const result = await dataProcessor.updateItemData({ name: 'foo' }, '1', config);
+
+      expect(update).not.toHaveBeenCalled();
+      expect(result).toEqual({ id: '1', success: false });
+    });
+  });
+
+  describe('createItemData without table name', () => {
+    it('returns success=false', async () => {
+      validateFileFieldsMock.mockReturnValue(true);
+      const dataProcessor = new DataProcessor(
+        { pgClient: {} as any, formId: '', opts: {} as Opts },
+        createFileProcessorMock() as unknown as FileProcessor
+      );
+      const formConfig = {
+        dataSource: { idColumn: 'id' },
+        includedProperties: ['name'],
+        properties: { name: { type: 'string' } }
+      } as unknown as FormConfigInternal;
+
+      expect(await dataProcessor.createItemData({ name: 'foo' }, formConfig)).toEqual({ success: false });
+    });
+  });
+
+  describe('handleData one-to-many removal', () => {
+    const formConfig = {
+      dataSource: {
+        tableName: 'test',
+        idColumn: 'id',
+        joinTables: {
+          bar: {
+            relationship: Relationship.ONE_TO_MANY,
+            dataSource: { tableName: 'bar', idColumn: 'id' },
+            on: { self: 'testId' },
+            includedProperties: ['id', 'value'],
+            properties: { id: { type: 'string' }, value: { type: 'string' } }
+          }
+        }
+      },
+      includedProperties: ['name', 'bar'],
+      properties: {
+        name: { type: 'string' },
+        bar: { resolveTable: true }
+      }
+    } as unknown as FormConfigInternal;
+
+    it.each([204, 400])('unjoins removed one-to-many items (response status %p)', async (status) => {
+      const query = createQueryStub({ status });
+      const { pgClient, from, update } = createPgClientStub(query);
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+      jest.spyOn(dataProcessor, 'updateItemData').mockResolvedValue({ id: '1', success: true });
+      jest.spyOn(dataProcessor, 'getItemData')
+        .mockResolvedValue({ data: [{ bar: [{ id: 'a', value: 'baz' }] }] });
+
+      const itemId = await dataProcessor.handleData({ id: '1', name: 'foo', bar: [] }, formConfig, DbAction.UPDATE);
+
+      expect(from).toHaveBeenCalledWith('bar');
+      expect(update).toHaveBeenCalledWith({ testId: null });
+      expect(query.eq).toHaveBeenCalledWith('id', 'a');
+      expect(itemId).toEqual('1');
+    });
+  });
 });

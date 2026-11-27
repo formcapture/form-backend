@@ -226,7 +226,7 @@ export class FileEditor extends Base64Editor {
       fileNameEl.innerHTML = fileName;
     }
     metadataContainer.innerHTML = `<strong>Typ:</strong> ${mime} <strong>Größe:</strong> ~${formattedSize}`;
-    if (mime.substr(0, 5) === 'image') {
+    if (mime?.startsWith('image')) {
       const img = document.createElement('img');
       img.style.maxWidth = '100%';
       img.style.maxHeight = '100px';

@@ -7,7 +7,7 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "types": ["vitest"],
+    "types": ["vitest", "vite/client"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

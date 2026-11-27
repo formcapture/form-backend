@@ -18,8 +18,11 @@ import { FormConfiguration } from '../../App';
 
 import ItemView from './ItemView';
 
+const jsonEditorConstructorMock = vi.hoisted(() => vi.fn());
+
 vi.mock('@json-editor/json-editor', () => ({
-  JSONEditor: function JSONEditorMock() {
+  JSONEditor: function JSONEditorMock(_element: HTMLElement, options: any) {
+    jsonEditorConstructorMock(options);
     return {
       on: vi.fn().mockImplementation((event, callback) => {
         if (event === 'ready') {
@@ -88,10 +91,36 @@ describe('<ItemView />', () => {
 
   afterEach(() => {
     cleanup();
+    vi.clearAllMocks();
   });
 
   it('is defined', () => {
     expect(ItemView).not.toBeNull();
+  });
+
+  it('passes the configured property order to the JSON editor', () => {
+    const orderedData: FormConfiguration = {
+      ...mockData,
+      config: {
+        ...mockData.config,
+        properties: {
+          value: {type: 'integer'},
+          name: {type: 'string'}
+        }
+      }
+    };
+
+    render(
+      <ItemView
+        data={orderedData}
+        formId={formId}
+        itemId={itemId}
+        previousView={previousView}
+      />
+    );
+
+    const editorOptions = jsonEditorConstructorMock.mock.lastCall?.[0];
+    expect(Object.keys(editorOptions.schema.properties)).toEqual(['value', 'name']);
   });
 
   it('renders the editor and handles back button', async () => {

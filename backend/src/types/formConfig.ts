@@ -745,13 +745,15 @@ export interface FormConfig {
   views: Views;
   /**
    * List of properties/columns that should be
-   * included in the form.
+    * included in the item form. The list order defines
+    * the order of the input fields.
    */
   includedProperties?: string[];
   /**
    * List of properties/columns that should be
-   * excluded from the table. If omitted, will take the same
-   * properties as `includedProperties`.
+    * included in the table. The list order defines the
+    * column order. If omitted, `includedProperties` and its
+    * order will be used.
    */
   includedPropertiesTable?: string[];
   /**

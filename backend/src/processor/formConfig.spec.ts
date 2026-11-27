@@ -841,6 +841,64 @@ describe('FormConfigProcessor', () => {
   });
 
   describe('postProcessItemConfig', () => {
+    it('orders properties according to includedProperties and ignores unknown properties', () => {
+      const formConfig: FormConfigInternal = {
+        dataSource: {
+          tableName: 'test'
+        },
+        access: {
+          write: true
+        },
+        includedProperties: ['third', 'unknown', 'first'],
+        properties: {
+          first: { type: 'string' },
+          second: { type: 'string' },
+          third: { type: 'string' }
+        }
+      } as unknown as FormConfigInternal;
+      const opts = {} as Opts;
+      const pgClient = {} as PostgrestClient<any, any, any>;
+      const formProcessor = new FormConfigProcessor(opts, pgClient, '');
+      formProcessor.setFormConfig(formConfig);
+
+      const processedConfig = formProcessor.postProcessItemConfig([]);
+
+      expect(Object.keys(processedConfig!.properties)).toEqual(['third', 'first']);
+    });
+    it('orders join table properties according to their includedProperties', () => {
+      const formConfig: FormConfigInternal = {
+        dataSource: {
+          tableName: 'test',
+          joinTables: {
+            relation: {
+              relationship: Relationship.ONE_TO_ONE,
+              includedProperties: ['second', 'first'],
+              properties: {
+                first: { type: 'string' },
+                second: { type: 'string' }
+              }
+            }
+          }
+        },
+        access: {
+          write: true
+        },
+        includedProperties: ['relation'],
+        properties: {
+          relation: {
+            resolveTable: true
+          }
+        }
+      } as unknown as FormConfigInternal;
+      const opts = {} as Opts;
+      const pgClient = {} as PostgrestClient<any, any, any>;
+      const formProcessor = new FormConfigProcessor(opts, pgClient, '');
+      formProcessor.setFormConfig(formConfig);
+
+      const processedConfig = formProcessor.postProcessItemConfig([]);
+
+      expect(Object.keys(processedConfig!.properties.relation.properties)).toEqual(['second', 'first']);
+    });
     describe('removes private properties in a postprocessing step', () => {
       it('removes the resolveTable property', () => {
         const formConfig: FormConfigInternal = {
@@ -1057,6 +1115,29 @@ describe('FormConfigProcessor', () => {
   });
 
   describe('postProcessTableConfig', () => {
+    it('orders properties according to includedPropertiesTable', () => {
+      const formConfig: FormConfigInternal = {
+        dataSource: {
+          tableName: 'test'
+        },
+        access: {
+          write: true
+        },
+        includedPropertiesTable: ['second', 'first'],
+        properties: {
+          first: { type: 'string' },
+          second: { type: 'string' }
+        }
+      } as unknown as FormConfigInternal;
+      const opts = {} as Opts;
+      const pgClient = {} as PostgrestClient<any, any, any>;
+      const formProcessor = new FormConfigProcessor(opts, pgClient, '');
+      formProcessor.setFormConfig(formConfig);
+
+      const processedConfig = formProcessor.postProcessTableConfig([]);
+
+      expect(Object.keys(processedConfig!.properties)).toEqual(['second', 'first']);
+    });
     describe('removes private properties in a postprocessing step', () => {
       it('removes the resolveTable property', () => {
         const formConfig: FormConfigInternal = {

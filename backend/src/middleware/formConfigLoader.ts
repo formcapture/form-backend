@@ -38,7 +38,7 @@ export const formConfigLoader = ({formConfigsDir}: {formConfigsDir: string}) => 
         .map(f => f.split('.')[0]);
       if (!formConfigs.includes(formId)) {
         next(new GenericRequestError(
-          'No formId provided', 404, {errorCode: FormBackendErrorCode.FORM_CONFIG_NOT_FOUND})
+          `Form config for formId ${formId} not found`, 404, {errorCode: FormBackendErrorCode.FORM_CONFIG_NOT_FOUND})
         );
         return;
       }

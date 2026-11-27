@@ -69,7 +69,9 @@ describe('reading a public form', () => {
   });
 
   it('answers unknown forms with 404', async () => {
-    expect((await get('/form/does_not_exist')).status).toBe(404);
+    const { status, body } = await get('/form/does_not_exist');
+    expect(status).toBe(404);
+    expect(body.message).toBe('Form config for formId does_not_exist not found');
   });
 
   it.each([

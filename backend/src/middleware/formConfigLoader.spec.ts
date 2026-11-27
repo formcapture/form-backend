@@ -57,6 +57,9 @@ describe('formConfigLoader', () => {
 
     await configLoader(req, {} as any, next);
 
-    expect(next).toHaveBeenCalledWith(expect.any(Error));
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({
+      status: 404,
+      message: 'Form config for formId formId not found'
+    }));
   });
 });

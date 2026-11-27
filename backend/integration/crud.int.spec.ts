@@ -80,12 +80,12 @@ describe('creating, updating and deleting items with joins and files', () => {
     expect((await postgrest(`/fountains?id=eq.${id}`)).body).toEqual([]);
     expect((await postgrest(`/fountains_contacts?fountain_id=eq.${id}`)).body).toEqual([]);
     expect((await postgrest(`/fountains_pictures?fountain_id=eq.${id}`)).body).toEqual([]);
+    // one-to-many items are deleted, not only unjoined
+    expect((await postgrest('/fountains_pictures?fountain_id=is.null')).body).toEqual([]);
+    await expect(access(path.join(backend.uploadDir, filePath))).rejects.toThrow();
   });
 
-  // Known gap: the one-to-many rows are removed by ON DELETE CASCADE, but their files stay on disk
-  // (DataProcessor.deleteItemData only deletes the files of the item itself).
-  // it.failing turns red once this is fixed; then change it to it().
-  it.failing('removes the files of one-to-many items when deleting an item', async () => {
+  it('removes the one-to-many items and their files when deleting an item', async () => {
     const created = await call('/form/fountains_editor/item', 'POST', {
       name: 'Testobjekt mit Bild',
       // eslint-disable-next-line camelcase
@@ -94,9 +94,30 @@ describe('creating, updating and deleting items with joins and files', () => {
     const id = created.body.id;
     const filePath = (await getItem(id)).fountains_pictures[0].img_path;
 
+    const pictureId = (await getItem(id)).fountains_pictures[0].id;
+
     await call(`/form/fountains_editor/item/${id}`, 'DELETE');
 
+    expect((await postgrest(`/fountains_pictures?id=eq.${pictureId}`)).body).toEqual([]);
     await expect(access(path.join(backend.uploadDir, filePath))).rejects.toThrow();
+  });
+
+  it('only unjoins one-to-many items that are removed while updating', async () => {
+    const created = await call('/form/fountains_editor/item', 'POST', {
+      name: 'Testobjekt mit entferntem Bild',
+      // eslint-disable-next-line camelcase
+      fountains_pictures: [{ img_path: `data:text/plain;base64,${Buffer.from('Bild').toString('base64')}` }]
+    });
+    const id = created.body.id;
+    const item = await getItem(id);
+    const pictureId = item.fountains_pictures[0].id;
+
+    // eslint-disable-next-line camelcase
+    await call(`/form/fountains_editor/item/${id}`, 'PATCH', { ...item, fountains_pictures: [] });
+
+    const picture = (await postgrest(`/fountains_pictures?id=eq.${pictureId}`)).body;
+    expect(picture).toEqual([expect.objectContaining({ id: pictureId, fountain_id: null })]);
+    await postgrest(`/fountains_pictures?id=eq.${pictureId}`, 'DELETE');
   });
 
   it('answers a missing file with 404', async () => {

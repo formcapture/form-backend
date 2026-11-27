@@ -400,7 +400,11 @@ describe('DataProcessor', () => {
         }
       } as unknown as FormConfigInternal;
       await dataProcessor.deleteItemData('1', formConfig);
-      expect(deleteFilesMock).toHaveBeenCalled();
+      expect(deleteFilesMock).toHaveBeenCalledWith('1', formConfig, undefined, undefined);
+
+      // files of join table items are stored below their config key
+      await dataProcessor.deleteItemData('1', formConfig, 'bar');
+      expect(deleteFilesMock).toHaveBeenLastCalledWith('1', formConfig, undefined, 'bar');
     });
   });
 
@@ -1616,6 +1620,26 @@ describe('DataProcessor', () => {
       expect(from).toHaveBeenCalledWith('bar');
       expect(update).toHaveBeenCalledWith({ testId: null });
       expect(query.eq).toHaveBeenCalledWith('id', 'a');
+      expect(itemId).toEqual('1');
+    });
+
+    it('deletes the one-to-many items of a deleted item instead of unjoining them', async () => {
+      const { pgClient, update } = createPgClientStub(createQueryStub({ status: 204 }));
+      const dataProcessor = new DataProcessor({ pgClient, formId: '', opts: {} as Opts }, {} as FileProcessor);
+      jest.spyOn(dataProcessor, 'getItemData').mockImplementation(async (id) => (
+        id === '1' ? { data: [{ bar: [{ id: 'a', value: 'baz' }] }] } : { data: [{}] }
+      ));
+      const deleteSpy = jest.spyOn(dataProcessor, 'deleteItemData')
+        .mockImplementation(async (id) => ({ id, success: true }));
+
+      const itemId = await dataProcessor.handleData({ id: '1' }, formConfig, DbAction.DELETE);
+
+      expect(update).not.toHaveBeenCalled();
+      // the child (with its config key for the file paths) is deleted before the parent
+      expect(deleteSpy.mock.calls).toEqual([
+        ['a', formConfig.dataSource.joinTables!.bar, 'bar'],
+        ['1', formConfig, undefined]
+      ]);
       expect(itemId).toEqual('1');
     });
   });

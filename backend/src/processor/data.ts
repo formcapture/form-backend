@@ -206,7 +206,7 @@ class DataProcessor {
     return { id: itemId, success: successfullyUpated };
   }
 
-  async deleteItemData(itemId: string, formConfig: FormConfigInternal | JoinTable) {
+  async deleteItemData(itemId: string, formConfig: FormConfigInternal | JoinTable, configKey?: string) {
     this.#logger.debug(`Deleting item ${itemId}`);
     const tableName = formConfig.dataSource.tableName;
     const idColumn = formConfig.dataSource.idColumn;
@@ -216,7 +216,7 @@ class DataProcessor {
     }
 
     try {
-      await this.#fileProcessor.deleteFiles(itemId, formConfig);
+      await this.#fileProcessor.deleteFiles(itemId, formConfig, undefined, configKey);
     } catch (err) {
       this.#logger.error(`Could not delete files for item ${itemId} of table ${tableName}. ${err}`);
     }
@@ -299,12 +299,16 @@ class DataProcessor {
     const propsWithOneToMany = FormConfigProcessor.getPropsWithJoinTables(formConfig, Relationship.ONE_TO_MANY);
     for (const prop of propsWithOneToMany) {
       const newConfigKeys = configKeys ? [...configKeys, prop] : [prop];
-      await this.#handleOneToManyData(itemId, item[prop] ?? [], formConfig, newConfigKeys);
+      await this.#handleOneToManyData(itemId, item[prop] ?? [], formConfig, newConfigKeys, action);
     }
 
     // we have to first remove references, so deletions come after handling join tables
     if (action === DbAction.DELETE) {
-      const deletedItem = await this.deleteItemData(item[formConfig.dataSource.idColumn], formConfig);
+      const deletedItem = await this.deleteItemData(
+        item[formConfig.dataSource.idColumn],
+        formConfig,
+        configKeys?.join('/')
+      );
       itemId = deletedItem.id;
     }
 
@@ -370,7 +374,8 @@ class DataProcessor {
     itemId: string,
     items: DataItem[],
     formConfig: FormConfigInternal | JoinTable,
-    configKeys: string[]
+    configKeys: string[],
+    parentAction: DbAction
   ) {
     this.#logger.debug(`Handling one-to-many join table data for configKeys ${configKeys.join('/')}`);
     const configKey = configKeys.at(-1);
@@ -419,9 +424,14 @@ class DataProcessor {
       });
     await Promise.all(updatedItems);
 
-    // For now, we will only remove the FK from the other side of the relationship.
+    // Items removed from the list are only unjoined (FK set to null). If the parent itself is deleted,
+    // its items are deleted including their own join data and files, so no orphans are left.
     const removedJoinItems = this.#getRemovedJoinItems(items, dbJoinItems, joinTableConfig)
       .map(item => {
+        if (parentAction === DbAction.DELETE) {
+          this.#logger.debug(`Deleting join table data of deleted item ${itemId}`);
+          return this.handleData(item, joinTableConfig, DbAction.DELETE, configKeys);
+        }
         this.#logger.debug(`Removing join table data for item ${itemId}`);
         return this.#unjoinOneToMany(item, joinTableConfig);
       });

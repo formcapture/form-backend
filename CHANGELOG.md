@@ -1,3 +1,17 @@
+# [4.1.0](https://github.com/formcapture/form-backend/compare/v4.0.2...v4.1.0) (2026-11-27)
+
+
+### Bug Fixes
+
+* delete one-to-many items and their files together with their parent ([0ac8a45](https://github.com/formcapture/form-backend/commit/0ac8a45014a880aa516c61dd64628a424e8ae751))
+* name the missing form config in the 404 message ([1ba60f9](https://github.com/formcapture/form-backend/commit/1ba60f946cdf2ac1957d9c9629e39d0c0637ff5d))
+
+
+### Features
+
+* order form fields and table columns by includedProperties ([#402](https://github.com/formcapture/form-backend/issues/402)) ([f52a9c1](https://github.com/formcapture/form-backend/commit/f52a9c16e14109b439efcce683032e72933f38c7))
+* provide the release version as /app/version.json ([d29feb7](https://github.com/formcapture/form-backend/commit/d29feb7d7e003ff914c51e939ffc20a3c8240c5c)), closes [#73](https://github.com/formcapture/form-backend/issues/73)
+
 ## [4.0.2](https://github.com/formcapture/form-backend/compare/v4.0.1...v4.0.2) (2026-11-06)
 
 
